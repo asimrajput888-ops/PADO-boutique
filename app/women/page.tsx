@@ -1,34 +1,40 @@
+"use client"
+
 import Link from "next/link"
+import { useCurrency } from "@/context/currency-context"
 
 const womenProducts = [
   {
     id: "w-01",
     name: "Tailored Ivory Double-Breasted Suit",
     fabric: "Super 120s Wool & Silk Blend",
-    price: "$1,350 USD",
+    priceUSD: 1350,
     image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "w-02",
     name: "Midnight Silk Loungewear Set",
     fabric: "100% Pure Mulberry Silk",
-    price: "$650 USD",
+    priceUSD: 650,
     image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "w-03",
     name: "Architectural Tuxedo Blazer",
     fabric: "Italian Velvet & Satin Lapel",
-    price: "$1,100 USD",
+    priceUSD: 1100,
     image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80",
   },
 ]
 
 export default function WomenPage() {
+  const { formatPrice } = useCurrency()
+
   return (
     <div className="bg-[#0A0A0A] text-white min-h-screen py-16 px-6">
       <div className="max-w-7xl mx-auto space-y-12">
         
+        {/* Header Section */}
         <div className="text-center space-y-3">
           <p className="text-amber-400 text-xs uppercase tracking-[0.3em] font-mono">
             COUTURE & TAILORED ELEGANCE
@@ -37,10 +43,11 @@ export default function WomenPage() {
             Women’s Bespoke Collection
           </h1>
           <p className="text-neutral-400 text-xs md:text-sm max-w-xl mx-auto font-light leading-relaxed">
-            Architectural suiting, pure silk loungewear, and custom-tailored evening silhouettes.
+            Architectural suiting, pure silk loungewear, and custom-tailored evening silhouettes built to your exact measurements.
           </p>
         </div>
 
+        {/* Product Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
           {womenProducts.map((product) => (
             <div
@@ -63,7 +70,7 @@ export default function WomenPage() {
 
                 <div className="flex items-center justify-between pt-2 border-t border-neutral-900">
                   <span className="text-xs font-mono text-amber-400 font-medium">
-                    {product.price}
+                    {formatPrice(product.priceUSD)}
                   </span>
                   <Link
                     href={`/custom?gender=women&item=${product.id}`}
