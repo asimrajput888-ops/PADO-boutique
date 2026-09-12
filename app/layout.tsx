@@ -4,7 +4,7 @@ import "./globals.css";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
 import Header from "@/components/site/site-header";
-import SiteFooter from "@/components/site/site-footer"; // Ensure this file exists with 'export default'
+import SiteFooter from "@/components/site/site-footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +20,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-[#0A0A0A] text-neutral-100 min-h-screen flex flex-col font-sans`}>
+      {/* YAHAN CHANGE KAREIN: bg-[#0A0A0A] ko bg-white aur text-neutral-100 ko text-neutral-900 karein */}
+      <body className={`${inter.className} bg-white text-neutral-900 min-h-screen flex flex-col font-sans`}>
         <CurrencyProvider>
           <CartProvider>
             <Header />
