@@ -1,53 +1,175 @@
-// app/shop/page.tsx
 "use client";
-import Link from "next/link";
-import { useState } from "react"; // Note: "use client" chahiye agar filter use kar rahe hain
 
-export default function ShopPage() {
-  const allProducts = [
-    { id: 1, name: "The Midnight Tuxedo", price: "PKR 85,000", category: "Men", type: "Bespoke Suit" },
-    { id: 2, name: "Silk Loungewear Set", price: "PKR 28,000", category: "Women", type: "Loungewear" },
-    { id: 3, name: "Emerald Evening Gown", price: "PKR 120,000", category: "Women", type: "Couture" },
-    { id: 4, name: "Heritage Wool Blazer", price: "PKR 45,000", category: "Men", type: "Outerwear" },
-    { id: 5, name: "Ivory Chiffon Saree", price: "PKR 65,000", category: "Women", type: "Traditional" },
-    { id: 6, name: "Ivory Silk Kurta", price: "PKR 35,000", category: "Men", type: "Traditional" },
-    { id: 7, name: "Gold Embroidered Jacket", price: "PKR 55,000", category: "Women", type: "Outerwear" },
-    { id: 8, name: "Charcoal Dress Shirt", price: "PKR 12,000", category: "Men", type: "Shirting" },
-  ];
+import { useState } from "react";
+import Link from "next/link";
+
+export default function CustomPage() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    garmentType: "",
+    fabric: "",
+    measurements: "",
+    name: "",
+    email: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev - 1);
 
   return (
-    <div className="bg-[#FFF8F0] min-h-screen">
-      {/* Hero Section */}
-      <div className="bg-[#1E1E2C] text-white py-24 px-6">
-        <div className="container mx-auto max-w-5xl text-center">
-          <h1 className="text-5xl md:text-6xl font-serif mb-4 tracking-tight">
-            The <span className="italic text-[#C5A059]">Collection</span>
+    <div className="min-h-screen bg-[#FDFBF7] text-neutral-900 py-24 px-6">
+      <div className="max-w-3xl mx-auto">
+        
+        {/* Header */}
+        <div className="text-center mb-12">
+          <p className="text-amber-600 tracking-[0.2em] text-sm font-semibold mb-4">
+            BESPOKE ATELIER
+          </p>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">
+            Create Your Custom Piece
           </h1>
-          <p className="text-white/60 font-light">Curated pieces from our atelier.</p>
+          <p className="text-neutral-600">
+            Experience the art of bespoke tailoring. Fill in your details below.
+          </p>
         </div>
-      </div>
 
-      {/* Products Grid */}
-      <div className="container mx-auto px-6 py-24 max-w-6xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {allProducts.map((product) => (
-            <Link 
-              key={product.id} 
-              href={`/shop/${product.id}`}
-              className="group cursor-pointer"
+        {/* Progress Bar */}
+        <div className="flex justify-between mb-12 relative">
+          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-neutral-200 -z-10"></div>
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
+                step >= item
+                  ? "bg-amber-600 text-white"
+                  : "bg-neutral-200 text-neutral-500"
+              }`}
             >
-              <div className="bg-[#1E1E2C]/5 aspect-[3/4] mb-4 border border-[#1E1E2C]/10 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-[#1E1E2C]/20 font-serif italic">
-                  Product Image
-                </div>
-                <div className="absolute inset-0 bg-[#5D1A24]/0 group-hover:bg-[#5D1A24]/10 transition-colors duration-500"></div>
-              </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">{product.type} • {product.category}</p>
-              <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">{product.name}</h3>
-              <p className="text-sm text-[#1E1E2C]/60">{product.price}</p>
-            </Link>
+              {item}
+            </div>
           ))}
         </div>
+
+        {/* Form Steps */}
+        <div className="bg-white border border-neutral-200 p-8 md:p-12 shadow-sm">
+          
+          {step === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-serif mb-6">Step 1: Garment Details</h2>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-neutral-700">Garment Type</label>
+                <select
+                  name="garmentType"
+                  value={formData.garmentType}
+                  onChange={handleChange}
+                  className="w-full border border-neutral-300 p-3 bg-[#FDFBF7] focus:border-amber-500 outline-none"
+                >
+                  <option value="">Select a garment</option>
+                  <option value="suit">Bespoke Suit</option>
+                  <option value="shirt">Custom Shirt</option>
+                  <option value="sherwani">Sherwani</option>
+                  <option value="loungewear">Silk Loungewear</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-neutral-700">Preferred Fabric</label>
+                <input
+                  type="text"
+                  name="fabric"
+                  value={formData.fabric}
+                  onChange={handleChange}
+                  placeholder="e.g., Italian Wool, Pure Silk"
+                  className="w-full border border-neutral-300 p-3 bg-[#FDFBF7] focus:border-amber-500 outline-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-serif mb-6">Step 2: Your Measurements</h2>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-neutral-700">Measurements (inches/cm)</label>
+                <textarea
+                  name="measurements"
+                  value={formData.measurements}
+                  onChange={handleChange}
+                  rows={5}
+                  placeholder="Chest: 40, Waist: 34, Shoulder: 18..."
+                  className="w-full border border-neutral-300 p-3 bg-[#FDFBF7] focus:border-amber-500 outline-none"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-serif mb-6">Step 3: Contact Information</h2>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-neutral-700">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full border border-neutral-300 p-3 bg-[#FDFBF7] focus:border-amber-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-neutral-700">Email Address</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full border border-neutral-300 p-3 bg-[#FDFBF7] focus:border-amber-500 outline-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-12 pt-6 border-t border-neutral-200">
+            {step > 1 ? (
+              <button
+                onClick={prevStep}
+                className="text-neutral-500 hover:text-neutral-900 font-medium"
+              >
+                &larr; Back
+              </button>
+            ) : (
+              <div></div>
+            )}
+
+            {step < 3 ? (
+              <button
+                onClick={nextStep}
+                className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-amber-700 transition"
+              >
+                Next Step
+              </button>
+            ) : (
+              <button
+                onClick={() => alert("Custom order submitted successfully!")}
+                className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-neutral-800 transition"
+              >
+                Submit Order
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="text-center mt-12">
+          <Link href="/" className="text-amber-600 hover:text-amber-700 font-medium text-sm">
+            &larr; Back to Home
+          </Link>
+        </div>
+
       </div>
     </div>
   );
