@@ -83,4 +83,4 @@ export function SiteFooter() {
     </footer>
   )
 }
-export default SiteFooter
+export default SiteFooter;
