@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { useCart } from '@/context/cart-context'
+import { useCurrency, Currency } from '@/context/currency-context'
 import { ShoppingBag } from 'lucide-react'
 
 export default function Header() {
   const { totalItems } = useCart()
+  const { currency, setCurrency } = useCurrency()
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">
@@ -26,12 +28,23 @@ export default function Header() {
             PADO BOUTIQUE
           </span>
           <span className="block text-[9px] uppercase tracking-[0.25em] text-neutral-500 font-sans">
-            PADO BOUTIQUE (Bespoke Modern Tailoring)
+            Bespoke Modern Tailoring
           </span>
         </Link>
 
-        {/* Cart Icon */}
+        {/* Actions & Currency Switcher */}
         <div className="flex items-center space-x-6">
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as Currency)}
+            className="border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-800 focus:outline-none uppercase font-mono cursor-pointer"
+          >
+            <option value="USD">USD ($)</option>
+            <option value="CAD">CAD (CA$)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+
           <Link href="/checkout" className="relative flex items-center text-neutral-800 hover:text-black">
             <ShoppingBag className="h-5 w-5" />
             {totalItems > 0 && (
