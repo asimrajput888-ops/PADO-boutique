@@ -1,86 +1,58 @@
-import Link from 'next/link'
+// components/site/site-footer.tsx
 
-const columns = [
-  {
-    title: 'Shop',
-    links: [
-      { label: 'Men', href: '/shop/men' },
-      { label: 'Women', href: '/shop/women' },
-      { label: 'Signature Collection', href: '/shop' },
-      { label: 'Custom Tailoring', href: '/custom' },
-    ],
-  },
-  {
-    title: 'Customer Care',
-    links: [
-      { label: 'Contact', href: '/contact' },
-      { label: 'Measurements', href: '/measurements' },
-      { label: 'Shipping', href: '/shipping' },
-      { label: 'Returns', href: '/returns' },
-      { label: 'Track Order', href: '/account/orders' },
-    ],
-  },
-  {
-    title: 'About',
-    links: [
-      { label: 'Our Story', href: '/about' },
-      { label: 'Craftsmanship', href: '/about' },
-      { label: 'Fabrics', href: '/custom' },
-      { label: 'Journal', href: '/journal' },
-    ],
-  },
-  {
-    title: 'Policies',
-    links: [
-      { label: 'Privacy', href: '/policies' },
-      { label: 'Terms', href: '/policies' },
-      { label: 'Shipping Policy', href: '/shipping' },
-      { label: 'Returns', href: '/returns' },
-    ],
-  },
-]
+import Link from "next/link";
 
-export function SiteFooter() {
+export default function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-offwhite">
-      <div className="mx-auto max-w-[1400px] px-5 py-16 md:px-8 md:py-20">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-6">
-          <div className="col-span-2">
-            <p className="font-serif text-3xl tracking-wide-sm">BESPOKE</p>
-            <p className="mt-2 text-[10px] tracking-luxe text-muted-foreground uppercase">
-              Tailored For You
-            </p>
-            <p className="mt-6 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Premium custom tailoring for men and women. Designed by you, crafted by us, delivered
-              worldwide.
-            </p>
-          </div>
-
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-[11px] tracking-wide-sm text-foreground uppercase">{col.title}</h3>
-              <ul className="mt-5 space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    <footer className="bg-[#0A0A0A] border-t border-neutral-800 text-neutral-400 pt-16 pb-8">
+      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        
+        {/* Brand Column */}
+        <div>
+          <h3 className="text-xl font-serif text-amber-500 mb-4 tracking-widest">PADO</h3>
+          <p className="text-sm leading-relaxed mb-6">
+            Luxury bespoke tailoring and silk loungewear. Crafted for the modern individual.
+          </p>
         </div>
 
-        <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-border pt-8 text-[11px] tracking-wide-sm text-muted-foreground uppercase md:flex-row md:items-center">
-          <p>© {new Date().getFullYear()} BESPOKE. All rights reserved.</p>
-          <p>Custom Tailoring • Premium Fabrics • Worldwide Shipping</p>
+        {/* Customer Care Column */}
+        <div>
+          <h4 className="text-white font-medium mb-4 uppercase tracking-wider text-sm">Customer Care</h4>
+          <ul className="space-y-3 text-sm">
+            <li><Link href="/contact" className="hover:text-amber-500 transition">Contact</Link></li>
+            <li><Link href="/measurements" className="hover:text-amber-500 transition">Measurements</Link></li>
+            <li><Link href="/shipping" className="hover:text-amber-500 transition">Shipping</Link></li>
+            <li><Link href="/returns" className="hover:text-amber-500 transition">Returns</Link></li>
+            <li><Link href="/track-order" className="hover:text-amber-500 transition">Track Order</Link></li>
+          </ul>
+        </div>
+
+        {/* Company Column */}
+        <div>
+          <h4 className="text-white font-medium mb-4 uppercase tracking-wider text-sm">Company</h4>
+          <ul className="space-y-3 text-sm">
+            <li><Link href="/about" className="hover:text-amber-500 transition">About</Link></li>
+            <li><Link href="/about" className="hover:text-amber-500 transition">Our Story</Link></li>
+            <li><Link href="/journal" className="hover:text-amber-500 transition">Journal</Link></li>
+          </ul>
+        </div>
+
+        {/* Policies Column */}
+        <div>
+          <h4 className="text-white font-medium mb-4 uppercase tracking-wider text-sm">Policies</h4>
+          <ul className="space-y-3 text-sm">
+            <li><Link href="/policies/privacy" className="hover:text-amber-500 transition">Privacy</Link></li>
+            <li><Link href="/policies/terms" className="hover:text-amber-500 transition">Terms</Link></li>
+            <li><Link href="/shipping" className="hover:text-amber-500 transition">Shipping Policy</Link></li>
+            <li><Link href="/returns" className="hover:text-amber-500 transition">Returns</Link></li>
+          </ul>
         </div>
       </div>
+
+      {/* Copyright Bottom Bar */}
+      <div className="container mx-auto px-6 pt-8 border-t border-neutral-900 text-xs text-center text-neutral-600">
+        &copy; {new Date().getFullYear()} PADO BOUTIQUE. All rights reserved.
+      </div>
     </footer>
-  )
+  );
 }
-export default SiteFooter;
