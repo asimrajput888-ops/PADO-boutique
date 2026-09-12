@@ -1,5 +1,5 @@
 // app/shop/page.tsx
-
+"use client";
 import Link from "next/link";
 import { useState } from "react"; // Note: "use client" chahiye agar filter use kar rahe hain
 
