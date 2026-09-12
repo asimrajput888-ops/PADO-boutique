@@ -1,5 +1,3 @@
-// components/site/site-header.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -21,23 +19,21 @@ export default function Header() {
   ];
 
   return (
-    // YAHAN CHANGE: bg-[#0A0A0A] -> bg-white, border-neutral-800 -> border-neutral-200
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-neutral-200">
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-[#FFF8F0]/95 backdrop-blur-sm border-b border-[#1E1E2C]/10">
+      <div className="container mx-auto px-6 h-24 flex items-center justify-between">
         
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-serif text-amber-600 tracking-widest">
-          PADO
+        {/* Logo - Serif & Gold */}
+        <Link href="/" className="text-3xl font-serif text-[#1E1E2C] tracking-[0.2em]">
+          PADO<span className="text-[#C5A059]">.</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-10">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href} 
-              // YAHAN CHANGE: text-neutral-400 -> text-neutral-600, hover:text-amber-500 -> hover:text-amber-600
-              className="text-sm text-neutral-600 hover:text-amber-600 transition-colors uppercase tracking-wider"
+              className="text-xs text-[#1E1E2C]/70 hover:text-[#5D1A24] transition-colors uppercase tracking-[0.15em]"
             >
               {link.name}
             </Link>
@@ -47,35 +43,31 @@ export default function Header() {
         {/* Right Side Icons */}
         <div className="flex items-center space-x-6">
           
-          {/* Currency Toggle */}
           <button 
             onClick={toggleCurrency} 
-            // YAHAN CHANGE: colors ko light theme ke hisaab se karein
-            className="text-xs text-neutral-600 hover:text-amber-600 transition border border-neutral-300 px-2 py-1"
+            className="text-xs text-[#1E1E2C]/70 hover:text-[#5D1A24] transition border border-[#1E1E2C]/20 px-3 py-1.5 tracking-widest"
           >
             {currency || "PKR"}
           </button>
 
-          {/* Cart Link */}
-          <Link href="/checkout" className="relative text-neutral-600 hover:text-amber-600 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <Link href="/checkout" className="relative text-[#1E1E2C]/70 hover:text-[#5D1A24] transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
             {cart.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+              <span className="absolute -top-2 -right-2 bg-[#5D1A24] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                 {cart.length}
               </span>
             )}
           </Link>
 
-          {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-neutral-600 hover:text-amber-600"
+            className="md:hidden text-[#1E1E2C]/70 hover:text-[#5D1A24]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               {isMenuOpen ? (
                 <>
                   <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -95,12 +87,12 @@ export default function Header() {
 
       {/* Mobile Navigation Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-neutral-200 px-6 py-4 space-y-4">
+        <div className="md:hidden bg-[#FFF8F0] border-t border-[#1E1E2C]/10 px-6 py-6 space-y-6">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 
               href={link.href} 
-              className="block text-neutral-600 hover:text-amber-600 transition uppercase tracking-wider text-sm"
+              className="block text-[#1E1E2C]/70 hover:text-[#5D1A24] transition uppercase tracking-[0.15em] text-xs"
               onClick={() => setIsMenuOpen(false)}
             >
               {link.name}
