@@ -1,12 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Playfair_Display, Inter } from "next/font/google"; // 1. Fonts import karein
 import "./globals.css";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
 import Header from "@/components/site/site-header";
 import SiteFooter from "@/components/site/site-footer";
 
-const inter = Inter({ subsets: ["latin"] });
+// 2. Fonts configure karein
+const playfair = Playfair_Display({ 
+  subsets: ["latin"], 
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const inter = Inter({ 
+  subsets: ["latin"], 
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "PADO BOUTIQUE | Bespoke Luxury",
@@ -20,8 +31,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* YAHAN CHANGE KAREIN: bg-[#0A0A0A] ko bg-white aur text-neutral-100 ko text-neutral-900 karein */}
-      <body className={`${inter.className} bg-white text-neutral-900 min-h-screen flex flex-col font-sans`}>
+      {/* 3. Body par fonts aur colors apply karein */}
+      <body 
+        className={`${playfair.variable} ${inter.variable} font-sans bg-[#FFF8F0] text-[#1E1E2C] min-h-screen flex flex-col`}
+      >
         <CurrencyProvider>
           <CartProvider>
             <Header />
