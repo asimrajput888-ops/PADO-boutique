@@ -3,27 +3,43 @@
 import Link from "next/link"
 import { useCurrency } from "@/context/currency-context"
 
-const womenProducts = [
+interface Product {
+  id: string
+  name: string
+  fabric: string
+  description: string
+  priceUSD: number
+  image: string
+  tag: string
+}
+
+const womenProducts: Product[] = [
   {
     id: "w-01",
     name: "Tailored Ivory Double-Breasted Suit",
-    fabric: "Super 120s Wool & Silk Blend",
-    priceUSD: 1350,
+    fabric: "Super 120s Wool & Mulberry Silk Blend",
+    description: "Sharp architectural shoulders, custom peak lapels, and hand-stitched detailing crafted for commanding elegance.",
+    priceUSD: 1450,
     image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80",
+    tag: "Bespoke Tailoring"
   },
   {
     id: "w-02",
     name: "Midnight Silk Loungewear Set",
-    fabric: "100% Pure Mulberry Silk",
-    priceUSD: 650,
+    fabric: "100% Pure 22 Momme Mulberry Silk",
+    description: "Fluid, ultra-soft tailored luxury loungewear designed for relaxed elegance with custom contrasting piping.",
+    priceUSD: 720,
     image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80",
+    tag: "Couture Loungewear"
   },
   {
     id: "w-03",
-    name: "Architectural Tuxedo Blazer",
-    fabric: "Italian Velvet & Satin Lapel",
-    priceUSD: 1100,
+    name: "Architectural Evening Tuxedo Blazer",
+    fabric: "Italian Silk Velvet & Grosgrain Satin Lapel",
+    description: "Sculpted women's black-tie tuxedo jacket featuring hand-finished buttonholes and natural structured canvas.",
+    priceUSD: 1250,
     image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=800&q=80",
+    tag: "Eveningwear"
   },
 ]
 
@@ -54,24 +70,31 @@ export default function WomenPage() {
               key={product.id}
               className="bg-[#0D0D0D] border border-neutral-800 rounded-none overflow-hidden hover:border-amber-400/50 transition-all flex flex-col justify-between group"
             >
-              <div className="relative h-[380px] w-full bg-neutral-900 overflow-hidden">
+              <div className="relative h-[400px] w-full bg-neutral-900 overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                <span className="absolute top-4 left-4 bg-black/70 backdrop-blur-md text-amber-400 border border-amber-400/30 text-[9px] uppercase tracking-widest px-3 py-1 font-mono">
+                  {product.tag}
+                </span>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div>
-                  <h3 className="text-sm font-serif text-white tracking-wide">{product.name}</h3>
-                  <p className="text-[11px] text-neutral-500 font-light mt-1">{product.fabric}</p>
+              <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <h3 className="text-base font-serif text-white tracking-wide">{product.name}</h3>
+                  <p className="text-[11px] text-amber-400/80 font-mono tracking-wide">{product.fabric}</p>
+                  <p className="text-xs text-neutral-400 font-light leading-relaxed">{product.description}</p>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-neutral-900">
-                  <span className="text-xs font-mono text-amber-400 font-medium">
-                    {formatPrice(product.priceUSD)}
-                  </span>
+                <div className="flex items-center justify-between pt-4 border-t border-neutral-900 mt-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-mono text-neutral-500">Starting at</span>
+                    <span className="text-sm font-mono text-amber-400 font-medium">
+                      {formatPrice(product.priceUSD)}
+                    </span>
+                  </div>
                   <Link
                     href={`/custom?gender=women&item=${product.id}`}
                     className="border border-neutral-700 text-neutral-300 hover:border-amber-400 hover:text-amber-400 text-[10px] uppercase tracking-widest px-4 py-2 transition-all font-medium"
