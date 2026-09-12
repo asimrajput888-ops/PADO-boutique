@@ -26,7 +26,7 @@ export default function Header() {
             PADO BOUTIQUE
           </span>
           <span className="block text-[9px] uppercase tracking-[0.25em] text-neutral-500 font-sans">
-            Bespoke Modern Tailoring
+            PADO BOUTIQUE (Bespoke Modern Tailoring)
           </span>
         </Link>
 
