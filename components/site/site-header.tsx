@@ -1,59 +1,49 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { useCart } from '@/context/cart-context'
-import { useCurrency, Currency } from '@/context/currency-context'
-import { ShoppingBag } from 'lucide-react'
+import Link from "next/link"
+import { useCurrency } from "@/context/currency-context"
 
 export default function Header() {
-  const { totalItems } = useCart()
   const { currency, setCurrency } = useCurrency()
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-4">
-        {/* Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-8 text-xs font-medium uppercase tracking-widest text-neutral-700">
-          <Link href="/shop" className="hover:text-black transition-colors">
-            Collections
-          </Link>
-          <Link href="/custom" className="hover:text-black transition-colors font-bold text-black">
-            Create Your Suit
-          </Link>
+    <header className="sticky top-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-md border-b border-neutral-800 px-6 py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        
+        {/* Navigation Links - Matching App Router */}
+        <nav className="hidden md:flex items-center space-x-8 text-xs uppercase tracking-[0.2em] font-medium text-neutral-300">
+          <Link href="/men" className="hover:text-amber-400 transition-colors">Men</Link>
+          <Link href="/women" className="hover:text-amber-400 transition-colors">Women</Link>
+          <Link href="/custom" className="hover:text-amber-400 transition-colors">Bespoke Studio</Link>
+          <Link href="/shop" className="hover:text-amber-400 transition-colors">Catalogue</Link>
         </nav>
 
-        {/* Brand Name */}
-        <Link href="/" className="text-center">
-          <span className="block text-xl font-serif font-bold tracking-wider text-black">
-            PADO BOUTIQUE
-          </span>
-          <span className="block text-[9px] uppercase tracking-[0.25em] text-neutral-500 font-sans">
-            Bespoke Modern Tailoring
-          </span>
+        {/* Brand Logo */}
+        <Link href="/" className="text-xl md:text-2xl font-serif tracking-[0.3em] font-light text-white text-center">
+          PADO <span className="text-xs tracking-[0.4em] font-sans block text-neutral-500 font-normal">BOUTIQUE</span>
         </Link>
 
-        {/* Actions & Currency Switcher */}
+        {/* Currency Switcher & Book Fitting Button */}
         <div className="flex items-center space-x-6">
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value as Currency)}
-            className="border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-800 focus:outline-none uppercase font-mono cursor-pointer"
+            onChange={(e) => setCurrency(e.target.value as any)}
+            className="bg-neutral-900 border border-neutral-800 text-neutral-300 text-[11px] px-2.5 py-1.5 rounded focus:outline-none focus:border-amber-400 font-mono"
           >
             <option value="USD">USD ($)</option>
-            <option value="CAD">CAD (CA$)</option>
+            <option value="CAD">CAD ($)</option>
             <option value="EUR">EUR (€)</option>
             <option value="GBP">GBP (£)</option>
           </select>
 
-          <Link href="/checkout" className="relative flex items-center text-neutral-800 hover:text-black">
-            <ShoppingBag className="h-5 w-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">
-                {totalItems}
-              </span>
-            )}
+          <Link
+            href="/custom"
+            className="hidden sm:inline-block border border-amber-400/60 text-amber-400 text-[10px] uppercase tracking-widest px-4 py-2 hover:bg-amber-400 hover:text-black transition-all font-medium"
+          >
+            Book Fitting
           </Link>
         </div>
+
       </div>
     </header>
   )
