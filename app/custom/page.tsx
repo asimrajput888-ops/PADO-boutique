@@ -1,57 +1,52 @@
-// app/custom/page.tsx
+// app/shop/page.tsx
 
 import Link from "next/link";
+import { useState } from "react"; // Note: "use client" chahiye agar filter use kar rahe hain
 
-export default function CustomPage() {
-  const steps = [
-    { step: "01", title: "Consultation", desc: "Book an appointment to discuss your vision, fabric, and style preferences." },
-    { step: "02", title: "Measurements", desc: "Our master tailors take precise measurements to ensure a perfect fit." },
-    { step: "03", title: "Crafting", desc: "Your garment is handcrafted over 2-3 weeks using premium materials." },
-    { step: "04", title: "Fitting", desc: "A final fitting to ensure perfection before delivery to your door." },
+export default function ShopPage() {
+  const allProducts = [
+    { id: 1, name: "The Midnight Tuxedo", price: "PKR 85,000", category: "Men", type: "Bespoke Suit" },
+    { id: 2, name: "Silk Loungewear Set", price: "PKR 28,000", category: "Women", type: "Loungewear" },
+    { id: 3, name: "Emerald Evening Gown", price: "PKR 120,000", category: "Women", type: "Couture" },
+    { id: 4, name: "Heritage Wool Blazer", price: "PKR 45,000", category: "Men", type: "Outerwear" },
+    { id: 5, name: "Ivory Chiffon Saree", price: "PKR 65,000", category: "Women", type: "Traditional" },
+    { id: 6, name: "Ivory Silk Kurta", price: "PKR 35,000", category: "Men", type: "Traditional" },
+    { id: 7, name: "Gold Embroidered Jacket", price: "PKR 55,000", category: "Women", type: "Outerwear" },
+    { id: 8, name: "Charcoal Dress Shirt", price: "PKR 12,000", category: "Men", type: "Shirting" },
   ];
 
   return (
     <div className="bg-[#FFF8F0] min-h-screen">
       {/* Hero Section */}
-      <div className="bg-[#1E1E2C] text-white py-32 px-6">
+      <div className="bg-[#1E1E2C] text-white py-24 px-6">
         <div className="container mx-auto max-w-5xl text-center">
-          <p className="text-[#C5A059] uppercase tracking-[0.4em] text-xs mb-6">Bespoke Service</p>
-          <h1 className="text-5xl md:text-7xl font-serif mb-6 tracking-tight">
-            Made to <span className="italic text-[#C5A059]">Measure</span>
+          <h1 className="text-5xl md:text-6xl font-serif mb-4 tracking-tight">
+            The <span className="italic text-[#C5A059]">Collection</span>
           </h1>
-          <p className="text-white/60 max-w-xl mx-auto font-light leading-relaxed">
-            Experience the art of bespoke tailoring. From consultation to final stitch, 
-            every detail is crafted around you.
-          </p>
+          <p className="text-white/60 font-light">Curated pieces from our atelier.</p>
         </div>
       </div>
 
-      {/* Process Steps */}
-      <div className="container mx-auto px-6 py-24 max-w-5xl">
-        <h2 className="text-3xl font-serif text-[#1E1E2C] mb-16 text-center">The Process</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 mb-20">
-          {steps.map((item) => (
-            <div key={item.step} className="flex gap-6">
-              <span className="text-4xl font-serif text-[#C5A059]">{item.step}</span>
-              <div>
-                <h3 className="text-xl font-serif text-[#1E1E2C] mb-2">{item.title}</h3>
-                <p className="text-[#1E1E2C]/70 font-light leading-relaxed">{item.desc}</p>
+      {/* Products Grid */}
+      <div className="container mx-auto px-6 py-24 max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {allProducts.map((product) => (
+            <Link 
+              key={product.id} 
+              href={`/shop/${product.id}`}
+              className="group cursor-pointer"
+            >
+              <div className="bg-[#1E1E2C]/5 aspect-[3/4] mb-4 border border-[#1E1E2C]/10 overflow-hidden relative">
+                <div className="absolute inset-0 flex items-center justify-center text-[#1E1E2C]/20 font-serif italic">
+                  Product Image
+                </div>
+                <div className="absolute inset-0 bg-[#5D1A24]/0 group-hover:bg-[#5D1A24]/10 transition-colors duration-500"></div>
               </div>
-            </div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">{product.type} • {product.category}</p>
+              <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">{product.name}</h3>
+              <p className="text-sm text-[#1E1E2C]/60">{product.price}</p>
+            </Link>
           ))}
-        </div>
-
-        {/* CTA */}
-        <div className="text-center bg-white border border-[#1E1E2C]/10 p-16">
-          <h3 className="text-3xl font-serif text-[#1E1E2C] mb-4">Begin Your Bespoke Journey</h3>
-          <p className="text-[#1E1E2C]/60 mb-8 font-light">Book a consultation with our master tailors today.</p>
-          <Link 
-            href="/contact" 
-            className="inline-block bg-[#5D1A24] text-white px-10 py-4 text-xs uppercase tracking-[0.2em] hover:bg-[#4A151E] transition"
-          >
-            Book Consultation
-          </Link>
         </div>
       </div>
     </div>
