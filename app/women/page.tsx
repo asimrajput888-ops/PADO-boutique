@@ -1,8 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
-import { useCurrency } from "@/context/currency-context"
+import { useCurrency } from "../../context/currency-context"
 
 const womenProducts = [
   {
@@ -56,11 +55,10 @@ export default function WomenPage() {
               className="bg-[#0D0D0D] border border-neutral-800 rounded-none overflow-hidden hover:border-amber-400/50 transition-all flex flex-col justify-between group"
             >
               <div className="relative h-[380px] w-full bg-neutral-900 overflow-hidden">
-                <Image
+                <img
                   src={product.image}
                   alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
