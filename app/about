@@ -1,1 +1,53 @@
+// app/about/page.tsx
 
+import Link from "next/link";
+
+export default function AboutPage() {
+  return (
+    <div className="container mx-auto px-6 py-24 max-w-5xl">
+      {/* Hero Section */}
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-6xl font-serif text-amber-500 mb-6">
+          Our Story
+        </h1>
+        <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
+          Crafting timeless elegance through bespoke tailoring and luxurious fabrics.
+        </p>
+      </div>
+
+      {/* Content Section */}
+      <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+        <div className="bg-neutral-900 aspect-square border border-neutral-800 flex items-center justify-center">
+          <span className="text-neutral-600 font-serif italic">Craftsmanship Image</span>
+        </div>
+        <div className="space-y-6 text-neutral-300 leading-relaxed">
+          <h2 className="text-2xl font-serif text-white">The PADO Philosophy</h2>
+          <p>
+            Founded with a passion for perfection, PADO BOUTIQUE specializes in creating 
+            garments that are as unique as the individuals who wear them. From precise 
+            measurements to the final stitch, every piece is a testament to our dedication 
+            to the art of tailoring.
+          </p>
+          <p>
+            We believe that luxury is not just about the fabric, but about the experience. 
+            Our dark-mode aesthetic reflects our modern approach to timeless traditions.
+          </p>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="text-center bg-neutral-900 border border-neutral-800 p-12">
+        <h3 className="text-2xl font-serif text-white mb-4">Experience Bespoke Luxury</h3>
+        <p className="text-neutral-400 mb-8">Book a consultation or explore our collections.</p>
+        <div className="flex gap-4 justify-center">
+          <Link href="/custom" className="bg-amber-600 text-black px-8 py-3 font-semibold hover:bg-amber-500 transition">
+            Custom Tailoring
+          </Link>
+          <Link href="/shop" className="border border-neutral-700 text-white px-8 py-3 font-semibold hover:border-amber-500 transition">
+            Shop Collection
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
