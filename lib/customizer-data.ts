@@ -1,12 +1,42 @@
 // lib/customizer-data.ts
 
 export const GARMENTS = [
-  { id: "suit", name: "Suit", basePrice: 45000, image: "/images/garments/suit.jpg" },
-  { id: "blazer", name: "Blazer", basePrice: 32000, image: "/images/garments/blazer.jpg" },
-  { id: "trousers", name: "Trousers", basePrice: 15000, image: "/images/garments/trousers.jpg" },
-  { id: "waistcoat", name: "Waistcoat", basePrice: 18000, image: "/images/garments/waistcoat.jpg" },
-  { id: "shirt", name: "Shirt", basePrice: 12000, image: "/images/garments/shirt.jpg" },
-  { id: "coat", name: "Coat", basePrice: 55000, image: "/images/garments/coat.jpg" },
+  { 
+    id: "suit", 
+    name: "Suit", 
+    basePrice: 45000, 
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c47e35f?w=800&q=80" 
+  },
+  { 
+    id: "blazer", 
+    name: "Blazer", 
+    basePrice: 32000, 
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80" 
+  },
+  { 
+    id: "trousers", 
+    name: "Trousers", 
+    basePrice: 15000, 
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c47e35f?w=800&q=80" 
+  },
+  { 
+    id: "waistcoat", 
+    name: "Waistcoat", 
+    basePrice: 18000, 
+    image: "https://images.unsplash.com/photo-1593030103066-0093718efeb9?w=800&q=80" 
+  },
+  { 
+    id: "shirt", 
+    name: "Shirt", 
+    basePrice: 12000, 
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&q=80" 
+  },
+  { 
+    id: "coat", 
+    name: "Coat", 
+    basePrice: 55000, 
+    image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&q=80" 
+  },
 ];
 
 export const FABRICS = [
