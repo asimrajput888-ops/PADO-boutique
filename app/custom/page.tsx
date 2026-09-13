@@ -1,5 +1,5 @@
 "use client";
-
+// Vercel redeploy trigger - 14 Sep 2026)
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
