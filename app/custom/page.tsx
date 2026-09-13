@@ -26,11 +26,9 @@ export default function CustomPage() {
 
   const totalSteps = 6;
 
-  // Get currently selected garment image
   const currentGarment = GARMENTS.find((g) => g.id === selection.garment);
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
-  // Live Price Calculation
   const totalPrice = useMemo(() => {
     let price = 0;
     if (currentGarment) price += currentGarment.basePrice;
@@ -63,18 +61,6 @@ export default function CustomPage() {
         [key]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value],
       };
     });
-  };
-
-  // Mouse move handler for 3D rotation
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
-    const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
-    setMousePos({ x, y });
-  };
-
-  const handleMouseLeave = () => {
-    setMousePos({ x: 0, y: 0 });
   };
 
   const cardVariants = {
@@ -122,50 +108,82 @@ export default function CustomPage() {
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
-          {/* Left: 3D Image Preview */}
+          {/* Left: 3D Semi Preview Area */}
           <div 
-            className="hidden lg:flex flex-col justify-center items-center bg-white/40 backdrop-blur-sm border border-white/60 rounded-2xl p-8 shadow-xl relative h-[600px]"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ perspective: "1000px" }}
+            className="hidden lg:flex flex-col justify-center items-center relative h-[600px]"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+              const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
+              setMousePos({ x, y });
+            }}
+            onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
+            style={{ perspective: "1200px" }}
           >
-            <div className="text-center w-full">
-              <p className="text-neutral-400 text-xs uppercase tracking-widest mb-2">Live Preview</p>
-              <h3 className="text-2xl font-serif text-neutral-800 mb-6">
-                {currentGarment?.name || "Your Garment"}
-              </h3>
-              
-              {/* 3D Rotating Image Container */}
-              <motion.div 
-                className="relative w-full h-80 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 flex items-center justify-center"
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform: `rotateY(${mousePos.x * 15}deg) rotateX(${-mousePos.y * 15}deg)`,
-                  transition: "transform 0.2s ease-out"
-                }}
+            {/* Glass Background Card */}
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-2xl" />
+            
+            {/* Amber Glow */}
+            <div className="absolute w-64 h-64 bg-amber-400/20 rounded-full blur-[80px] pointer-events-none" />
+
+            {/* 3D Rotating Card */}
+            <motion.div
+              className="relative z-10 w-full max-w-md p-8"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: `rotateY(${mousePos.x * 20}deg) rotateX(${-mousePos.y * 20}deg)`,
+                transition: "transform 0.3s ease-out"
+              }}
+            >
+              {/* Floating Image */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-full h-80 rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-100 border border-white/80 shadow-xl flex items-center justify-center"
+                style={{ transform: "translateZ(40px)" }}
               >
                 {selection.garment ? (
                   <img 
                     src={currentGarment?.image} 
                     alt={currentGarment?.name}
-                    className="w-full h-full object-contain p-4"
+                    className="w-full h-full object-contain p-6 drop-shadow-2xl"
                     style={{ 
                       filter: currentFabric?.colorFilter || "none",
                       transition: "filter 0.5s ease"
                     }}
                   />
                 ) : (
-                  <span className="text-neutral-400 text-sm">Select a garment to preview</span>
+                  <span className="text-neutral-400 text-sm">Select a garment</span>
                 )}
               </motion.div>
 
-              {/* Selection Summary */}
-              <div className="mt-6 space-y-1 text-xs text-neutral-500">
-                {selection.fabric && <p>Fabric: <span className="font-medium text-neutral-700">{currentFabric?.name}</span></p>}
-                {selection.style.length > 0 && <p>Style: <span className="font-medium text-neutral-700">{selection.style.length} selected</span></p>}
-                {selection.details.length > 0 && <p>Details: <span className="font-medium text-neutral-700">{selection.details.length} selected</span></p>}
+              {/* Text Info */}
+              <div className="mt-6 text-center" style={{ transform: "translateZ(20px)" }}>
+                <p className="text-neutral-400 text-[10px] uppercase tracking-[0.3em] mb-2">Live Preview</p>
+                <h3 className="text-2xl font-serif text-neutral-800 mb-4">
+                  {currentGarment?.name || "Your Garment"}
+                </h3>
+                
+                {/* Selection Pills */}
+                <div className="flex flex-wrap justify-center gap-2 text-[10px]">
+                  {selection.fabric && (
+                    <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-medium">
+                      {currentFabric?.name}
+                    </span>
+                  )}
+                  {selection.style.length > 0 && (
+                    <span className="bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full font-medium">
+                      {selection.style.length} Styles
+                    </span>
+                  )}
+                  {selection.details.length > 0 && (
+                    <span className="bg-neutral-100 text-neutral-700 px-3 py-1 rounded-full font-medium">
+                      {selection.details.length} Details
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right: Form Step */}
@@ -307,7 +325,6 @@ export default function CustomPage() {
                   <div className="space-y-4">
                     <h2 className="text-2xl font-serif mb-6">Step 06 — Final Preview</h2>
                     
-                    {/* Preview Image */}
                     <div className="bg-neutral-100 rounded-lg h-56 flex items-center justify-center overflow-hidden">
                       {currentGarment ? (
                         <img 
