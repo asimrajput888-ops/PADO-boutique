@@ -13,7 +13,9 @@ export default function CustomPage() {
     email: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -29,7 +31,7 @@ export default function CustomPage() {
           <p className="text-amber-600 tracking-[0.2em] text-sm font-semibold mb-4">
             BESPOKE ATELIER
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">
+          <h1 className="text-4xl md:text-5xl font-serif mb-4 text-neutral-900">
             Create Your Custom Piece
           </h1>
           <p className="text-neutral-600">
@@ -59,7 +61,7 @@ export default function CustomPage() {
           
           {step === 1 && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-serif mb-6">Step 1: Garment Details</h2>
+              <h2 className="text-2xl font-serif mb-6 text-neutral-900">Step 1: Garment Details</h2>
               <div>
                 <label className="block text-sm font-medium mb-2 text-neutral-700">Garment Type</label>
                 <select
@@ -91,7 +93,7 @@ export default function CustomPage() {
 
           {step === 2 && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-serif mb-6">Step 2: Your Measurements</h2>
+              <h2 className="text-2xl font-serif mb-6 text-neutral-900">Step 2: Your Measurements</h2>
               <div>
                 <label className="block text-sm font-medium mb-2 text-neutral-700">Measurements (inches/cm)</label>
                 <textarea
@@ -108,7 +110,7 @@ export default function CustomPage() {
 
           {step === 3 && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-serif mb-6">Step 3: Contact Information</h2>
+              <h2 className="text-2xl font-serif mb-6 text-neutral-900">Step 3: Contact Information</h2>
               <div>
                 <label className="block text-sm font-medium mb-2 text-neutral-700">Full Name</label>
                 <input
@@ -137,7 +139,7 @@ export default function CustomPage() {
             {step > 1 ? (
               <button
                 onClick={prevStep}
-                className="text-neutral-500 hover:text-neutral-900 font-medium"
+                className="text-neutral-500 hover:text-neutral-900 font-medium transition"
               >
                 &larr; Back
               </button>
@@ -165,7 +167,7 @@ export default function CustomPage() {
 
         {/* Back to Home */}
         <div className="text-center mt-12">
-          <Link href="/" className="text-amber-600 hover:text-amber-700 font-medium text-sm">
+          <Link href="/" className="text-amber-600 hover:text-amber-700 font-medium text-sm transition">
             &larr; Back to Home
           </Link>
         </div>
