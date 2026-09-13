@@ -1,21 +1,51 @@
 // lib/customizer-data.ts
 
 export const GARMENTS = [
-  { id: "suit", name: "Suit", basePrice: 45000, image: "/images/garments/suit.jpg" },
-  { id: "blazer", name: "Blazer", basePrice: 32000, image: "/images/garments/blazer.jpg" },
-  { id: "trousers", name: "Trousers", basePrice: 15000, image: "/images/garments/trousers.jpg" },
-  { id: "waistcoat", name: "Waistcoat", basePrice: 18000, image: "/images/garments/waistcoat.jpg" },
-  { id: "shirt", name: "Shirt", basePrice: 12000, image: "/images/garments/shirt.jpg" },
-  { id: "coat", name: "Coat", basePrice: 55000, image: "/images/garments/coat.jpg" },
+  { 
+    id: "suit", 
+    name: "Suit", 
+    basePrice: 45000, 
+    image: "/images/garments/suit.webp" 
+  },
+  { 
+    id: "blazer", 
+    name: "Blazer", 
+    basePrice: 32000, 
+    image: "/images/garments/blazer.webp" 
+  },
+  { 
+    id: "trousers", 
+    name: "Trousers", 
+    basePrice: 15000, 
+    image: "/images/garments/trousers.webp" 
+  },
+  { 
+    id: "waistcoat", 
+    name: "Waistcoat", 
+    basePrice: 18000, 
+    image: "/images/garments/waistcoat.webp" 
+  },
+  { 
+    id: "shirt", 
+    name: "Shirt", 
+    basePrice: 12000, 
+    image: "/images/garments/shirt.webp" 
+  },
+  { 
+    id: "coat", 
+    name: "Coat", 
+    basePrice: 55000, 
+    image: "/images/garments/coat.webp" 
+  },
 ];
 
 export const FABRICS = [
-  { id: "premium-wool", name: "Premium Wool", price: 0 },
-  { id: "super-120s", name: "Super 120s", price: 5000 },
-  { id: "super-130s", name: "Super 130s", price: 8000 },
-  { id: "linen", name: "Linen", price: 3000 },
-  { id: "wool-blend", name: "Wool Blend", price: 2000 },
-  { id: "seasonal", name: "Seasonal Fabrics", price: 6000 },
+  { id: "premium-wool", name: "Premium Wool", price: 0, colorFilter: "none" },
+  { id: "super-120s", name: "Super 120s", price: 5000, colorFilter: "hue-rotate(0deg)" },
+  { id: "super-130s", name: "Super 130s", price: 8000, colorFilter: "hue-rotate(20deg)" },
+  { id: "linen", name: "Linen", price: 3000, colorFilter: "saturate(0.6) brightness(1.1)" },
+  { id: "wool-blend", name: "Wool Blend", price: 2000, colorFilter: "hue-rotate(-20deg)" },
+  { id: "seasonal", name: "Seasonal Fabrics", price: 6000, colorFilter: "sepia(0.3)" },
 ];
 
 export const STYLES = [
