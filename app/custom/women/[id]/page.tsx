@@ -1,1 +1,247 @@
+// app/custom/women/[id]/page.tsx
 
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useParams } from "next/navigation";
+
+// PADO Women's Signature Designs
+const WOMEN_DESIGNS = [
+  {
+    id: "silk-loungewear",
+    name: "The Silk Loungewear",
+    price: 28000,
+    image: "/images/editorial-women.png",
+    description: "Pure silk loungewear set for effortless luxury at home.",
+  },
+  {
+    id: "emerald-gown",
+    name: "The Emerald Gown",
+    price: 120000,
+    image: "/images/product-kensington.png",
+    description: "Hand-embroidered evening gown in emerald silk, crafted for special occasions.",
+  },
+  {
+    id: "ivory-chiffon",
+    name: "The Ivory Chiffon",
+    price: 65000,
+    image: "/images/product-marlow.png",
+    description: "Delicate chiffon with subtle gold detailing, perfect for elegant evenings.",
+  },
+  {
+    id: "gold-jacket",
+    name: "The Gold Embroidered Jacket",
+    price: 55000,
+    image: "/images/editorial-fabrics.png",
+    description: "Statement jacket with hand-embroidered gold motifs.",
+  },
+  {
+    id: "atelier-blazer",
+    name: "The Atelier Blazer",
+    price: 75000,
+    image: "/images/editorial-custom.png",
+    description: "A tailored women's blazer, structured yet soft.",
+  },
+  {
+    id: "heritage-coat",
+    name: "The Heritage Coat",
+    price: 95000,
+    image: "/images/product-belgrave.png",
+    description: "Full-length wool coat with a timeless silhouette.",
+  },
+];
+
+export default function WomenDesignDetail() {
+  const params = useParams();
+  const id = params?.id as string;
+  const design = WOMEN_DESIGNS.find((d) => d.id === id);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    bust: "",
+    waist: "",
+    hips: "",
+    height: "",
+    notes: "",
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+
+  if (!design) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+        <div className="text-center">
+          <h1 className="text-4xl font-serif text-[#1E1E2C] mb-4">
+            Design Not Found
+          </h1>
+          <Link href="/custom/women" className="text-[#5D1A24] hover:underline">
+            &larr; Back to Women's Collection
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FFF8F0] py-32 px-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Back Link */}
+        <Link
+          href="/custom/women"
+          className="text-sm text-neutral-500 hover:text-[#5D1A24] mb-8 inline-block"
+        >
+          &larr; Back to Women's Collection
+        </Link>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Left: Design Image + Details */}
+          <div>
+            <div className="relative aspect-[3/4] bg-[#1E1E2C]/5 border border-[#1E1E2C]/10 overflow-hidden">
+              <Image
+                src={design.image}
+                alt={design.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="mt-6">
+              <p className="text-[#C5A059] text-xs uppercase tracking-[0.3em] mb-2">
+                PADO Signature Design
+              </p>
+              <h1 className="text-3xl font-serif text-[#1E1E2C] mb-4">
+                {design.name}
+              </h1>
+              <p className="text-[#1E1E2C]/70 leading-relaxed mb-4">
+                {design.description}
+              </p>
+              <p className="text-2xl text-[#5D1A24] font-serif">
+                PKR {design.price.toLocaleString()}
+              </p>
+              <div className="mt-6 border-t border-[#1E1E2C]/10 pt-4">
+                <p className="text-xs text-[#1E1E2C]/50 uppercase tracking-widest mb-2">
+                  Crafting Time
+                </p>
+                <p className="text-sm text-[#1E1E2C]/80">
+                  3 weeks — Hand-crafted with no compromise on quality.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Measurement Form */}
+          <div className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 p-8 rounded-2xl shadow-xl h-fit">
+            {submitted ? (
+              <div className="text-center py-12">
+                <div className="text-5xl mb-4 text-[#5D1A24]">✓</div>
+                <h2 className="text-2xl font-serif text-[#1E1E2C] mb-4">
+                  Order Received
+                </h2>
+                <p className="text-[#1E1E2C]/70 mb-8">
+                  Thank you, {formData.name}. Our atelier will contact you within 24 hours.
+                  Your piece will be hand-crafted and delivered in 3 weeks.
+                </p>
+                <Link
+                  href="/custom/women"
+                  className="text-[#5D1A24] hover:underline"
+                >
+                  &larr; Back to Women's Collection
+                </Link>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-serif text-[#1E1E2C] mb-2">
+                  Enter Your Measurements
+                </h2>
+                <p className="text-sm text-[#1E1E2C]/60 mb-6">
+                  We'll craft this piece to fit you perfectly in 3 weeks.
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    required
+                  />
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Bust (in)"
+                      value={formData.bust}
+                      onChange={(e) => setFormData({ ...formData, bust: e.target.value })}
+                      className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Waist (in)"
+                      value={formData.waist}
+                      onChange={(e) => setFormData({ ...formData, waist: e.target.value })}
+                      className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Hips (in)"
+                      value={formData.hips}
+                      onChange={(e) => setFormData({ ...formData, hips: e.target.value })}
+                      className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Height (in)"
+                      value={formData.height}
+                      onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+                      className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none"
+                    />
+                  </div>
+
+                  <textarea
+                    placeholder="Additional notes (optional)"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                    className="w-full border border-[#1E1E2C]/20 p-3 rounded-lg focus:border-[#5D1A24] outline-none resize-none"
+                  />
+
+                  <button
+                    type="submit"
+                    className="w-full bg-[#5D1A24] text-white py-4 font-semibold hover:bg-[#1E1E2C] transition rounded-lg"
+                  >
+                    Submit Order
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
