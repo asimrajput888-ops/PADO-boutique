@@ -29,7 +29,7 @@ export default function MenPage() {
           {products.map((product) => (
             <Link 
               key={product.id} 
-              href={`/men/${product.id}`}
+              href={`/men/${product.id}`}   // ⚠️ UPDATED: /custom/ se /men/ kar diya
               className="group cursor-pointer"
             >
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200 mb-4">
@@ -39,7 +39,6 @@ export default function MenPage() {
                   fill 
                   className="object-cover group-hover:scale-105 transition duration-700"
                 />
-                {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
                 <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="bg-white text-neutral-900 px-4 py-2 text-xs uppercase tracking-widest font-semibold inline-block">
@@ -50,9 +49,7 @@ export default function MenPage() {
               <h3 className="text-lg font-serif text-neutral-900 group-hover:text-amber-600 transition">
                 {product.name}
               </h3>
-              <p className="text-neutral-500 text-sm">
-                Starting at Rs. {product.price.toLocaleString()}
-              </p>
+              <p className="text-neutral-500 text-sm">Starting at Rs. {product.price.toLocaleString()}</p>
             </Link>
           ))}
         </div>
