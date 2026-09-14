@@ -4,13 +4,15 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  category: "men" | "women" | "signature";
+  category: "men" | "women" | "custom" | "signature";
   image: string;
   description: string;
 }
 
 export const PRODUCTS: Product[] = [
-  // MEN'S COLLECTION
+  // ============================================
+  // MEN'S BESPOKE COLLECTION
+  // ============================================
   {
     id: "italian-wool-suit",
     name: "The Italian Wool Suit",
@@ -60,7 +62,9 @@ export const PRODUCTS: Product[] = [
     description: "Full-length wool overcoat for the modern gentleman.",
   },
 
-  // WOMEN'S COLLECTION
+  // ============================================
+  // WOMEN'S BESPOKE COLLECTION
+  // ============================================
   {
     id: "silk-loungewear",
     name: "Silk Loungewear Set",
@@ -94,7 +98,45 @@ export const PRODUCTS: Product[] = [
     description: "Statement jacket with hand-embroidered gold motifs.",
   },
 
-  // SIGNATURE SUIT (TIER 3) - Ready to Wear
+  // ============================================
+  // PADO SIGNATURE DESIGNS (CUSTOM — TIER 2)
+  // ============================================
+  {
+    id: "pado-atelier-navy",
+    name: "PADO Atelier Navy",
+    price: 85000,
+    category: "custom",
+    image: "/images/editorial-custom.png",
+    description: "Exclusive PADO signature design with hand-stitched peak lapels and a bespoke navy wool finish.",
+  },
+  {
+    id: "pado-heritage-check",
+    name: "PADO Heritage Check",
+    price: 92000,
+    category: "custom",
+    image: "/images/editorial-fabrics.png",
+    description: "PADO's take on the classic check pattern — soft flannel finish with subtle texture.",
+  },
+  {
+    id: "pado-modern-ivory",
+    name: "PADO Modern Ivory",
+    price: 78000,
+    category: "custom",
+    image: "/images/hero.png",
+    description: "A contemporary ivory blazer with a relaxed silhouette, perfect for evening wear.",
+  },
+  {
+    id: "pado-signature-charcoal",
+    name: "PADO Signature Charcoal",
+    price: 88000,
+    category: "custom",
+    image: "/images/editorial-men.png",
+    description: "PADO's take on the timeless charcoal suit — clean lines and structured shoulders.",
+  },
+
+  // ============================================
+  // SIGNATURE SUIT (READY-TO-WEAR — TIER 3)
+  // ============================================
   {
     id: "signature-navy-single",
     name: "Signature Navy Suit — Single Breasted",
@@ -129,7 +171,12 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-export const getProductsByCategory = (category: "men" | "women" | "signature") => {
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+export const getProductsByCategory = (
+  category: "men" | "women" | "custom" | "signature"
+) => {
   return PRODUCTS.filter((p) => p.category === category);
 };
 
