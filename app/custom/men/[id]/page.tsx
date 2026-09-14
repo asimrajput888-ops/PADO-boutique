@@ -7,8 +7,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 
+// Same MEN_DESIGNS array (must match the gallery page)
 const MEN_DESIGNS = [
-  { id: "atelier-navy", name: "The Atelier Navy", price: 85000, image: "/images/editorial-custom.png", description: "Hand-stitched peak lapels, subtle ticket pocket, and a bespoke navy wool that shifts in natural light." },
+  { id: "atelier-navy", name: "The Atelier Navy", price: 85000, image: "/images/editorial-custom.png", description: "Hand-stitched peak lapels, subtle ticket pocket, and a bespoke navy wool." },
   { id: "heritage-check", name: "The Heritage Check", price: 92000, image: "/images/editorial-fabrics.png", description: "Classic check pattern with elbow patches and a soft flannel finish." },
   { id: "modern-charcoal", name: "The Modern Charcoal", price: 88000, image: "/images/product-belgrave.png", description: "Structured shoulders, clean lines, and a modern slim fit." },
   { id: "signature-midnight", name: "The Signature Midnight", price: 95000, image: "/images/product-camden.png", description: "Deep midnight blue with a satin shawl lapel — perfect for evening wear." },
@@ -16,7 +17,7 @@ const MEN_DESIGNS = [
   { id: "kensington-wool", name: "The Kensington Wool", price: 90000, image: "/images/product-kensington.png", description: "Pure wool with a subtle sheen, ideal for both office and evening." },
 ];
 
-export default function MenDesignDetail() {
+export default function MenDesignDetailPage() {
   const params = useParams();
   const id = params?.id as string;
   const design = MEN_DESIGNS.find((d) => d.id === id);
@@ -46,14 +47,14 @@ export default function MenDesignDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
+    <div className="min-h-screen bg-[#FDFBF7] py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <Link href="/custom/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
           &larr; Back to Men's Collection
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Left: Design */}
+          {/* Left: Design Image */}
           <div>
             <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
               <Image src={design.image} alt={design.name} fill className="object-cover" />
@@ -66,16 +67,16 @@ export default function MenDesignDetail() {
             </div>
           </div>
 
-          {/* Right: Form */}
+          {/* Right: Measurement Form */}
           <div className="bg-white/80 backdrop-blur-xl border border-neutral-200 p-8 rounded-2xl shadow-xl h-fit">
             {submitted ? (
               <div className="text-center py-12">
                 <div className="text-5xl mb-4">✓</div>
                 <h2 className="text-2xl font-serif text-neutral-900 mb-4">Order Received</h2>
                 <p className="text-neutral-600 mb-8">
-                  Thank you, {formData.name}. Our atelier will contact you within 24 hours. Your piece will be crafted in 3 weeks.
+                  Thank you, {formData.name}. Our atelier will craft your piece in 3 weeks and contact you shortly.
                 </p>
-                <Link href="/custom/men" className="text-amber-600 hover:underline">← Back to Collection</Link>
+                <Link href="/" className="text-amber-600 hover:underline">&larr; Back to Home</Link>
               </div>
             ) : (
               <>
@@ -92,9 +93,7 @@ export default function MenDesignDetail() {
                     <input type="text" placeholder="Height (in)" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
                   </div>
                   <textarea placeholder="Additional notes (optional)" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none resize-none" />
-                  <button type="submit" className="w-full bg-neutral-900 text-white py-4 font-semibold hover:bg-amber-600 transition rounded-lg">
-                    Submit Order
-                  </button>
+                  <button type="submit" className="w-full bg-neutral-900 text-white py-4 font-semibold hover:bg-amber-600 transition rounded-lg">Submit Order</button>
                 </form>
               </>
             )}
