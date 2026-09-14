@@ -1,17 +1,15 @@
 // app/women/page.tsx
 
+import Image from "next/image";
 import Link from "next/link";
+import { getProductsByCategory } from "@/lib/products";
 
 export default function WomenPage() {
-  const products = [
-    { id: 1, name: "Silk Loungewear Set", price: "PKR 28,000", category: "Loungewear" },
-    { id: 2, name: "Emerald Evening Gown", price: "PKR 120,000", category: "Couture" },
-    { id: 3, name: "Ivory Chiffon Saree", price: "PKR 65,000", category: "Traditional" },
-    { id: 4, name: "Gold Embroidered Jacket", price: "PKR 55,000", category: "Outerwear" },
-  ];
+  const products = getProductsByCategory("women");
 
   return (
-    <div className="bg-[#FFF8F0] min-h-screen">
+    <div className="min-h-screen bg-[#FFF8F0]">
+      
       {/* Hero Section */}
       <div className="bg-[#5D1A24] text-white py-32 px-6">
         <div className="container mx-auto max-w-5xl text-center">
@@ -41,14 +39,21 @@ export default function WomenPage() {
               className="group cursor-pointer"
             >
               <div className="bg-[#1E1E2C]/5 aspect-[3/4] mb-4 border border-[#1E1E2C]/10 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-[#1E1E2C]/20 font-serif italic">
-                  Product Image
-                </div>
+                <Image 
+                  src={product.image} 
+                  alt={product.name} 
+                  fill 
+                  className="object-cover group-hover:scale-105 transition duration-700"
+                />
                 <div className="absolute inset-0 bg-[#5D1A24]/0 group-hover:bg-[#5D1A24]/10 transition-colors duration-500"></div>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">{product.category}</p>
-              <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">{product.name}</h3>
-              <p className="text-sm text-[#1E1E2C]/60">{product.price}</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">
+                {product.category}
+              </p>
+              <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">
+                {product.name}
+              </h3>
+              <p className="text-sm text-[#1E1E2C]/60">PKR {product.price.toLocaleString()}</p>
             </Link>
           ))}
         </div>
