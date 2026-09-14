@@ -28,16 +28,14 @@ export default function WomenPage() {
       <div className="container mx-auto px-6 py-24 max-w-6xl">
         <div className="flex justify-between items-end mb-12 border-b border-[#1E1E2C]/10 pb-6">
           <h2 className="text-3xl font-serif text-[#1E1E2C]">The Atelier</h2>
-          <p className="text-[#1E1E2C]/50 text-xs uppercase tracking-widest">
-            {products.length} Pieces
-          </p>
+          <p className="text-[#1E1E2C]/50 text-xs uppercase tracking-widest">{products.length} Pieces</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((product) => (
             <Link 
               key={product.id} 
-              href={`/women/${product.id}`}
+              href={`/women/${product.id}`}   // ⚠️ UPDATED: /custom/ se /women/ kar diya
               className="group cursor-pointer"
             >
               <div className="bg-[#1E1E2C]/5 aspect-[3/4] mb-4 border border-[#1E1E2C]/10 overflow-hidden relative">
@@ -47,7 +45,6 @@ export default function WomenPage() {
                   fill 
                   className="object-cover group-hover:scale-105 transition duration-700"
                 />
-                {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-[#5D1A24]/0 group-hover:bg-[#5D1A24]/10 transition-colors duration-500"></div>
                 <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <span className="bg-white text-[#5D1A24] px-4 py-2 text-xs uppercase tracking-widest font-semibold inline-block">
@@ -55,9 +52,7 @@ export default function WomenPage() {
                   </span>
                 </div>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">
-                {product.category}
-              </p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">{product.category}</p>
               <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">
                 {product.name}
               </h3>
