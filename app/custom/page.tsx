@@ -1,86 +1,49 @@
-// app/custom/page.tsx
+// app/shop/page.tsx
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { PRODUCTS } from "@/lib/products";
 
-const SIGNATURE_DESIGNS = [
-  {
-    id: "atelier-navy",
-    name: "The Atelier Navy",
-    price: 85000,
-    image: "/images/editorial-custom.png",
-  },
-  {
-    id: "heritage-check",
-    name: "The Heritage Check",
-    price: 92000,
-    image: "/images/editorial-fabrics.png",
-  },
-  {
-    id: "modern-ivory",
-    name: "The Modern Ivory",
-    price: 78000,
-    image: "/images/product-alton.png",
-  },
-  {
-    id: "signature-charcoal",
-    name: "The Signature Charcoal",
-    price: 88000,
-    image: "/images/product-belgrave.png",
-  },
-  {
-    id: "midnight-blue",
-    name: "The Midnight Blue",
-    price: 95000,
-    image: "/images/product-camden.png",
-  },
-  {
-    id: "heritage-tweed",
-    name: "The Heritage Tweed",
-    price: 89000,
-    image: "/images/product-foxley.png",
-  },
-];
-
-export default function CustomGalleryPage() {
+export default function ShopPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-24 px-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
-            PADO Signature Designs
+            The Collection
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">
-            Exclusive Designer Collection
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">All Products</h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
-            One-of-a-kind designs crafted by PADO. Choose a design, provide your
-            measurements, and we&apos;ll tailor it to you.
+            Explore our complete collection of bespoke tailoring, ready-to-wear
+            suits, and signature designs.
           </p>
         </div>
 
-        {/* Designs Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {SIGNATURE_DESIGNS.map((design) => (
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {PRODUCTS.map((product) => (
             <Link
-              key={design.id}
-              href={`/custom/${design.id}`}
+              key={product.id}
+              href={`/shop/${product.id}`}
               className="group cursor-pointer"
             >
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
                 <Image
-                  src={design.image}
-                  alt={design.name}
+                  src={product.image}
+                  alt={product.name}
                   fill
                   className="object-cover group-hover:scale-105 transition duration-700"
                 />
               </div>
-              <h3 className="text-lg font-serif text-neutral-900 group-hover:text-amber-600 transition">
-                {design.name}
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-600 mb-1">
+                {product.category}
+              </p>
+              <h3 className="font-serif text-lg text-neutral-900 group-hover:text-amber-600 transition">
+                {product.name}
               </h3>
-              <p className="text-neutral-500 text-sm">
-                Rs. {design.price.toLocaleString()}
+              <p className="text-sm text-neutral-500">
+                Rs. {product.price.toLocaleString()}
               </p>
             </Link>
           ))}
