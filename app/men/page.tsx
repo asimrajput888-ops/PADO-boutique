@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { getProductsByCategory } from "@/lib/products";
 
 export default function MenPage() {
+  const products = getProductsByCategory("men");
+
   return (
-    // 1. Background ko Cream kar diya, Text ko Dark kar diya
     <div className="min-h-screen bg-[#FDFBF7] text-neutral-900">
       
       {/* Hero Section */}
@@ -21,52 +23,29 @@ export default function MenPage() {
         </p>
       </section>
 
-      {/* Product Grid (Example) */}
+      {/* Product Grid */}
       <section className="container mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* Card 1 */}
-          <div className="group">
-            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200 mb-4">
-              <Image 
-                src="/images/men-suit-1.jpg" 
-                alt="Bespoke Suit" 
-                fill 
-                className="object-cover group-hover:scale-105 transition duration-700"
-              />
-            </div>
-            <h3 className="text-lg font-serif text-neutral-900">The Italian Wool Suit</h3>
-            <p className="text-neutral-500 text-sm">Starting at Rs. 45,000</p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="group">
-            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200 mb-4">
-              <Image 
-                src="/images/men-suit-2.jpg" 
-                alt="Bespoke Suit" 
-                fill 
-                className="object-cover group-hover:scale-105 transition duration-700"
-              />
-            </div>
-            <h3 className="text-lg font-serif text-neutral-900">The Navy Blue Blazer</h3>
-            <p className="text-neutral-500 text-sm">Starting at Rs. 35,000</p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="group">
-            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200 mb-4">
-              <Image 
-                src="/images/men-suit-3.jpg" 
-                alt="Bespoke Suit" 
-                fill 
-                className="object-cover group-hover:scale-105 transition duration-700"
-              />
-            </div>
-            <h3 className="text-lg font-serif text-neutral-900">The Casual Linen Shirt</h3>
-            <p className="text-neutral-500 text-sm">Starting at Rs. 12,000</p>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product) => (
+            <Link 
+              key={product.id} 
+              href={`/shop/${product.id}`}
+              className="group cursor-pointer"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-200 mb-4">
+                <Image 
+                  src={product.image} 
+                  alt={product.name} 
+                  fill 
+                  className="object-cover group-hover:scale-105 transition duration-700"
+                />
+              </div>
+              <h3 className="text-lg font-serif text-neutral-900 group-hover:text-amber-600 transition">
+                {product.name}
+              </h3>
+              <p className="text-neutral-500 text-sm">Starting at Rs. {product.price.toLocaleString()}</p>
+            </Link>
+          ))}
         </div>
       </section>
     </div>
