@@ -1,105 +1,100 @@
+// components/site/site-header.tsx
+
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
   const { cart } = useCart();
-  const { currency, toggleCurrency } = useCurrency();
+  const { currency, setCurrency } = useCurrency();
 
-  const navLinks = [
-    { name: "Men", href: "/men" },
-    { name: "Women", href: "/women" },
-    { name: "Custom", href: "/custom" },
-    { name: "Shop", href: "/shop" },
-    { name: "About", href: "/about" },
-  ];
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FFF8F0]/95 backdrop-blur-sm border-b border-[#1E1E2C]/10">
-      <div className="container mx-auto px-6 h-24 flex items-center justify-between">
-        
-        {/* Logo - Serif & Gold */}
-        <Link href="/" className="text-3xl font-serif text-[#1E1E2C] tracking-[0.2em]">
-          PADO<span className="text-[#C5A059]">.</span>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-[#FDFBF7]/90 backdrop-blur-md border-b border-neutral-200"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="text-2xl font-serif tracking-tight text-neutral-900">
+          PADO<span className="text-amber-600">.</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-10">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
-              className="text-xs text-[#1E1E2C]/70 hover:text-[#5D1A24] transition-colors uppercase tracking-[0.15em]"
-            >
-              {link.name}
-            </Link>
-          ))}
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/men" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Men
+          </Link>
+          <Link href="/women" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Women
+          </Link>
+          <Link href="/custom" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Custom
+          </Link>
+          <Link href="/signature-suit" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Signature Suit
+          </Link>
+          <Link href="/shop" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Shop
+          </Link>
+          <Link href="/about" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            About
+          </Link>
+          <Link href="/journal" className="text-xs uppercase tracking-[0.2em] text-neutral-600 hover:text-amber-600 transition">
+            Journal
+          </Link>
         </nav>
 
-        {/* Right Side Icons */}
-        <div className="flex items-center space-x-6">
-          
-          <button 
-            onClick={toggleCurrency} 
-            className="text-xs text-[#1E1E2C]/70 hover:text-[#5D1A24] transition border border-[#1E1E2C]/20 px-3 py-1.5 tracking-widest"
+        {/* Right Side: Currency + Cart */}
+        <div className="flex items-center gap-4">
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className="bg-transparent text-xs uppercase tracking-widest text-neutral-600 border border-neutral-300 px-2 py-1 rounded cursor-pointer"
           >
-            {currency || "PKR"}
-          </button>
+            <option value="PKR">PKR</option>
+            <option value="USD">USD</option>
+          </select>
 
-          <Link href="/checkout" className="relative text-[#1E1E2C]/70 hover:text-[#5D1A24] transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          <Link href="/checkout" className="relative">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5 text-neutral-900"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
             </svg>
-            {cart.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#5D1A24] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                {cart.length}
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                {cartCount}
               </span>
             )}
           </Link>
-
-          <button 
-            className="md:hidden text-[#1E1E2C]/70 hover:text-[#5D1A24]"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              {isMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
-          </button>
         </div>
       </div>
-
-      {/* Mobile Navigation Dropdown */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-[#FFF8F0] border-t border-[#1E1E2C]/10 px-6 py-6 space-y-6">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
-              className="block text-[#1E1E2C]/70 hover:text-[#5D1A24] transition uppercase tracking-[0.15em] text-xs"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.name}
-            </Link>
-          ))}
-        </div>
-      )}
     </header>
   );
 }
