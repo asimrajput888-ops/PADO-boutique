@@ -309,3 +309,27 @@ export default function WomenBespokePage() {
                   </div>
                   <div className="flex justify-between">
                     {step > 1 ? (
+                      <button onClick={prevStep} className="text-[#1E1E2C]/50 hover:text-[#1E1E2C] font-medium text-sm">&larr; Back</button>
+                    ) : <div />}
+                    {step < totalSteps ? (
+                      <button onClick={nextStep}
+                        disabled={(step === 1 && !selection.fabric) || (step === 4 && !selection.fit)}
+                        className="bg-[#5D1A24] text-white px-8 py-3 font-semibold hover:bg-[#C5A059] transition rounded-lg disabled:opacity-50 text-sm">
+                        Next Step
+                      </button>
+                    ) : (
+                      <button onClick={handleAddToCart}
+                        className="bg-[#C5A059] text-white px-8 py-3 font-semibold hover:bg-[#5D1A24] transition rounded-lg text-sm">
+                        {added ? "✓ Added to Cart" : "Add to Cart"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
