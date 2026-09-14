@@ -1,52 +1,57 @@
-// app/shop/page.tsx
+// app/custom/page.tsx
 
 import Link from "next/link";
-import Image from "next/image";
-import { PRODUCTS } from "@/lib/products";
 
-export default function ShopPage() {
+export default function CustomGenderPage() {
   return (
-    <div className="min-h-screen bg-[#FDFBF7] py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
-            The Collection
+            PADO Signature Designs
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">All Products</h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">
+            Choose Your Collection
+          </h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
-            Explore our complete collection of bespoke tailoring, ready-to-wear
-            suits, and signature designs.
+            One-of-a-kind designs crafted by PADO. Choose a design, provide your measurements, and we'll tailor it to you in 3 weeks.
           </p>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {PRODUCTS.map((product) => (
-            <Link
-              key={product.id}
-              href={`/shop/${product.id}`}
-              className="group cursor-pointer"
-            >
-              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition duration-700"
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Men's Collection */}
+          <Link href="/custom/men" className="group cursor-pointer">
+            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
+              <img 
+                src="/images/editorial-men.png" 
+                alt="Men's Signature Designs" 
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-8 left-8 right-8">
+                <p className="text-amber-400 text-xs uppercase tracking-[0.3em] mb-2">Collection</p>
+                <h2 className="text-3xl font-serif text-white mb-2">Men's Signature</h2>
+                <p className="text-white/80 text-sm">Bespoke designs, hand-crafted for you.</p>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-600 mb-1">
-                {product.category}
-              </p>
-              <h3 className="font-serif text-lg text-neutral-900 group-hover:text-amber-600 transition">
-                {product.name}
-              </h3>
-              <p className="text-sm text-neutral-500">
-                Rs. {product.price.toLocaleString()}
-              </p>
-            </Link>
-          ))}
+            </div>
+          </Link>
+
+          {/* Women's Collection */}
+          <Link href="/custom/women" className="group cursor-pointer">
+            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
+              <img 
+                src="/images/editorial-women.png" 
+                alt="Women's Signature Designs" 
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#5D1A24]/80 to-transparent" />
+              <div className="absolute bottom-8 left-8 right-8">
+                <p className="text-[#C5A059] text-xs uppercase tracking-[0.3em] mb-2">Collection</p>
+                <h2 className="text-3xl font-serif text-white mb-2">Women's Signature</h2>
+                <p className="text-white/80 text-sm">Timeless couture, tailored to you.</p>
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
