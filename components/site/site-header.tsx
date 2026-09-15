@@ -13,9 +13,7 @@ export default function SiteHeader() {
   const { currency, setCurrency } = useCurrency();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -32,23 +30,25 @@ export default function SiteHeader() {
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className={`text-2xl font-serif tracking-tight transition-colors duration-500 ${
             scrolled ? "text-neutral-900" : "text-white"
           }`}
         >
-          PADO<span className="text-amber-600">.</span>
+          PADO<span className="text-amber-500">.</span>
         </Link>
 
-        {/* Navigation */}
+        {/* Nav Links */}
         <nav className="hidden md:flex items-center gap-8">
           {["MEN", "WOMEN", "CUSTOM", "SIGNATURE SUIT", "SHOP", "ABOUT", "JOURNAL"].map((item) => (
             <Link
               key={item}
               href={`/${item.toLowerCase().replace(" ", "-")}`}
               className={`text-xs uppercase tracking-[0.2em] transition-colors duration-500 ${
-                scrolled ? "text-neutral-600 hover:text-amber-600" : "text-white/80 hover:text-amber-500"
+                scrolled
+                  ? "text-neutral-600 hover:text-amber-600"
+                  : "text-white/90 hover:text-amber-400"
               }`}
             >
               {item}
