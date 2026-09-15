@@ -1,66 +1,163 @@
-// app/women/page.tsx
+// app/men/page.tsx
+
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { getProductsByCategory } from "@/lib/products";
 
-export default function WomenPage() {
-  const products = getProductsByCategory("women");
+export default function MenPage() {
+  const products = getProductsByCategory("men");
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0]">
+    <div className="min-h-screen bg-[#FDFBF7] text-neutral-900">
       
       {/* Hero Section */}
-      <div className="bg-[#5D1A24] text-white py-32 px-6">
-        <div className="container mx-auto max-w-5xl text-center">
-          <p className="text-[#C5A059] uppercase tracking-[0.4em] text-xs mb-6">Womenswear</p>
-          <h1 className="text-5xl md:text-7xl font-serif mb-6 tracking-tight">
-            Timeless <span className="italic text-[#C5A059]">Grace</span>
-          </h1>
-          <p className="text-white/70 max-w-xl mx-auto font-light leading-relaxed">
-            From silk loungewear to bespoke couture. Every piece tells a story of 
-            refined craftsmanship.
-          </p>
-        </div>
-      </div>
+      <section className="pt-32 pb-16 px-6 text-center">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase"
+        >
+          Gentlemen's Bespoke Atelier
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-4xl md:text-6xl font-serif mb-6"
+        >
+          Men's Sartorial Collection
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-neutral-600 max-w-2xl mx-auto text-lg leading-relaxed"
+        >
+          Hand-cut Italian wools, precision canvas construction, and timeless tailoring built to your exact silhouette.
+        </motion.p>
+      </section>
 
-      {/* Products Grid */}
-      <div className="container mx-auto px-6 py-24 max-w-6xl">
-        <div className="flex justify-between items-end mb-12 border-b border-[#1E1E2C]/10 pb-6">
-          <h2 className="text-3xl font-serif text-[#1E1E2C]">The Atelier</h2>
-          <p className="text-[#1E1E2C]/50 text-xs uppercase tracking-widest">{products.length} Pieces</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <Link 
-              key={product.id} 
-              href={`/women/${product.id}`}   // ⚠️ UPDATED: /custom/ se /women/ kar diya
-              className="group cursor-pointer"
+      {/* Products — Suitsupply Style Large Images */}
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+        <div className="space-y-32">
+          {products.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+                index % 2 === 1 ? "lg:grid-flow-dense" : ""
+              }`}
             >
-              <div className="bg-[#1E1E2C]/5 aspect-[3/4] mb-4 border border-[#1E1E2C]/10 overflow-hidden relative">
-                <Image 
-                  src={product.image} 
-                  alt={product.name} 
-                  fill 
-                  className="object-cover group-hover:scale-105 transition duration-700"
+              {/* Large Product Image */}
+              <Link
+                href={`/men/${product.id}`}
+                className={`group relative aspect-[4/5] overflow-hidden bg-neutral-100 ${
+                  index % 2 === 1 ? "lg:col-start-2" : ""
+                }`}
+              >
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-[#5D1A24]/0 group-hover:bg-[#5D1A24]/10 transition-colors duration-500"></div>
-                <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <span className="bg-white text-[#5D1A24] px-4 py-2 text-xs uppercase tracking-widest font-semibold inline-block">
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500" />
+              </Link>
+
+              {/* Product Info */}
+              <div className={`max-w-md ${index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""}`}>
+                <motion.p
+                  initial={{ opacity: 0, x: index % 2 === 1 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase"
+                >
+                  {product.category} Collection
+                </motion.p>
+                <motion.h2
+                  initial={{ opacity: 0, x: index % 2 === 1 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="text-3xl md:text-4xl font-serif mb-4"
+                >
+                  {product.name}
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, x: index % 2 === 1 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="text-neutral-600 leading-relaxed mb-6"
+                >
+                  {product.description}
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0, x: index % 2 === 1 ? -20 : 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="text-2xl font-serif text-neutral-900 mb-8"
+                >
+                  Rs. {product.price.toLocaleString()}
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  className="flex gap-4"
+                >
+                  <Link
+                    href={`/men/${product.id}`}
+                    className="bg-neutral-900 text-white px-8 py-4 text-xs uppercase tracking-widest font-semibold hover:bg-amber-600 transition-all duration-300"
+                  >
                     Customize This Piece
-                  </span>
-                </div>
+                  </Link>
+                  <Link
+                    href={`/shop/${product.id}`}
+                    className="border border-neutral-300 px-8 py-4 text-xs uppercase tracking-widest font-semibold hover:border-amber-600 hover:text-amber-600 transition-all duration-300"
+                  >
+                    View Details
+                  </Link>
+                </motion.div>
               </div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#C5A059] mb-1">{product.category}</p>
-              <h3 className="font-serif text-lg text-[#1E1E2C] mb-1 group-hover:text-[#5D1A24] transition">
-                {product.name}
-              </h3>
-              <p className="text-sm text-[#1E1E2C]/60">PKR {product.price.toLocaleString()}</p>
-            </Link>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="bg-neutral-900 text-white py-24 px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2 className="text-3xl md:text-5xl font-serif mb-6">
+            Experience the Art of Bespoke
+          </h2>
+          <p className="text-white/60 max-w-xl mx-auto mb-8">
+            Book a fitting consultation with our master tailors.
+          </p>
+          <Link
+            href="/custom"
+            className="bg-amber-600 text-black px-10 py-4 text-xs uppercase tracking-widest font-semibold hover:bg-amber-500 transition-all duration-300 inline-block"
+          >
+            Book Consultation
+          </Link>
+        </motion.div>
+      </section>
     </div>
   );
 }
