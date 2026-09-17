@@ -14,3 +14,7 @@ node_modules
 .next/
 .DS_Store
 .env.local
+.env.local
+.env.local.tsx
+.env
+.env.*.local
