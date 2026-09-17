@@ -4,19 +4,68 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
+import { supabase } from "@/lib/supabase";
 import { getProductById } from "@/lib/products";
-import { useParams } from "next/navigation";
-import { useState } from "react";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const id = params?.id as string;
-  const product = getProductById(id);
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
+
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      // Pehle Supabase se try karein
+      const { data: supabaseProduct } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (supabaseProduct) {
+        setProduct({
+          id: supabaseProduct.id,
+          name: supabaseProduct.name,
+          price: supabaseProduct.price,
+          image: supabaseProduct.image_url,
+          category: supabaseProduct.category,
+          description: supabaseProduct.description,
+        });
+      } else {
+        // Fallback: lib/products.ts se
+        const fallback = getProductById(id);
+        if (fallback) {
+          setProduct({
+            id: fallback.id,
+            name: fallback.name,
+            price: fallback.price,
+            image: fallback.image,
+            category: fallback.category,
+            description: fallback.description,
+          });
+        }
+      }
+      setLoading(false);
+    };
+
+    if (id) fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <p className="text-neutral-400">Loading...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -26,7 +75,7 @@ export default function ProductDetailPage() {
             Product Not Found
           </h1>
           <Link href="/shop" className="text-amber-600 hover:underline">
-            &larr; Back to Shop
+            ← Back to Shop
           </Link>
         </div>
       </div>
@@ -52,11 +101,11 @@ export default function ProductDetailPage() {
           href="/shop"
           className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block"
         >
-          &larr; Back to Shop
+          ← Back to Shop
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Product Image */}
+          {/* LEFT: Product Image */}
           <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
             <Image
               src={product.image}
@@ -66,7 +115,7 @@ export default function ProductDetailPage() {
             />
           </div>
 
-          {/* Product Details */}
+          {/* RIGHT: Product Details */}
           <div className="flex flex-col justify-center">
             <p className="text-amber-600 text-xs uppercase tracking-[0.3em] mb-4">
               {product.category}
@@ -91,10 +140,17 @@ export default function ProductDetailPage() {
 
               <Link
                 href="/custom"
-                className="block w-full text-center border border-neutral-300 py-4 font-semibold hover:border-amber-600 transition rounded-lg"
+                className="block w-full text-center border border-neutral-300 py-4 font-semibold hover:border-amber-600 hover:text-amber-600 transition rounded-lg"
               >
                 Customize This Piece
               </Link>
+            </div>
+
+            {/* Details */}
+            <div className="mt-8 pt-8 border-t border-neutral-200 space-y-2 text-sm text-neutral-500">
+              <p>• Free delivery worldwide</p>
+              <p>• Bespoke orders crafted in 3 weeks</p>
+              <p>• Handcrafted by master tailors</p>
             </div>
           </div>
         </div>
