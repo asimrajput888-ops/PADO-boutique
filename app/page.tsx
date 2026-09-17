@@ -77,28 +77,55 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Link href="/men" className="group block">
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-6">
-                <Image src="/images/editorial-men.png" alt="Men's Bespoke" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image
+                  src="/images/editorial-men.png"
+                  alt="Men's Bespoke"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
-              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">Tier 01</p>
-              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">Men's Bespoke</h3>
+              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">
+                Tier 01
+              </p>
+              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">
+                Men's Bespoke
+              </h3>
               <p className="text-neutral-500 text-sm">Full custom tailoring.</p>
             </Link>
 
             <Link href="/women" className="group block">
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-6">
-                <Image src="/images/editorial-women.png" alt="Women's Bespoke" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image
+                  src="/images/editorial-women.png"
+                  alt="Women's Bespoke"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
-              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">Tier 02</p>
-              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">Women's Bespoke</h3>
+              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">
+                Tier 02
+              </p>
+              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">
+                Women's Bespoke
+              </h3>
               <p className="text-neutral-500 text-sm">Timeless couture.</p>
             </Link>
 
             <Link href="/signature-suit" className="group block">
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-6">
-                <Image src="/images/garments/suit.webp" alt="Signature Suit" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image
+                  src="/images/garments/suit.webp"
+                  alt="Signature Suit"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
               </div>
-              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">Tier 03</p>
-              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">Signature Suit</h3>
+              <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-2 uppercase">
+                Tier 03
+              </p>
+              <h3 className="text-2xl font-serif mb-2 group-hover:text-amber-600 transition">
+                Signature Suit
+              </h3>
               <p className="text-neutral-500 text-sm">Ready-to-wear.</p>
             </Link>
           </div>
