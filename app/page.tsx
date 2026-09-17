@@ -20,7 +20,7 @@ export default function HomePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             className="z-10"
-          >
+            src="/images/hero.png"    {/* <-- Apni image ka path */}
             <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-6 uppercase">
               100% Made to Measure
             </p>
