@@ -45,7 +45,7 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          {/* RIGHT: Hero Image — Full Model Visible */}
+          {/* RIGHT: Hero Image */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
