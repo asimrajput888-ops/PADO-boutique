@@ -9,8 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
-import { FABRICS, STYLES, DETAILS, FIT_OPTIONS } from "@/lib/customizer-data";
+import { FABRICS, STYLES, DETAILS, FIT_OPTIONS, FINAL_SUIT_IMAGE } from "@/lib/customizer-data";
 import { getProductById } from "@/lib/products";
+import FittingRoom from "@/components/customizer/FittingRoom";
 
 export default function MenBespokePage() {
   const params = useParams();
@@ -134,33 +135,18 @@ export default function MenBespokePage() {
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left: Live Preview */}
-          <div className="hidden lg:flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm border border-white/60 rounded-2xl p-8 shadow-xl h-[600px]">
-            <div className="text-center w-full">
-              <p className="text-neutral-400 text-xs uppercase tracking-widest mb-2">Live Preview</p>
-              <h3 className="text-2xl font-serif text-neutral-800 mb-6">{product.name}</h3>
-              <div className="w-full h-72 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 flex items-center justify-center">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={400}
-                  height={500}
-                  className="object-contain p-4"
-                  style={{
-                    filter: currentFabric?.colorFilter || "none",
-                    transition: "filter 0.5s ease",
-                  }}
-                />
-              </div>
-              <div className="mt-6 space-y-1 text-xs text-neutral-500">
-                {currentFabric && <p>Fabric: <span className="font-medium text-neutral-700">{currentFabric.name}</span></p>}
-                {selection.style.length > 0 && <p>Style: <span className="font-medium text-neutral-700">{selection.style.length} selected</span></p>}
-                {selection.details.length > 0 && <p>Details: <span className="font-medium text-neutral-700">{selection.details.length} selected</span></p>}
-              </div>
-            </div>
+          {/* LEFT: LIVE FITTING ROOM PREVIEW */}
+          <div className="hidden lg:block sticky top-24 h-fit">
+            <FittingRoom
+              productImage={product.image}
+              productName={product.name}
+              selectedStyle={selection.style}
+              selectedDetails={selection.details}
+              fabricFilter={currentFabric?.colorFilter || "none"}
+            />
           </div>
 
-          {/* Right: Form */}
+          {/* RIGHT: FORM */}
           <div className="relative">
             <AnimatePresence mode="wait">
               <motion.div
@@ -196,10 +182,15 @@ export default function MenBespokePage() {
                     <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto pr-2">
                       {STYLES.map((s) => (
                         <button key={s.id} onClick={() => toggleArray("style", s.id)}
-                          className={`p-3 border rounded-lg text-left flex justify-between transition-all ${
+                          className={`p-3 border rounded-lg text-left flex justify-between items-center transition-all ${
                             selection.style.includes(s.id) ? "border-amber-600 bg-amber-50" : "border-neutral-200 hover:border-amber-400"
                           }`}>
-                          <span className="text-sm">{s.name}</span>
+                          <div className="flex items-center gap-3">
+                            {s.image && (
+                              <img src={s.image} alt={s.name} className="w-10 h-10 object-contain" />
+                            )}
+                            <span className="text-sm">{s.name}</span>
+                          </div>
                           <span className="text-xs text-neutral-500">{s.price > 0 ? `+ Rs. ${s.price.toLocaleString()}` : "Included"}</span>
                         </button>
                       ))}
@@ -214,10 +205,15 @@ export default function MenBespokePage() {
                     <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto pr-2">
                       {DETAILS.map((d) => (
                         <button key={d.id} onClick={() => toggleArray("details", d.id)}
-                          className={`p-3 border rounded-lg text-left flex justify-between transition-all ${
+                          className={`p-3 border rounded-lg text-left flex justify-between items-center transition-all ${
                             selection.details.includes(d.id) ? "border-amber-600 bg-amber-50" : "border-neutral-200 hover:border-amber-400"
                           }`}>
-                          <span className="text-sm">{d.name}</span>
+                          <div className="flex items-center gap-3">
+                            {d.image && (
+                              <img src={d.image} alt={d.name} className="w-10 h-10 object-contain" />
+                            )}
+                            <span className="text-sm">{d.name}</span>
+                          </div>
                           <span className="text-xs text-neutral-500">{d.price > 0 ? `+ Rs. ${d.price.toLocaleString()}` : "Included"}</span>
                         </button>
                       ))}
@@ -276,9 +272,14 @@ export default function MenBespokePage() {
                 {step === 6 && (
                   <div className="space-y-4">
                     <h2 className="text-2xl font-serif mb-6">Step 06 — Final Preview</h2>
-                    <div className="bg-neutral-100 rounded-lg h-56 flex items-center justify-center overflow-hidden">
-                      <Image src={product.image} alt={product.name} width={300} height={400}
-                        className="object-contain p-4" style={{ filter: currentFabric?.colorFilter || "none" }} />
+                    <div className="bg-neutral-100 rounded-lg h-64 flex items-center justify-center overflow-hidden">
+                      <Image
+                        src={FINAL_SUIT_IMAGE}
+                        alt="Final Suit"
+                        width={300}
+                        height={400}
+                        className="object-contain p-4"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
