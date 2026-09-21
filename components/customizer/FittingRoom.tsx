@@ -61,118 +61,46 @@ export default function FittingRoom({
 
   return (
     <div className="relative w-full h-[650px] rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-50 to-neutral-100 border border-neutral-200 shadow-xl">
-      
-      {/* Top Label */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 text-[10px] uppercase tracking-[0.3em] text-neutral-400 bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full">
         Live Preview
       </div>
 
-      {/* Zoom Controls */}
-      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
-        <TransformWrapper
-          initialScale={1}
-          minScale={0.5}
-          maxScale={3}
-          centerOnInit
-        >
+      <div className="absolute top-4 right-4 z-20">
+        <TransformWrapper initialScale={1} minScale={0.5} maxScale={3} centerOnInit>
           {({ zoomIn, zoomOut, resetTransform }) => (
             <>
-              <button
-                onClick={() => zoomIn()}
-                className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm"
-              >
-                <ZoomIn className="w-4 h-4 text-neutral-700" />
-              </button>
-              <button
-                onClick={() => zoomOut()}
-                className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm"
-              >
-                <ZoomOut className="w-4 h-4 text-neutral-700" />
-              </button>
-              <button
-                onClick={() => resetTransform()}
-                className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm"
-              >
-                <RotateCcw className="w-4 h-4 text-neutral-700" />
-              </button>
+              <div className="flex flex-col gap-2">
+                <button onClick={() => zoomIn()} className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm">
+                  <ZoomIn className="w-4 h-4 text-neutral-700" />
+                </button>
+                <button onClick={() => zoomOut()} className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm">
+                  <ZoomOut className="w-4 h-4 text-neutral-700" />
+                </button>
+                <button onClick={() => resetTransform()} className="w-9 h-9 bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-full flex items-center justify-center hover:bg-amber-50 hover:border-amber-400 transition shadow-sm">
+                  <RotateCcw className="w-4 h-4 text-neutral-700" />
+                </button>
+              </div>
 
-              {/* Main Image Area with Zoom */}
-              <TransformComponent
-                wrapperStyle={{ width: "100%", height: "100%" }}
-                contentStyle={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }} contentStyle={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div className="relative w-full h-full flex items-center justify-center">
-                  {/* Base Product Image */}
-                  <motion.div
-                    key={productImage}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    className="relative"
-                  >
-                    <Image
-                      src={productImage}
-                      alt={productName}
-                      width={400}
-                      height={550}
-                      className="object-contain"
-                      style={{
-                        filter: fabricFilter,
-                        transition: "filter 0.5s ease",
-                      }}
-                    />
+                  <motion.div key={productImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="relative">
+                    <Image src={productImage} alt={productName} width={400} height={550} className="object-contain" style={{ filter: fabricFilter, transition: "filter 0.5s ease" }} />
                   </motion.div>
 
-                  {/* Detail Layer (Vest/Trouser) — Top Right */}
                   <AnimatePresence>
-                    {currentDetailImage && (
-                      <motion.div
-                        key={currentDetailImage}
-                        initial={{ opacity: 0, x: 30, scale: 0.9 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: 30, scale: 0.9 }}
-                        transition={{ duration: 0.4 }}
-                        className="absolute top-6 right-6 w-28 h-28 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-amber-200 shadow-lg p-2"
-                      >
-                        <Image
-                          src={currentDetailImage}
-                          alt="Detail"
-                          fill
-                          className="object-contain p-2"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-amber-600 text-white text-[8px] uppercase tracking-widest text-center py-0.5">
-                          Detail
-                        </div>
+                    {currentStyleImage && (
+                      <motion.div key={currentStyleImage} initial={{ opacity: 0, x: -30, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -30, scale: 0.9 }} transition={{ duration: 0.4 }} className="absolute top-6 left-6 w-28 h-28 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-neutral-300 shadow-lg p-2">
+                        <Image src={currentStyleImage} alt="Style" fill className="object-contain p-2" />
+                        <div className="absolute bottom-0 left-0 right-0 bg-neutral-900 text-white text-[8px] uppercase tracking-widest text-center py-0.5">Style</div>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {/* Style Layer (Lapel/Button) — Top Left */}
                   <AnimatePresence>
-                    {currentStyleImage && (
-                      <motion.div
-                        key={currentStyleImage}
-                        initial={{ opacity: 0, x: -30, scale: 0.9 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: -30, scale: 0.9 }}
-                        transition={{ duration: 0.4 }}
-                        className="absolute top-6 left-6 w-28 h-28 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-neutral-300 shadow-lg p-2"
-                      >
-                        <Image
-                          src={currentStyleImage}
-                          alt="Style"
-                          fill
-                          className="object-contain p-2"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-neutral-900 text-white text-[8px] uppercase tracking-widest text-center py-0.5">
-                          Style
-                        </div>
+                    {currentDetailImage && (
+                      <motion.div key={currentDetailImage} initial={{ opacity: 0, x: 30, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 30, scale: 0.9 }} transition={{ duration: 0.4 }} className="absolute top-6 right-6 w-28 h-28 rounded-xl overflow-hidden bg-white/95 backdrop-blur-md border border-amber-200 shadow-lg p-2">
+                        <Image src={currentDetailImage} alt="Detail" fill className="object-contain p-2" />
+                        <div className="absolute bottom-0 left-0 right-0 bg-amber-600 text-white text-[8px] uppercase tracking-widest text-center py-0.5">Detail</div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -183,25 +111,14 @@ export default function FittingRoom({
         </TransformWrapper>
       </div>
 
-      {/* Selected Options Pills — Bottom */}
       <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-wrap gap-2 justify-center">
         {selectedStyle.map((s) => (
-          <motion.span
-            key={s}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-[10px] uppercase tracking-widest bg-neutral-900 text-white px-3 py-1.5 rounded-full font-medium shadow-sm"
-          >
+          <motion.span key={s} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-[10px] uppercase tracking-widest bg-neutral-900 text-white px-3 py-1.5 rounded-full font-medium shadow-sm">
             {s.replace("lapel-", "").replace("buttons-", "").replace("sleeve-", "")}
           </motion.span>
         ))}
         {selectedDetails.map((d) => (
-          <motion.span
-            key={d}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-[10px] uppercase tracking-widest bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-full font-medium shadow-sm"
-          >
+          <motion.span key={d} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-[10px] uppercase tracking-widest bg-amber-100 text-amber-800 border border-amber-200 px-3 py-1.5 rounded-full font-medium shadow-sm">
             {d.replace("trouser-", "").replace("vest-", "")}
           </motion.span>
         ))}
