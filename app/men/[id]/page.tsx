@@ -9,13 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
-import {
-  FABRICS,
-  STYLES,
-  DETAILS,
-  FIT_OPTIONS,
-  FINAL_SUIT_IMAGE,
-} from "@/lib/customizer-data";
+import { FABRICS, STYLES, DETAILS, FIT_OPTIONS, FINAL_SUIT_IMAGE } from "@/lib/customizer-data";
 import { getProductById } from "@/lib/products";
 import StepIndicator from "@/components/customizer/StepIndicator";
 import FittingRoom from "@/components/customizer/FittingRoom";
@@ -35,14 +29,7 @@ export default function MenBespokePage() {
     style: [] as string[],
     details: [] as string[],
     fit: "",
-    measurements: {
-      name: "",
-      email: "",
-      chest: "",
-      waist: "",
-      shoulder: "",
-      height: "",
-    },
+    measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "" },
   });
   const [added, setAdded] = useState(false);
 
@@ -52,12 +39,8 @@ export default function MenBespokePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-neutral-900 mb-4">
-            Product Not Found
-          </h1>
-          <Link href="/men" className="text-amber-600 hover:underline">
-            ← Back to Men's Collection
-          </Link>
+          <h1 className="text-4xl font-serif text-neutral-900 mb-4">Product Not Found</h1>
+          <Link href="/men" className="text-amber-600 hover:underline">← Back to Men's Collection</Link>
         </div>
       </div>
     );
@@ -86,35 +69,19 @@ export default function MenBespokePage() {
 
   const toggleStyle = (styleId: string) => {
     setSelection((prev) => {
-      const styleGroupPrefix = styleId.split("-")[0];
-      const filteredStyles = prev.style.filter((s) => {
-        const sPrefix = s.split("-")[0];
-        return sPrefix !== styleGroupPrefix;
-      });
-      const isAlreadySelected = prev.style.includes(styleId);
-      return {
-        ...prev,
-        style: isAlreadySelected
-          ? prev.style.filter((s) => s !== styleId)
-          : [...filteredStyles, styleId],
-      };
+      const prefix = styleId.split("-")[0];
+      const filtered = prev.style.filter((s) => s.split("-")[0] !== prefix);
+      const isSelected = prev.style.includes(styleId);
+      return { ...prev, style: isSelected ? prev.style.filter((s) => s !== styleId) : [...filtered, styleId] };
     });
   };
 
   const toggleDetail = (detailId: string) => {
     setSelection((prev) => {
-      const detailGroupPrefix = detailId.split("-")[0];
-      const filteredDetails = prev.details.filter((d) => {
-        const dPrefix = d.split("-")[0];
-        return dPrefix !== detailGroupPrefix;
-      });
-      const isAlreadySelected = prev.details.includes(detailId);
-      return {
-        ...prev,
-        details: isAlreadySelected
-          ? prev.details.filter((d) => d !== detailId)
-          : [...filteredDetails, detailId],
-      };
+      const prefix = detailId.split("-")[0];
+      const filtered = prev.details.filter((d) => d.split("-")[0] !== prefix);
+      const isSelected = prev.details.includes(detailId);
+      return { ...prev, details: isSelected ? prev.details.filter((d) => d !== detailId) : [...filtered, detailId] };
     });
   };
 
@@ -139,42 +106,21 @@ export default function MenBespokePage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-16 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Back Link */}
-        <Link
-          href="/men"
-          className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block"
-        >
+        <Link href="/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
           ← Back to Men's Collection
         </Link>
 
-        {/* Header */}
         <div className="text-center mb-12">
-          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
-            Bespoke Customizer
-          </p>
+          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Bespoke Customizer</p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4">{product.name}</h1>
           <p className="text-neutral-500 text-sm">
-            Step {step} of {totalSteps} —{" "}
-            {step === 1
-              ? "Choose Fabric"
-              : step === 2
-              ? "Choose Style"
-              : step === 3
-              ? "Customize Details"
-              : step === 4
-              ? "Your Fit"
-              : step === 5
-              ? "Measurements"
-              : "Final Preview"}
+            Step {step} of {totalSteps} — {step === 1 ? "Choose Fabric" : step === 2 ? "Choose Style" : step === 3 ? "Customize Details" : step === 4 ? "Your Fit" : step === 5 ? "Measurements" : "Final Preview"}
           </p>
         </div>
 
-        {/* Progress Bar */}
         <StepIndicator currentStep={step} totalSteps={totalSteps} />
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* LEFT: FITTING ROOM (60% width) */}
           <div className="lg:col-span-3 sticky top-24 h-fit">
             <FittingRoom
               productImage={product.image}
@@ -185,241 +131,77 @@ export default function MenBespokePage() {
             />
           </div>
 
-          {/* RIGHT: FORM (40% width) */}
           <div className="lg:col-span-2 relative">
             <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                variants={cardVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-8"
-              >
-                {/* Step 1: Fabric */}
+              <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-8">
                 {step === 1 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 01 — Choose Fabric
-                    </h2>
+                    <h2 className="text-2xl font-serif mb-6">Step 01 — Choose Fabric</h2>
                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {FABRICS.map((f) => (
-                        <button
-                          key={f.id}
-                          onClick={() =>
-                            setSelection({ ...selection, fabric: f.id })
-                          }
-                          className={`w-full p-4 border rounded-lg text-left flex justify-between items-center transition-all ${
-                            selection.fabric === f.id
-                              ? "border-amber-600 bg-amber-50 shadow-md"
-                              : "border-neutral-200 hover:border-amber-400"
-                          }`}
-                        >
+                        <button key={f.id} onClick={() => setSelection({ ...selection, fabric: f.id })}
+                          className={`w-full p-4 border rounded-lg text-left flex justify-between items-center transition-all ${selection.fabric === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"}`}>
                           <div className="flex items-center gap-3">
-                            <div
-                              className={`w-10 h-10 rounded-lg border border-neutral-300 ${
-                                f.id === "premium-wool"
-                                  ? "bg-neutral-800"
-                                  : f.id === "super-120s"
-                                  ? "bg-neutral-700"
-                                  : f.id === "super-130s"
-                                  ? "bg-neutral-600"
-                                  : f.id === "linen"
-                                  ? "bg-amber-100"
-                                  : f.id === "wool-blend"
-                                  ? "bg-neutral-500"
-                                  : "bg-amber-200"
-                              }`}
-                            />
+                            <div className={`w-10 h-10 rounded-lg border border-neutral-300 ${f.id === "premium-wool" ? "bg-neutral-800" : f.id === "super-120s" ? "bg-neutral-700" : f.id === "super-130s" ? "bg-neutral-600" : f.id === "linen" ? "bg-amber-100" : f.id === "wool-blend" ? "bg-neutral-500" : "bg-amber-200"}`} />
                             <span className="font-medium text-sm">{f.name}</span>
                           </div>
-                          <span className="text-xs text-neutral-500">
-                            {f.price > 0
-                              ? `+ Rs. ${f.price.toLocaleString()}`
-                              : "Included"}
-                          </span>
+                          <span className="text-xs text-neutral-500">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Step 2: Style */}
                 {step === 2 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 02 — Choose Style
-                    </h2>
-                    <StyleSelector
-                      styles={STYLES}
-                      selectedStyles={selection.style}
-                      onToggle={toggleStyle}
-                    />
+                    <h2 className="text-2xl font-serif mb-6">Step 02 — Choose Style</h2>
+                    <StyleSelector styles={STYLES} selectedStyles={selection.style} onToggle={toggleStyle} />
                   </div>
                 )}
 
-                {/* Step 3: Details */}
                 {step === 3 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 03 — Customize Details
-                    </h2>
-                    <DetailSelector
-                      details={DETAILS}
-                      selectedDetails={selection.details}
-                      onToggle={toggleDetail}
-                    />
+                    <h2 className="text-2xl font-serif mb-6">Step 03 — Customize Details</h2>
+                    <DetailSelector details={DETAILS} selectedDetails={selection.details} onToggle={toggleDetail} />
                   </div>
                 )}
 
-                {/* Step 4: Fit */}
                 {step === 4 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 04 — Your Fit
-                    </h2>
+                    <h2 className="text-2xl font-serif mb-6">Step 04 — Your Fit</h2>
                     <div className="space-y-3">
                       {FIT_OPTIONS.map((f) => (
-                        <button
-                          key={f.id}
-                          onClick={() =>
-                            setSelection({ ...selection, fit: f.id })
-                          }
-                          className={`w-full p-4 border rounded-lg text-left flex justify-between transition-all ${
-                            selection.fit === f.id
-                              ? "border-amber-600 bg-amber-50 shadow-md"
-                              : "border-neutral-200 hover:border-amber-400"
-                          }`}
-                        >
+                        <button key={f.id} onClick={() => setSelection({ ...selection, fit: f.id })}
+                          className={`w-full p-4 border rounded-lg text-left flex justify-between transition-all ${selection.fit === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"}`}>
                           <span className="font-medium text-sm">{f.name}</span>
-                          <span className="text-xs text-neutral-500">
-                            {f.price > 0
-                              ? `+ Rs. ${f.price.toLocaleString()}`
-                              : "Included"}
-                          </span>
+                          <span className="text-xs text-neutral-500">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Step 5: Measurements */}
                 {step === 5 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 05 — Your Measurements
-                    </h2>
+                    <h2 className="text-2xl font-serif mb-6">Step 05 — Your Measurements</h2>
                     <div className="space-y-3">
-                      <input
-                        type="text"
-                        placeholder="Full Name"
-                        value={selection.measurements.name}
-                        onChange={(e) =>
-                          setSelection({
-                            ...selection,
-                            measurements: {
-                              ...selection.measurements,
-                              name: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email Address"
-                        value={selection.measurements.email}
-                        onChange={(e) =>
-                          setSelection({
-                            ...selection,
-                            measurements: {
-                              ...selection.measurements,
-                              email: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                      />
+                      <input type="text" placeholder="Full Name" value={selection.measurements.name} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, name: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                      <input type="email" placeholder="Email Address" value={selection.measurements.email} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, email: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
                       <div className="grid grid-cols-2 gap-3">
-                        <input
-                          type="text"
-                          placeholder="Chest (in)"
-                          value={selection.measurements.chest}
-                          onChange={(e) =>
-                            setSelection({
-                              ...selection,
-                              measurements: {
-                                ...selection.measurements,
-                                chest: e.target.value,
-                              },
-                            })
-                          }
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Waist (in)"
-                          value={selection.measurements.waist}
-                          onChange={(e) =>
-                            setSelection({
-                              ...selection,
-                              measurements: {
-                                ...selection.measurements,
-                                waist: e.target.value,
-                              },
-                            })
-                          }
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Shoulder (in)"
-                          value={selection.measurements.shoulder}
-                          onChange={(e) =>
-                            setSelection({
-                              ...selection,
-                              measurements: {
-                                ...selection.measurements,
-                                shoulder: e.target.value,
-                              },
-                            })
-                          }
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Height (in)"
-                          value={selection.measurements.height}
-                          onChange={(e) =>
-                            setSelection({
-                              ...selection,
-                              measurements: {
-                                ...selection.measurements,
-                                height: e.target.value,
-                              },
-                            })
-                          }
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
-                        />
+                        <input type="text" placeholder="Chest (in)" value={selection.measurements.chest} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, chest: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                        <input type="text" placeholder="Waist (in)" value={selection.measurements.waist} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, waist: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                        <input type="text" placeholder="Shoulder (in)" value={selection.measurements.shoulder} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, shoulder: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                        <input type="text" placeholder="Height (in)" value={selection.measurements.height} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, height: e.target.value } })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Step 6: Preview */}
                 {step === 6 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">
-                      Step 06 — Final Preview
-                    </h2>
+                    <h2 className="text-2xl font-serif mb-6">Step 06 — Final Preview</h2>
                     <div className="bg-neutral-100 rounded-lg h-64 flex items-center justify-center overflow-hidden">
-                      <Image
-                        src={FINAL_SUIT_IMAGE}
-                        alt="Final Suit"
-                        width={300}
-                        height={400}
-                        className="object-contain p-4"
-                      />
+                      <Image src={FINAL_SUIT_IMAGE} alt="Final Suit" width={300} height={400} className="object-contain p-4" />
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
@@ -428,61 +210,36 @@ export default function MenBespokePage() {
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Fabric</p>
-                        <p className="font-medium">
-                          {currentFabric?.name || "Not selected"}
-                        </p>
+                        <p className="font-medium">{currentFabric?.name || "Not selected"}</p>
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Style</p>
-                        <p className="font-medium">
-                          {selection.style.length} selected
-                        </p>
+                        <p className="font-medium">{selection.style.length} selected</p>
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Details</p>
-                        <p className="font-medium">
-                          {selection.details.length} selected
-                        </p>
+                        <p className="font-medium">{selection.details.length} selected</p>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Price + Navigation */}
                 <div className="mt-8 pt-6 border-t border-neutral-100">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-sm text-neutral-500">Total Price</span>
-                    <span className="text-2xl font-serif text-amber-600">
-                      {formatPrice(totalPrice)}
-                    </span>
+                    <span className="text-2xl font-serif text-amber-600">{formatPrice(totalPrice)}</span>
                   </div>
                   <div className="flex justify-between">
                     {step > 1 ? (
-                      <button
-                        onClick={prevStep}
-                        className="text-neutral-500 hover:text-neutral-900 font-medium text-sm"
-                      >
-                        ← Back
-                      </button>
-                    ) : (
-                      <div />
-                    )}
+                      <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm">← Back</button>
+                    ) : <div />}
                     {step < totalSteps ? (
-                      <button
-                        onClick={nextStep}
-                        disabled={
-                          (step === 1 && !selection.fabric) ||
-                          (step === 4 && !selection.fit)
-                        }
-                        className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg disabled:opacity-50 text-sm"
-                      >
+                      <button onClick={nextStep} disabled={(step === 1 && !selection.fabric) || (step === 4 && !selection.fit)}
+                        className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg disabled:opacity-50 text-sm">
                         Next Step
                       </button>
                     ) : (
-                      <button
-                        onClick={handleAddToCart}
-                        className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm"
-                      >
+                      <button onClick={handleAddToCart} className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm">
                         {added ? "✓ Added to Cart" : "Add to Cart"}
                       </button>
                     )}
