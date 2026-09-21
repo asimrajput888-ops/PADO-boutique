@@ -8,21 +8,13 @@ interface StepIndicatorProps {
 }
 
 export default function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
-  const stepLabels = [
-    "Fabric",
-    "Style",
-    "Details",
-    "Fit",
-    "Measurements",
-    "Preview",
-  ];
+  const stepLabels = ["Fabric", "Style", "Details", "Fit", "Measurements", "Preview"];
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-12">
       <div className="flex items-center justify-between">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div key={i} className="flex items-center flex-1">
-            {/* Step Circle */}
             <div className="flex flex-col items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
@@ -43,8 +35,6 @@ export default function StepIndicator({ currentStep, totalSteps }: StepIndicator
                 {stepLabels[i]}
               </span>
             </div>
-
-            {/* Connector Line */}
             {i < totalSteps - 1 && (
               <div
                 className={`flex-1 h-[2px] mx-2 transition-colors duration-500 ${
