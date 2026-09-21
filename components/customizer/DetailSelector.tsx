@@ -20,7 +20,6 @@ interface DetailSelectorProps {
 }
 
 export default function DetailSelector({ details, selectedDetails, onToggle }: DetailSelectorProps) {
-  // Group details by category (Vest, Trouser)
   const groupedDetails = {
     "Vest Options": details.filter((d) => d.id.startsWith("vest-")),
     "Trouser Options": details.filter((d) => d.id.startsWith("trouser-")),
@@ -49,19 +48,12 @@ export default function DetailSelector({ details, selectedDetails, onToggle }: D
                       : "border-neutral-200 hover:border-amber-400 hover:bg-neutral-50"
                   }`}
                 >
-                  {/* Image Thumbnail */}
                   {item.image && (
                     <div className="relative w-16 h-16 flex-shrink-0 bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-contain p-1"
-                      />
+                      <Image src={item.image} alt={item.name} fill className="object-contain p-1" />
                     </div>
                   )}
 
-                  {/* Name */}
                   <div className="flex-1">
                     <p className="font-medium text-sm text-neutral-900">{item.name}</p>
                     <p className="text-xs text-neutral-500 mt-0.5">
@@ -69,14 +61,7 @@ export default function DetailSelector({ details, selectedDetails, onToggle }: D
                     </p>
                   </div>
 
-                  {/* Check Mark */}
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                      isSelected
-                        ? "bg-amber-600 text-white"
-                        : "border-2 border-neutral-300 group-hover:border-amber-400"
-                    }`}
-                  >
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${isSelected ? "bg-amber-600 text-white" : "border-2 border-neutral-300 group-hover:border-amber-400"}`}>
                     {isSelected && <Check className="w-4 h-4" />}
                   </div>
                 </motion.button>
