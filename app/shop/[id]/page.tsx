@@ -82,6 +82,10 @@ export default function ProductDetailPage() {
     );
   }
 
+  // Determine product type
+  const isReadyToWear = product.category === "signature";
+  const isCustomMade = product.category === "men" || product.category === "women";
+
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
@@ -131,19 +135,53 @@ export default function ProductDetailPage() {
             </p>
 
             <div className="space-y-4">
-              <button
-                onClick={handleAddToCart}
-                className="w-full bg-neutral-900 text-white py-4 font-semibold hover:bg-amber-600 transition rounded-lg"
-              >
-                {added ? "✓ Added to Cart" : "Add to Cart"}
-              </button>
+              {/* CUSTOM MADE: Only Customize Button */}
+              {isCustomMade && (
+                <>
+                  <Link
+                    href={`/${product.category}/${product.id}`}
+                    className="block w-full text-center bg-amber-600 text-white py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:bg-neutral-900 transition"
+                  >
+                    Start Customizing
+                  </Link>
+                  <p className="text-xs text-neutral-500 text-center">
+                    Customize style, fabric, details, and measurements
+                  </p>
+                </>
+              )}
 
-              <Link
-                href="/custom"
-                className="block w-full text-center border border-neutral-300 py-4 font-semibold hover:border-amber-600 hover:text-amber-600 transition rounded-lg"
-              >
-                Customize This Piece
-              </Link>
+              {/* READY TO WEAR: Only Add to Cart Button */}
+              {isReadyToWear && (
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-neutral-900 text-white py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:bg-amber-600 transition"
+                  >
+                    {added ? "✓ Added to Cart" : "Add to Cart"}
+                  </button>
+                  <p className="text-xs text-neutral-500 text-center">
+                    Ready to wear — immediate delivery
+                  </p>
+                </>
+              )}
+
+              {/* FALLBACK: If category is not set, show both */}
+              {!isCustomMade && !isReadyToWear && (
+                <>
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-neutral-900 text-white py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:bg-amber-600 transition"
+                  >
+                    {added ? "✓ Added to Cart" : "Add to Cart"}
+                  </button>
+                  <Link
+                    href={`/custom/${product.id}`}
+                    className="block w-full text-center border border-neutral-300 py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:border-amber-600 hover:text-amber-600 transition"
+                  >
+                    Customize This Piece
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Details */}
