@@ -9,9 +9,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
-import { FABRICS, STYLES, DETAILS, FIT_OPTIONS, FINAL_SUIT_IMAGE } from "@/lib/customizer-data";
+import {
+  FABRICS,
+  STYLES,
+  DETAILS,
+  FIT_OPTIONS,
+  FINAL_SUIT_IMAGE,
+} from "@/lib/customizer-data";
 import { getProductById } from "@/lib/products";
+import StepIndicator from "@/components/customizer/StepIndicator";
 import FittingRoom from "@/components/customizer/FittingRoom";
+import StyleSelector from "@/components/customizer/StyleSelector";
+import DetailSelector from "@/components/customizer/DetailSelector";
 
 export default function MenBespokePage() {
   const params = useParams();
@@ -26,7 +35,14 @@ export default function MenBespokePage() {
     style: [] as string[],
     details: [] as string[],
     fit: "",
-    measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "" },
+    measurements: {
+      name: "",
+      email: "",
+      chest: "",
+      waist: "",
+      shoulder: "",
+      height: "",
+    },
   });
   const [added, setAdded] = useState(false);
 
@@ -36,8 +52,12 @@ export default function MenBespokePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-neutral-900 mb-4">Product Not Found</h1>
-          <Link href="/men" className="text-amber-600 hover:underline">&larr; Back to Men's Collection</Link>
+          <h1 className="text-4xl font-serif text-neutral-900 mb-4">
+            Product Not Found
+          </h1>
+          <Link href="/men" className="text-amber-600 hover:underline">
+            ← Back to Men's Collection
+          </Link>
         </div>
       </div>
     );
@@ -64,12 +84,36 @@ export default function MenBespokePage() {
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
-  const toggleArray = (key: "style" | "details", value: string) => {
+  const toggleStyle = (styleId: string) => {
     setSelection((prev) => {
-      const arr = prev[key];
+      const styleGroupPrefix = styleId.split("-")[0];
+      const filteredStyles = prev.style.filter((s) => {
+        const sPrefix = s.split("-")[0];
+        return sPrefix !== styleGroupPrefix;
+      });
+      const isAlreadySelected = prev.style.includes(styleId);
       return {
         ...prev,
-        [key]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value],
+        style: isAlreadySelected
+          ? prev.style.filter((s) => s !== styleId)
+          : [...filteredStyles, styleId],
+      };
+    });
+  };
+
+  const toggleDetail = (detailId: string) => {
+    setSelection((prev) => {
+      const detailGroupPrefix = detailId.split("-")[0];
+      const filteredDetails = prev.details.filter((d) => {
+        const dPrefix = d.split("-")[0];
+        return dPrefix !== detailGroupPrefix;
+      });
+      const isAlreadySelected = prev.details.includes(detailId);
+      return {
+        ...prev,
+        details: isAlreadySelected
+          ? prev.details.filter((d) => d !== detailId)
+          : [...filteredDetails, detailId],
       };
     });
   };
@@ -94,9 +138,13 @@ export default function MenBespokePage() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-16 px-6">
-      <div className="max-w-6xl mx-auto">
-        <Link href="/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
-          &larr; Back to Men's Collection
+      <div className="max-w-7xl mx-auto">
+        {/* Back Link */}
+        <Link
+          href="/men"
+          className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block"
+        >
+          ← Back to Men's Collection
         </Link>
 
         {/* Header */}
@@ -107,36 +155,27 @@ export default function MenBespokePage() {
           <h1 className="text-3xl md:text-5xl font-serif mb-4">{product.name}</h1>
           <p className="text-neutral-500 text-sm">
             Step {step} of {totalSteps} —{" "}
-            {step === 1 ? "Choose Fabric" :
-             step === 2 ? "Choose Style" :
-             step === 3 ? "Customize Details" :
-             step === 4 ? "Your Fit" :
-             step === 5 ? "Measurements" : "Final Preview"}
+            {step === 1
+              ? "Choose Fabric"
+              : step === 2
+              ? "Choose Style"
+              : step === 3
+              ? "Customize Details"
+              : step === 4
+              ? "Your Fit"
+              : step === 5
+              ? "Measurements"
+              : "Final Preview"}
           </p>
         </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center justify-center gap-2 mb-12">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div key={i} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                step > i + 1 ? "bg-amber-600 text-white" :
-                step === i + 1 ? "bg-neutral-900 text-white" :
-                "bg-neutral-200 text-neutral-500"
-              }`}>
-                {i + 1}
-              </div>
-              {i < totalSteps - 1 && (
-                <div className={`w-8 h-[2px] ${step > i + 1 ? "bg-amber-600" : "bg-neutral-200"}`} />
-              )}
-            </div>
-          ))}
-        </div>
+        <StepIndicator currentStep={step} totalSteps={totalSteps} />
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* LEFT: LIVE FITTING ROOM PREVIEW */}
-          <div className="hidden lg:block sticky top-24 h-fit">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* LEFT: FITTING ROOM (60% width) */}
+          <div className="lg:col-span-3 sticky top-24 h-fit">
             <FittingRoom
               productImage={product.image}
               productName={product.name}
@@ -146,8 +185,8 @@ export default function MenBespokePage() {
             />
           </div>
 
-          {/* RIGHT: FORM */}
-          <div className="relative">
+          {/* RIGHT: FORM (40% width) */}
+          <div className="lg:col-span-2 relative">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -155,20 +194,50 @@ export default function MenBespokePage() {
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-8"
+                className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-8"
               >
                 {/* Step 1: Fabric */}
                 {step === 1 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 01 — Choose Fabric</h2>
-                    <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 01 — Choose Fabric
+                    </h2>
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                       {FABRICS.map((f) => (
-                        <button key={f.id} onClick={() => setSelection({ ...selection, fabric: f.id })}
-                          className={`w-full p-4 border rounded-lg text-left flex justify-between transition-all ${
-                            selection.fabric === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"
-                          }`}>
-                          <span className="font-medium text-sm">{f.name}</span>
-                          <span className="text-xs text-neutral-500">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
+                        <button
+                          key={f.id}
+                          onClick={() =>
+                            setSelection({ ...selection, fabric: f.id })
+                          }
+                          className={`w-full p-4 border rounded-lg text-left flex justify-between items-center transition-all ${
+                            selection.fabric === f.id
+                              ? "border-amber-600 bg-amber-50 shadow-md"
+                              : "border-neutral-200 hover:border-amber-400"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-lg border border-neutral-300 ${
+                                f.id === "premium-wool"
+                                  ? "bg-neutral-800"
+                                  : f.id === "super-120s"
+                                  ? "bg-neutral-700"
+                                  : f.id === "super-130s"
+                                  ? "bg-neutral-600"
+                                  : f.id === "linen"
+                                  ? "bg-amber-100"
+                                  : f.id === "wool-blend"
+                                  ? "bg-neutral-500"
+                                  : "bg-amber-200"
+                              }`}
+                            />
+                            <span className="font-medium text-sm">{f.name}</span>
+                          </div>
+                          <span className="text-xs text-neutral-500">
+                            {f.price > 0
+                              ? `+ Rs. ${f.price.toLocaleString()}`
+                              : "Included"}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -178,61 +247,56 @@ export default function MenBespokePage() {
                 {/* Step 2: Style */}
                 {step === 2 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 02 — Choose Style</h2>
-                    <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto pr-2">
-                      {STYLES.map((s) => (
-                        <button key={s.id} onClick={() => toggleArray("style", s.id)}
-                          className={`p-3 border rounded-lg text-left flex justify-between items-center transition-all ${
-                            selection.style.includes(s.id) ? "border-amber-600 bg-amber-50" : "border-neutral-200 hover:border-amber-400"
-                          }`}>
-                          <div className="flex items-center gap-3">
-                            {s.image && (
-                              <img src={s.image} alt={s.name} className="w-10 h-10 object-contain" />
-                            )}
-                            <span className="text-sm">{s.name}</span>
-                          </div>
-                          <span className="text-xs text-neutral-500">{s.price > 0 ? `+ Rs. ${s.price.toLocaleString()}` : "Included"}</span>
-                        </button>
-                      ))}
-                    </div>
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 02 — Choose Style
+                    </h2>
+                    <StyleSelector
+                      styles={STYLES}
+                      selectedStyles={selection.style}
+                      onToggle={toggleStyle}
+                    />
                   </div>
                 )}
 
                 {/* Step 3: Details */}
                 {step === 3 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 03 — Customize Details</h2>
-                    <div className="grid grid-cols-1 gap-3 max-h-96 overflow-y-auto pr-2">
-                      {DETAILS.map((d) => (
-                        <button key={d.id} onClick={() => toggleArray("details", d.id)}
-                          className={`p-3 border rounded-lg text-left flex justify-between items-center transition-all ${
-                            selection.details.includes(d.id) ? "border-amber-600 bg-amber-50" : "border-neutral-200 hover:border-amber-400"
-                          }`}>
-                          <div className="flex items-center gap-3">
-                            {d.image && (
-                              <img src={d.image} alt={d.name} className="w-10 h-10 object-contain" />
-                            )}
-                            <span className="text-sm">{d.name}</span>
-                          </div>
-                          <span className="text-xs text-neutral-500">{d.price > 0 ? `+ Rs. ${d.price.toLocaleString()}` : "Included"}</span>
-                        </button>
-                      ))}
-                    </div>
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 03 — Customize Details
+                    </h2>
+                    <DetailSelector
+                      details={DETAILS}
+                      selectedDetails={selection.details}
+                      onToggle={toggleDetail}
+                    />
                   </div>
                 )}
 
                 {/* Step 4: Fit */}
                 {step === 4 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 04 — Your Fit</h2>
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 04 — Your Fit
+                    </h2>
                     <div className="space-y-3">
                       {FIT_OPTIONS.map((f) => (
-                        <button key={f.id} onClick={() => setSelection({ ...selection, fit: f.id })}
+                        <button
+                          key={f.id}
+                          onClick={() =>
+                            setSelection({ ...selection, fit: f.id })
+                          }
                           className={`w-full p-4 border rounded-lg text-left flex justify-between transition-all ${
-                            selection.fit === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"
-                          }`}>
+                            selection.fit === f.id
+                              ? "border-amber-600 bg-amber-50 shadow-md"
+                              : "border-neutral-200 hover:border-amber-400"
+                          }`}
+                        >
                           <span className="font-medium text-sm">{f.name}</span>
-                          <span className="text-xs text-neutral-500">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
+                          <span className="text-xs text-neutral-500">
+                            {f.price > 0
+                              ? `+ Rs. ${f.price.toLocaleString()}`
+                              : "Included"}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -242,27 +306,101 @@ export default function MenBespokePage() {
                 {/* Step 5: Measurements */}
                 {step === 5 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 05 — Your Measurements</h2>
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 05 — Your Measurements
+                    </h2>
                     <div className="space-y-3">
-                      <input type="text" placeholder="Full Name" value={selection.measurements.name}
-                        onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, name: e.target.value } })}
-                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
-                      <input type="email" placeholder="Email Address" value={selection.measurements.email}
-                        onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, email: e.target.value } })}
-                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                      <input
+                        type="text"
+                        placeholder="Full Name"
+                        value={selection.measurements.name}
+                        onChange={(e) =>
+                          setSelection({
+                            ...selection,
+                            measurements: {
+                              ...selection.measurements,
+                              name: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={selection.measurements.email}
+                        onChange={(e) =>
+                          setSelection({
+                            ...selection,
+                            measurements: {
+                              ...selection.measurements,
+                              email: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                      />
                       <div className="grid grid-cols-2 gap-3">
-                        <input type="text" placeholder="Chest (in)" value={selection.measurements.chest}
-                          onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, chest: e.target.value } })}
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
-                        <input type="text" placeholder="Waist (in)" value={selection.measurements.waist}
-                          onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, waist: e.target.value } })}
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
-                        <input type="text" placeholder="Shoulder (in)" value={selection.measurements.shoulder}
-                          onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, shoulder: e.target.value } })}
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
-                        <input type="text" placeholder="Height (in)" value={selection.measurements.height}
-                          onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, height: e.target.value } })}
-                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none" />
+                        <input
+                          type="text"
+                          placeholder="Chest (in)"
+                          value={selection.measurements.chest}
+                          onChange={(e) =>
+                            setSelection({
+                              ...selection,
+                              measurements: {
+                                ...selection.measurements,
+                                chest: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Waist (in)"
+                          value={selection.measurements.waist}
+                          onChange={(e) =>
+                            setSelection({
+                              ...selection,
+                              measurements: {
+                                ...selection.measurements,
+                                waist: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Shoulder (in)"
+                          value={selection.measurements.shoulder}
+                          onChange={(e) =>
+                            setSelection({
+                              ...selection,
+                              measurements: {
+                                ...selection.measurements,
+                                shoulder: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Height (in)"
+                          value={selection.measurements.height}
+                          onChange={(e) =>
+                            setSelection({
+                              ...selection,
+                              measurements: {
+                                ...selection.measurements,
+                                height: e.target.value,
+                              },
+                            })
+                          }
+                          className="w-full border border-neutral-200 p-3 rounded-lg focus:border-amber-500 outline-none"
+                        />
                       </div>
                     </div>
                   </div>
@@ -271,7 +409,9 @@ export default function MenBespokePage() {
                 {/* Step 6: Preview */}
                 {step === 6 && (
                   <div className="space-y-4">
-                    <h2 className="text-2xl font-serif mb-6">Step 06 — Final Preview</h2>
+                    <h2 className="text-2xl font-serif mb-6">
+                      Step 06 — Final Preview
+                    </h2>
                     <div className="bg-neutral-100 rounded-lg h-64 flex items-center justify-center overflow-hidden">
                       <Image
                         src={FINAL_SUIT_IMAGE}
@@ -288,15 +428,21 @@ export default function MenBespokePage() {
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Fabric</p>
-                        <p className="font-medium">{currentFabric?.name || "Not selected"}</p>
+                        <p className="font-medium">
+                          {currentFabric?.name || "Not selected"}
+                        </p>
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Style</p>
-                        <p className="font-medium">{selection.style.length} selected</p>
+                        <p className="font-medium">
+                          {selection.style.length} selected
+                        </p>
                       </div>
                       <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                         <p className="text-neutral-400 mb-1">Details</p>
-                        <p className="font-medium">{selection.details.length} selected</p>
+                        <p className="font-medium">
+                          {selection.details.length} selected
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -306,21 +452,37 @@ export default function MenBespokePage() {
                 <div className="mt-8 pt-6 border-t border-neutral-100">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-sm text-neutral-500">Total Price</span>
-                    <span className="text-2xl font-serif text-amber-600">{formatPrice(totalPrice)}</span>
+                    <span className="text-2xl font-serif text-amber-600">
+                      {formatPrice(totalPrice)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     {step > 1 ? (
-                      <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm">&larr; Back</button>
-                    ) : <div />}
+                      <button
+                        onClick={prevStep}
+                        className="text-neutral-500 hover:text-neutral-900 font-medium text-sm"
+                      >
+                        ← Back
+                      </button>
+                    ) : (
+                      <div />
+                    )}
                     {step < totalSteps ? (
-                      <button onClick={nextStep}
-                        disabled={(step === 1 && !selection.fabric) || (step === 4 && !selection.fit)}
-                        className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg disabled:opacity-50 text-sm">
+                      <button
+                        onClick={nextStep}
+                        disabled={
+                          (step === 1 && !selection.fabric) ||
+                          (step === 4 && !selection.fit)
+                        }
+                        className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg disabled:opacity-50 text-sm"
+                      >
                         Next Step
                       </button>
                     ) : (
-                      <button onClick={handleAddToCart}
-                        className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm">
+                      <button
+                        onClick={handleAddToCart}
+                        className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm"
+                      >
                         {added ? "✓ Added to Cart" : "Add to Cart"}
                       </button>
                     )}
