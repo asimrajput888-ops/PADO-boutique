@@ -31,7 +31,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-64 bg-white border-r border-neutral-200 p-6 flex flex-col">
         <h2 className="text-xl font-serif mb-2">PADO</h2>
         <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-8">Admin Panel</p>
-
         <nav className="space-y-1 flex-1">
           <Link href="/admin/dashboard" className={`block p-3 rounded-lg text-sm transition ${pathname === "/admin/dashboard" ? "bg-neutral-900 text-white" : "hover:bg-neutral-100 text-neutral-700"}`}>
             Dashboard
@@ -39,8 +38,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/products" className={`block p-3 rounded-lg text-sm transition ${pathname.startsWith("/admin/products") ? "bg-neutral-900 text-white" : "hover:bg-neutral-100 text-neutral-700"}`}>
             Products
           </Link>
+          <Link href="/admin/models" className={`block p-3 rounded-lg text-sm transition ${pathname.startsWith("/admin/models") ? "bg-neutral-900 text-white" : "hover:bg-neutral-100 text-neutral-700"}`}>
+            Models
+          </Link>
         </nav>
-
         <button
           onClick={async () => {
             await supabase.auth.signOut();
@@ -51,7 +52,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           Logout
         </button>
       </aside>
-
       <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
