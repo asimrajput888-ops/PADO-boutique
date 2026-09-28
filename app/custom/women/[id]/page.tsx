@@ -2,103 +2,399 @@
 
 "use client";
 
-import Image from "next/image";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
+import { useCart } from "@/context/cart-context";
+import { useCurrency } from "@/context/currency-context";
+import { supabase } from "@/lib/supabase";
+import {
+  FABRICS, LAPEL_OPTIONS, BUTTON_OPTIONS, SLEEVE_OPTIONS,
+  SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS, TROUSER_OPTIONS,
+  SKIRT_OPTIONS, VENT_OPTIONS, VEST_OPTIONS, LINING_OPTIONS,
+} from "@/lib/customizer-data";
+import ThumbnailOption from "@/components/customizer/ThumbnailOption";
+import SimpleOption from "@/components/customizer/SimpleOption";
 
-// Same WOMEN_DESIGNS array (must match the gallery page)
-const WOMEN_DESIGNS = [
-  { id: "silk-loungewear", name: "The Silk Loungewear", price: 28000, image: "/images/editorial-women.png", description: "Pure silk loungewear set for effortless luxury at home." },
-  { id: "emerald-gown", name: "The Emerald Gown", price: 120000, image: "/images/product-kensington.png", description: "Hand-embroidered evening gown in emerald silk." },
-  { id: "ivory-chiffon", name: "The Ivory Chiffon", price: 65000, image: "/images/product-marlow.png", description: "Delicate chiffon with subtle gold detailing." },
-  { id: "gold-jacket", name: "The Gold Embroidered Jacket", price: 55000, image: "/images/editorial-fabrics.png", description: "Statement jacket with hand-embroidered gold motifs." },
-  { id: "atelier-blazer", name: "The Atelier Blazer", price: 75000, image: "/images/editorial-custom.png", description: "A tailored women's blazer, structured yet soft." },
-  { id: "heritage-coat", name: "The Heritage Coat", price: 95000, image: "/images/product-belgrave.png", description: "Full-length wool coat with a timeless silhouette." },
-];
+const DEMO_MODEL = {
+  id: "demo-women-1",
+  name: "The Signature Ivory",
+  price: 55000,
+  description: "Classic ivory suit with peak lapel",
+  image_url: "/images/garments/suit.webp",
+  default_fabric: "premium-wool",
+  default_lapel: "peak",
+  default_buttons: "2-button",
+  default_sleeve: "4-sleeve",
+  default_pocket: "patch",
+  default_fit: "slim",
+  default_trouser: "flat-front",
+  default_vent: "double-vent",
+  default_vest: "without-vest",
+  default_lining: "navy",
+};
 
-export default function WomenDesignDetailPage() {
+export default function WomenSignatureDetail() {
   const params = useParams();
   const id = params?.id as string;
-  const design = WOMEN_DESIGNS.find((d) => d.id === id);
+  const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
-  const [formData, setFormData] = useState({
-    name: "", email: "", phone: "",
-    chest: "", waist: "", shoulder: "", height: "", notes: "",
+  const [model, setModel] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [step, setStep] = useState(1);
+  const [selection, setSelection] = useState<any>({
+    fabric: "", lapel: "", buttons: "", sleeve: "", collar: "",
+    pocket: "", fit: "", trouser: "", skirt: "", vent: "", vest: "", lining: "",
+    measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "", notes: "" },
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [added, setAdded] = useState(false);
+  const totalSteps = 4;
 
-  if (!design) {
+  // Step change hone par scroll to top
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
+  useEffect(() => {
+    const fetchModel = async () => {
+      // Pehle Supabase se try karein
+      const { data } = await supabase.from("models").select("*").eq("id", id).single();
+      
+      let modelData;
+      if (data) {
+        modelData = data;
+      } else {
+        // Fallback: demo model
+        modelData = DEMO_MODEL;
+      }
+      
+      setModel(modelData);
+      
+      // Pre-selection with defaults
+      setSelection((prev: any) => ({
+        ...prev,
+        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
+        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
+        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
+        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
+        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
+        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
+        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
+        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
+        skirt: modelData.default_skirt || SKIRT_OPTIONS[0]?.id || "",
+        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
+        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
+        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
+      }));
+      setLoading(false);
+    };
+    fetchModel();
+  }, [id]);
+
+  const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
+
+  const totalPrice = useMemo(() => {
+    if (!model) return 0;
+    let price = model.price;
+    const add = (opt: any) => { if (opt) price += opt.price; };
+    add(currentFabric);
+    add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
+    add(BUTTON_OPTIONS.find((b) => b.id === selection.buttons));
+    add(SLEEVE_OPTIONS.find((s) => s.id === selection.sleeve));
+    add(SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar));
+    add(POCKET_OPTIONS.find((p) => p.id === selection.pocket));
+    add(FIT_OPTIONS.find((f) => f.id === selection.fit));
+    add(TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
+    add(SKIRT_OPTIONS.find((s) => s.id === selection.skirt));
+    add(VENT_OPTIONS.find((v) => v.id === selection.vent));
+    add(VEST_OPTIONS.find((v) => v.id === selection.vest));
+    add(LINING_OPTIONS.find((l) => l.id === selection.lining));
+    return price;
+  }, [selection, currentFabric, model]);
+
+  const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
+  const prevStep = () => setStep((p) => Math.max(p - 1, 1));
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: `${model.id}-custom-${Date.now()}`,
+      name: `${model.name} (Custom)`,
+      price: totalPrice,
+      image: model.image_url,
+      quantity: 1,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 3000);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+        <p className="text-[#1E1E2C]/40">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!model) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-[#1E1E2C] mb-4">Design Not Found</h1>
-          <Link href="/custom/women" className="text-[#5D1A24] hover:underline">
-            &larr; Back to Women's Collection
-          </Link>
+          <h1 className="text-4xl font-serif text-[#1E1E2C] mb-4">Model Not Found</h1>
+          <Link href="/custom/women" className="text-[#5D1A24] hover:underline">← Back to Women's Signature</Link>
         </div>
       </div>
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
+  const cardVariants = {
+    initial: { opacity: 0, x: 50 },
+    animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] py-24 px-6">
-      <div className="max-w-6xl mx-auto">
-        <Link href="/custom/women" className="text-sm text-neutral-500 hover:text-[#5D1A24] mb-8 inline-block">
-          &larr; Back to Women's Collection
-        </Link>
+    <div className="min-h-screen bg-[#FFF8F0] py-16 px-6">
+      <div className="max-w-4xl mx-auto">
+        <Link href="/custom/women" className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block">← Back to Models</Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Left: Design Image */}
-          <div>
-            <div className="relative aspect-[3/4] bg-[#1E1E2C]/5 overflow-hidden border border-[#1E1E2C]/10">
-              <Image src={design.image} alt={design.name} fill className="object-cover" />
-            </div>
-            <div className="mt-6">
-              <p className="text-[#C5A059] text-xs uppercase tracking-[0.3em] mb-2">PADO Signature Design</p>
-              <h1 className="text-3xl font-serif text-[#1E1E2C] mb-4">{design.name}</h1>
-              <p className="text-[#1E1E2C]/60 leading-relaxed mb-4">{design.description}</p>
-              <p className="text-2xl text-[#1E1E2C] font-serif">PKR {design.price.toLocaleString()}</p>
-            </div>
-          </div>
-
-          {/* Right: Measurement Form */}
-          <div className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 p-8 rounded-2xl shadow-xl h-fit">
-            {submitted ? (
-              <div className="text-center py-12">
-                <div className="text-5xl mb-4">✓</div>
-                <h2 className="text-2xl font-serif text-[#1E1E2C] mb-4">Order Received</h2>
-                <p className="text-[#1E1E2C]/60 mb-8">
-                  Thank you, {formData.name}. Our atelier will craft your piece in 3 weeks and contact you shortly.
-                </p>
-                <Link href="/" className="text-[#5D1A24] hover:underline">&larr; Back to Home</Link>
-              </div>
-            ) : (
-              <>
-                <h2 className="text-2xl font-serif text-[#1E1E2C] mb-2">Enter Your Measurements</h2>
-                <p className="text-sm text-[#1E1E2C]/50 mb-6">We'll craft this piece to fit you perfectly in 3 weeks.</p>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" required />
-                  <input type="email" placeholder="Email Address" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" required />
-                  <input type="tel" placeholder="Phone Number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" required />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input type="text" placeholder="Chest (in)" value={formData.chest} onChange={(e) => setFormData({ ...formData, chest: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" />
-                    <input type="text" placeholder="Waist (in)" value={formData.waist} onChange={(e) => setFormData({ ...formData, waist: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" />
-                    <input type="text" placeholder="Shoulder (in)" value={formData.shoulder} onChange={(e) => setFormData({ ...formData, shoulder: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" />
-                    <input type="text" placeholder="Height (in)" value={formData.height} onChange={(e) => setFormData({ ...formData, height: e.target.value })} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none" />
-                  </div>
-                  <textarea placeholder="Additional notes (optional)" value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full border border-neutral-200 p-3 rounded-lg focus:border-[#5D1A24] outline-none resize-none" />
-                  <button type="submit" className="w-full bg-[#5D1A24] text-white py-4 font-semibold hover:bg-[#C5A059] transition rounded-lg">Submit Order</button>
-                </form>
-              </>
-            )}
-          </div>
+        <div className="text-center mb-12">
+          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Customize Your Model</p>
+          <h1 className="text-3xl md:text-5xl font-serif mb-4 text-[#1E1E2C]">{model.name}</h1>
+          <p className="text-[#1E1E2C]/50 text-sm">
+            Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
+          </p>
         </div>
+
+        {/* Progress Bar */}
+        <div className="flex items-center justify-center gap-2 mb-12">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div key={i} className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                step > i + 1 ? "bg-[#5D1A24] text-white" : step === i + 1 ? "bg-[#1E1E2C] text-white" : "bg-[#1E1E2C]/10 text-[#1E1E2C]/40"
+              }`}>
+                {step > i + 1 ? "✓" : i + 1}
+              </div>
+              {i < totalSteps - 1 && <div className={`w-8 h-[2px] ${step > i + 1 ? "bg-[#5D1A24]" : "bg-[#1E1E2C]/10"}`} />}
+            </div>
+          ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10">
+
+            {/* ============ STEP 1: Fabric & Style ============ */}
+            {step === 1 && (
+              <div className="space-y-10">
+                <div>
+                  <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 01 — Fabric & Style</h2>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Fabric</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {FABRICS.map((f) => (
+                      <button key={f.id} onClick={() => setSelection({ ...selection, fabric: f.id })}
+                        className={`p-4 border rounded-xl flex flex-col items-center gap-2 transition-all ${
+                          selection.fabric === f.id ? "border-[#5D1A24] bg-[#5D1A24]/5 shadow-md" : "border-[#1E1E2C]/10 hover:border-[#C5A059]"
+                        }`}>
+                        <div className="w-12 h-12 rounded-full border-2 border-[#1E1E2C]/20" style={{ backgroundColor: f.color }} />
+                        <span className="text-sm font-medium text-[#1E1E2C]">{f.name}</span>
+                        <span className="text-xs text-[#1E1E2C]/50">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ✅ STYLE SECTION (Lapel, Buttons, Sleeve, Collar) */}
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Lapel Style</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {LAPEL_OPTIONS.map((l) => (
+                      <ThumbnailOption key={l.id} id={l.id} name={l.name} price={l.price} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Buttons</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {BUTTON_OPTIONS.map((b) => (
+                      <ThumbnailOption key={b.id} id={b.id} name={b.name} price={b.price} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Sleeve Buttons</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    {SLEEVE_OPTIONS.map((s) => (
+                      <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Shirt Collar</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {SHIRT_COLLAR_OPTIONS.map((c) => (
+                      <ThumbnailOption key={c.id} id={c.id} name={c.name} price={c.price} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ============ STEP 2: Details ============ */}
+            {step === 2 && (
+              <div className="space-y-10">
+                <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 02 — Customize Details</h2>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Pockets</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {POCKET_OPTIONS.map((p) => (
+                      <ThumbnailOption key={p.id} id={p.id} name={p.name} price={p.price} thumbnail={p.thumbnail} selected={selection.pocket === p.id} onSelect={() => setSelection({ ...selection, pocket: p.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Fit</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {FIT_OPTIONS.map((f) => (
+                      <ThumbnailOption key={f.id} id={f.id} name={f.name} price={f.price} thumbnail={f.thumbnail} selected={selection.fit === f.id} onSelect={() => setSelection({ ...selection, fit: f.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Bottoms (Trousers)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {TROUSER_OPTIONS.map((t) => (
+                      <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* ✅ SKIRT SECTION */}
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Or Choose a Skirt</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {SKIRT_OPTIONS.map((s) => (
+                      <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.skirt === s.id} onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Jacket Vents</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {VENT_OPTIONS.map((v) => (
+                      <ThumbnailOption key={v.id} id={v.id} name={v.name} price={v.price} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Vest</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {VEST_OPTIONS.map((v) => (
+                      <SimpleOption key={v.id} id={v.id} name={v.name} price={v.price} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Lining Color</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {LINING_OPTIONS.map((l) => (
+                      <button key={l.id} onClick={() => setSelection({ ...selection, lining: l.id })}
+                        className={`p-3 border rounded-xl flex flex-col items-center gap-2 transition-all ${
+                          selection.lining === l.id ? "border-[#5D1A24] bg-[#5D1A24]/5 shadow-md" : "border-[#1E1E2C]/10 hover:border-[#C5A059]"
+                        }`}>
+                        <div className="w-10 h-10 rounded-full border-2 border-[#1E1E2C]/20" style={{ backgroundColor: l.color }} />
+                        <span className="text-xs font-medium text-center text-[#1E1E2C]">{l.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ============ STEP 3: Measurements ============ */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 03 — Your Measurements</h2>
+                <div className="space-y-4">
+                  <input type="text" placeholder="Full Name" value={selection.measurements.name} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, name: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                  <input type="email" placeholder="Email Address" value={selection.measurements.email} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, email: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input type="text" placeholder="Chest (in)" value={selection.measurements.chest} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, chest: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                    <input type="text" placeholder="Waist (in)" value={selection.measurements.waist} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, waist: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                    <input type="text" placeholder="Shoulder (in)" value={selection.measurements.shoulder} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, shoulder: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                    <input type="text" placeholder="Height (in)" value={selection.measurements.height} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, height: e.target.value } })} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none bg-white/50" />
+                  </div>
+                  <textarea placeholder="Additional notes (optional)" value={selection.measurements.notes} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, notes: e.target.value } })} rows={3} className="w-full border border-[#1E1E2C]/10 p-3 rounded-lg focus:border-[#5D1A24] outline-none resize-none bg-white/50" />
+                </div>
+              </div>
+            )}
+
+            {/* ============ STEP 4: Final Review ============ */}
+            {step === 4 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 04 — Final Review</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10">
+                    <p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Model</p>
+                    <p className="font-medium text-[#1E1E2C]">{model.name}</p>
+                  </div>
+                  <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10">
+                    <p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Fabric</p>
+                    <p className="font-medium text-[#1E1E2C]">{currentFabric?.name || "Not selected"}</p>
+                  </div>
+                  {selection.lapel && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Lapel</p><p className="font-medium text-[#1E1E2C]">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
+                  {selection.buttons && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Buttons</p><p className="font-medium text-[#1E1E2C]">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
+                  {selection.collar && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Collar</p><p className="font-medium text-[#1E1E2C]">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
+                  {selection.fit && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Fit</p><p className="font-medium text-[#1E1E2C]">{FIT_OPTIONS.find((f) => f.id === selection.fit)?.name}</p></div>}
+                  {selection.trouser && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Trouser</p><p className="font-medium text-[#1E1E2C]">{TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
+                  {selection.skirt && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Skirt</p><p className="font-medium text-[#1E1E2C]">{SKIRT_OPTIONS.find((s) => s.id === selection.skirt)?.name}</p></div>}
+                  {selection.vent && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Vent</p><p className="font-medium text-[#1E1E2C]">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
+                  {selection.lining && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Lining</p><p className="font-medium text-[#1E1E2C]">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
+                </div>
+
+                <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 p-4 rounded-lg text-sm text-[#1E1E2C]">
+                  <p className="font-medium mb-1">📦 Order Summary</p>
+                  <p>Your bespoke piece will be handcrafted and delivered within 3 weeks.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Price + Navigation */}
+            <div className="mt-10 pt-6 border-t border-[#1E1E2C]/10">
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-sm text-[#1E1E2C]/50">Total Price</span>
+                <span className="text-2xl font-serif text-[#5D1A24]">{formatPrice(totalPrice)}</span>
+              </div>
+              <div className="flex justify-between">
+                {step > 1 ? (
+                  <button onClick={prevStep} className="text-[#1E1E2C]/50 hover:text-[#1E1E2C] font-medium text-sm">
+                    ← Back
+                  </button>
+                ) : <div />}
+                {step < totalSteps ? (
+                  <button onClick={nextStep}
+                    className="bg-[#1E1E2C] text-white px-8 py-3 font-semibold hover:bg-[#5D1A24] transition rounded-lg text-sm">
+                    Next Step
+                  </button>
+                ) : (
+                  <button onClick={handleAddToCart}
+                    className="bg-[#5D1A24] text-white px-8 py-3 font-semibold hover:bg-[#1E1E2C] transition rounded-lg text-sm">
+                    {added ? "✓ Added to Cart" : "Add to Cart"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
