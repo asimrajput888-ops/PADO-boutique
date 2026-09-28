@@ -17,7 +17,6 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
-// Fallback demo model
 const DEMO_MODEL = {
   id: "demo-1",
   name: "The Signature Navy",
@@ -53,32 +52,32 @@ export default function MenBespokePage() {
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
+  // ✅ FIX 2: Scroll to top whenever step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
   useEffect(() => {
     const fetchModel = async () => {
-      // Pehle Supabase se try karein
       const { data } = await supabase.from("models").select("*").eq("id", id).single();
       
-      let modelData;
-      if (data) {
-        modelData = data;
-      } else {
-        // Fallback: demo model
-        modelData = DEMO_MODEL;
-      }
-      
+      const modelData = data || DEMO_MODEL;
       setModel(modelData);
+      
+      // ✅ FIX 3: Pre-select first option if no default exists
       setSelection((prev: any) => ({
         ...prev,
-        fabric: modelData.default_fabric || "",
-        lapel: modelData.default_lapel || "",
-        buttons: modelData.default_buttons || "",
-        sleeve: modelData.default_sleeve || "",
-        pocket: modelData.default_pocket || "",
-        fit: modelData.default_fit || "",
-        trouser: modelData.default_trouser || "",
-        vent: modelData.default_vent || "",
-        vest: modelData.default_vest || "",
-        lining: modelData.default_lining || "",
+        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
+        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
+        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
+        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
+        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
+        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
+        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
+        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
+        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
+        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
+        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
       }));
       setLoading(false);
     };
