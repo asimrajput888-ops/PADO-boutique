@@ -1,5 +1,6 @@
 // lib/customizer-data.ts
 
+// ============ GARMENTS ============
 export const GARMENTS = [
   { id: "suit", name: "Full Suit", basePrice: 45000, type: "jacket" },
   { id: "blazer", name: "Blazer", basePrice: 32000, type: "jacket" },
@@ -9,6 +10,7 @@ export const GARMENTS = [
   { id: "waistcoat", name: "Waistcoat", basePrice: 18000, type: "vest" },
 ];
 
+// ============ FABRICS ============
 export const FABRICS = [
   { id: "premium-wool", name: "Premium Wool", price: 0, color: "#1a1a1a" },
   { id: "super-120s", name: "Super 120s", price: 5000, color: "#2d2d2d" },
@@ -18,12 +20,14 @@ export const FABRICS = [
   { id: "seasonal", name: "Seasonal Fabrics", price: 6000, color: "#8b7355" },
 ];
 
+// ============ LAPEL OPTIONS (3 icons) ============
 export const LAPEL_OPTIONS = [
   { id: "notch", name: "Notch Lapel", price: 0, thumbnail: "/images/thumbnails/notch-lapel.png" },
   { id: "peak", name: "Peak Lapel", price: 3000, thumbnail: "/images/thumbnails/peak-lapel.png" },
   { id: "shawl", name: "Shawl Lapel", price: 4000, thumbnail: "/images/thumbnails/shawl-lapel.png" },
 ];
 
+// ============ BUTTON OPTIONS (4 icons) ============
 export const BUTTON_OPTIONS = [
   { id: "1-button", name: "Single Breasted 1 Button", price: 0, thumbnail: "/images/thumbnails/1-button.png" },
   { id: "2-button", name: "Single Breasted 2 Button", price: 0, thumbnail: "/images/thumbnails/2-button.png" },
@@ -31,6 +35,7 @@ export const BUTTON_OPTIONS = [
   { id: "double-breasted", name: "Double Breasted", price: 4000, thumbnail: "/images/thumbnails/double-breasted.png" },
 ];
 
+// ============ SLEEVE OPTIONS (4 icons) ============
 export const SLEEVE_OPTIONS = [
   { id: "1-sleeve", name: "1 Sleeve Button", price: 0, thumbnail: "/images/thumbnails/1-sleeve.png" },
   { id: "2-sleeve", name: "2 Sleeve Buttons", price: 0, thumbnail: "/images/thumbnails/2-sleeve.png" },
@@ -38,6 +43,7 @@ export const SLEEVE_OPTIONS = [
   { id: "4-sleeve", name: "4 Sleeve Buttons", price: 500, thumbnail: "/images/thumbnails/4-sleeve.png" },
 ];
 
+// ============ SHIRT COLLAR OPTIONS (4 icons) ============
 export const SHIRT_COLLAR_OPTIONS = [
   { id: "point", name: "Point Collar", price: 0, thumbnail: "/images/thumbnails/point-collar.png" },
   { id: "spread", name: "Spread Collar", price: 0, thumbnail: "/images/thumbnails/spread-collar.png" },
@@ -45,30 +51,42 @@ export const SHIRT_COLLAR_OPTIONS = [
   { id: "button-down", name: "Button-Down Collar", price: 500, thumbnail: "/images/thumbnails/button-down-collar.png" },
 ];
 
+// ============ POCKET OPTIONS (3 icons) ============
 export const POCKET_OPTIONS = [
   { id: "ticket", name: "Ticket Pocket", price: 700, thumbnail: "/images/thumbnails/ticket-pocket.png" },
   { id: "patch", name: "Patch Pocket", price: 0, thumbnail: "/images/thumbnails/patch-pocket.png" },
   { id: "double-welt", name: "Double Welt Pocket", price: 800, thumbnail: "/images/thumbnails/double-welt.png" },
 ];
 
+// ============ FIT OPTIONS (3 icons) ============
 export const FIT_OPTIONS = [
   { id: "slim", name: "Slim Fit", price: 0, thumbnail: "/images/thumbnails/slim-fit.png" },
   { id: "modern", name: "Modern Fit", price: 0, thumbnail: "/images/thumbnails/modern-fit.png" },
   { id: "regular", name: "Regular Fit", price: 2000, thumbnail: "/images/thumbnails/regular-fit.png" },
 ];
 
+// ============ TROUSER OPTIONS (3 icons) ============
 export const TROUSER_OPTIONS = [
   { id: "flat-front", name: "Flat Front", price: 0, thumbnail: "/images/thumbnails/flat-front.png" },
   { id: "single-pleat", name: "Single Pleat", price: 500, thumbnail: "/images/thumbnails/single-pleat.png" },
   { id: "double-pleat", name: "Double Pleat", price: 1000, thumbnail: "/images/thumbnails/double-pleat.png" },
 ];
 
+// ============ SKIRT OPTIONS (Women Only — 3 icons) ============
+export const SKIRT_OPTIONS = [
+  { id: "pencil-skirt", name: "Pencil Skirt", price: 0, thumbnail: "/images/thumbnails/pencil-skirt.png" },
+  { id: "a-line-skirt", name: "A-Line Skirt", price: 0, thumbnail: "/images/thumbnails/a-line-skirt.png" },
+  { id: "pleated-skirt", name: "Pleated Skirt", price: 1500, thumbnail: "/images/thumbnails/pleated-skirt.png" },
+];
+
+// ============ VENT OPTIONS (3 icons) ============
 export const VENT_OPTIONS = [
   { id: "single-vent", name: "Single Vent (Centre Cut)", price: 0, thumbnail: "/images/thumbnails/single-vent.png" },
   { id: "double-vent", name: "Double Vent (Side Cut)", price: 0, thumbnail: "/images/thumbnails/double-vent.png" },
   { id: "no-vent", name: "No Vent", price: 0, thumbnail: "/images/thumbnails/no-vent.png" },
 ];
 
+// ============ VEST OPTIONS (Bina Icons — Sirf Text) ============
 export const VEST_OPTIONS = [
   { id: "without-vest", name: "Without Vest", price: 0 },
   { id: "vest-2-button", name: "2 Button Vest", price: 18000 },
@@ -78,6 +96,7 @@ export const VEST_OPTIONS = [
   { id: "vest-6-button", name: "6 Button Vest", price: 18000 },
 ];
 
+// ============ LINING OPTIONS (Bina Icons — Sirf Colors) ============
 export const LINING_OPTIONS = [
   { id: "navy", name: "Navy Lining", price: 0, color: "#1a237e" },
   { id: "black", name: "Black Lining", price: 0, color: "#000000" },
