@@ -1,4 +1,4 @@
-// app/men/[id]/page.tsx
+// app/custom/men/[id]/page.tsx
 
 "use client";
 
@@ -17,6 +17,24 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
+const DEMO_MODEL = {
+  id: "demo-1",
+  name: "The Signature Navy",
+  price: 55000,
+  description: "Classic navy suit with peak lapel",
+  image_url: "/images/garments/suit.webp",
+  default_fabric: "premium-wool",
+  default_lapel: "peak",
+  default_buttons: "2-button",
+  default_sleeve: "4-sleeve",
+  default_pocket: "patch",
+  default_fit: "slim",
+  default_trouser: "flat-front",
+  default_vent: "double-vent",
+  default_vest: "without-vest",
+  default_lining: "navy",
+};
+
 export default function MenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
@@ -34,28 +52,36 @@ export default function MenBespokePage() {
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
+  // ✅ FIX 2: Scroll to top whenever step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
   useEffect(() => {
     const fetchModel = async () => {
       const { data } = await supabase.from("models").select("*").eq("id", id).single();
-      if (data) {
-        setModel(data);
-        setSelection((prev: any) => ({
-          ...prev,
-          fabric: data.default_fabric || "",
-          lapel: data.default_lapel || "",
-          buttons: data.default_buttons || "",
-          sleeve: data.default_sleeve || "",
-          pocket: data.default_pocket || "",
-          fit: data.default_fit || "",
-          trouser: data.default_trouser || "",
-          vent: data.default_vent || "",
-          vest: data.default_vest || "",
-          lining: data.default_lining || "",
-        }));
-      }
+      
+      const modelData = data || DEMO_MODEL;
+      setModel(modelData);
+      
+      // ✅ FIX 3: Pre-select first option if no default exists
+      setSelection((prev: any) => ({
+        ...prev,
+        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
+        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
+        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
+        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
+        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
+        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
+        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
+        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
+        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
+        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
+        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
+      }));
       setLoading(false);
     };
-    if (id) fetchModel();
+    fetchModel();
   }, [id]);
 
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
@@ -304,13 +330,11 @@ export default function MenBespokePage() {
                   <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm">← Back</button>
                 ) : <div />}
                 {step < totalSteps ? (
-                  <button onClick={nextStep}
-                    className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg text-sm">
+                  <button onClick={nextStep} className="bg-neutral-900 text-white px-8 py-3 font-semibold hover:bg-amber-600 transition rounded-lg text-sm">
                     Next Step
                   </button>
                 ) : (
-                  <button onClick={handleAddToCart}
-                    className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm">
+                  <button onClick={handleAddToCart} className="bg-amber-600 text-white px-8 py-3 font-semibold hover:bg-neutral-900 transition rounded-lg text-sm">
                     {added ? "✓ Added to Cart" : "Add to Cart"}
                   </button>
                 )}
