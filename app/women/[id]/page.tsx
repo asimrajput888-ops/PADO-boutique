@@ -12,7 +12,7 @@ import { getProductById } from "@/lib/products";
 import {
   FABRICS, LAPEL_OPTIONS, BUTTON_OPTIONS, SLEEVE_OPTIONS,
   SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS, TROUSER_OPTIONS,
-  VENT_OPTIONS, VEST_OPTIONS, LINING_OPTIONS,
+  SKIRT_OPTIONS, VENT_OPTIONS, VEST_OPTIONS, LINING_OPTIONS,
 } from "@/lib/customizer-data";
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
@@ -26,7 +26,6 @@ export default function WomenBespokePage() {
 
   const [step, setStep] = useState(1);
   
-  // Pre-selected defaults set karna
   const [selection, setSelection] = useState<any>({
     fabric: FABRICS[0]?.id || "",
     lapel: LAPEL_OPTIONS[0]?.id || "",
@@ -36,6 +35,7 @@ export default function WomenBespokePage() {
     pocket: POCKET_OPTIONS[0]?.id || "",
     fit: FIT_OPTIONS[0]?.id || "",
     trouser: TROUSER_OPTIONS[0]?.id || "",
+    skirt: SKIRT_OPTIONS[0]?.id || "", // ✅ Skirt State
     vent: VENT_OPTIONS[0]?.id || "",
     vest: VEST_OPTIONS[0]?.id || "",
     lining: LINING_OPTIONS[0]?.id || "",
@@ -45,7 +45,6 @@ export default function WomenBespokePage() {
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
-  // Step change hone par scroll to top
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
@@ -74,6 +73,7 @@ export default function WomenBespokePage() {
     add(POCKET_OPTIONS.find((p) => p.id === selection.pocket));
     add(FIT_OPTIONS.find((f) => f.id === selection.fit));
     add(TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
+    add(SKIRT_OPTIONS.find((s) => s.id === selection.skirt)); // ✅ Skirt Price
     add(VENT_OPTIONS.find((v) => v.id === selection.vent));
     add(VEST_OPTIONS.find((v) => v.id === selection.vest));
     add(LINING_OPTIONS.find((l) => l.id === selection.lining));
@@ -116,7 +116,6 @@ export default function WomenBespokePage() {
           </p>
         </div>
 
-        {/* Progress Bar */}
         <div className="flex items-center justify-center gap-2 mb-12">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex items-center">
@@ -133,7 +132,6 @@ export default function WomenBespokePage() {
         <AnimatePresence mode="wait">
           <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10">
 
-            {/* Step 1: Fabric & Style */}
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -189,7 +187,6 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* Step 2: Details */}
             {step === 2 && (
               <div className="space-y-10">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 02 — Customize Details</h2>
@@ -213,10 +210,20 @@ export default function WomenBespokePage() {
                 </div>
 
                 <div>
-                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Trouser Style</h3>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Bottoms (Trousers)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {TROUSER_OPTIONS.map((t) => (
-                      <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id })} />
+                      <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* ✅ YEH NAYA SECTION SKIRT KE LIYE ADD KIYA HAI */}
+                <div>
+                  <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Or Choose a Skirt</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {SKIRT_OPTIONS.map((s) => (
+                      <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.skirt === s.id} onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })} />
                     ))}
                   </div>
                 </div>
@@ -254,7 +261,6 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* Step 3: Measurements */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 03 — Your Measurements</h2>
@@ -272,7 +278,6 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* Step 4: Final Review */}
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 04 — Final Review</h2>
@@ -289,6 +294,8 @@ export default function WomenBespokePage() {
                   {selection.buttons && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Buttons</p><p className="font-medium text-[#1E1E2C]">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
                   {selection.collar && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Collar</p><p className="font-medium text-[#1E1E2C]">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
                   {selection.fit && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Fit</p><p className="font-medium text-[#1E1E2C]">{FIT_OPTIONS.find((f) => f.id === selection.fit)?.name}</p></div>}
+                  {selection.trouser && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Trouser</p><p className="font-medium text-[#1E1E2C]">{TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
+                  {selection.skirt && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Skirt</p><p className="font-medium text-[#1E1E2C]">{SKIRT_OPTIONS.find((s) => s.id === selection.skirt)?.name}</p></div>}
                   {selection.vent && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Vent</p><p className="font-medium text-[#1E1E2C]">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
                   {selection.lining && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Lining</p><p className="font-medium text-[#1E1E2C]">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
                 </div>
@@ -300,7 +307,6 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* Price + Navigation */}
             <div className="mt-10 pt-6 border-t border-[#1E1E2C]/10">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-[#1E1E2C]/50">Total Price</span>
