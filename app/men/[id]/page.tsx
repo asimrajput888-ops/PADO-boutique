@@ -1,4 +1,4 @@
-// app/custom/men/[id]/page.tsx
+// app/men/[id]/page.tsx
 
 "use client";
 
@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
-import { supabase } from "@/lib/supabase";
+import { getProductById } from "@/lib/products";
 import {
   FABRICS, LAPEL_OPTIONS, BUTTON_OPTIONS, SLEEVE_OPTIONS,
   SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS, TROUSER_OPTIONS,
@@ -17,78 +17,54 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
-const DEMO_MODEL = {
-  id: "demo-1",
-  name: "The Signature Navy",
-  price: 55000,
-  description: "Classic navy suit with peak lapel",
-  image_url: "/images/garments/suit.webp",
-  default_fabric: "premium-wool",
-  default_lapel: "peak",
-  default_buttons: "2-button",
-  default_sleeve: "4-sleeve",
-  default_pocket: "patch",
-  default_fit: "slim",
-  default_trouser: "flat-front",
-  default_vent: "double-vent",
-  default_vest: "without-vest",
-  default_lining: "navy",
-};
-
 export default function MenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
+  const product = getProductById(id);
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
-  const [model, setModel] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
+  
+  // Pre-selected defaults set karna
   const [selection, setSelection] = useState<any>({
-    fabric: "", lapel: "", buttons: "", sleeve: "", collar: "",
-    pocket: "", fit: "", trouser: "", vent: "", vest: "", lining: "",
+    fabric: FABRICS[0]?.id || "",
+    lapel: LAPEL_OPTIONS[0]?.id || "",
+    buttons: BUTTON_OPTIONS[0]?.id || "",
+    sleeve: SLEEVE_OPTIONS[0]?.id || "",
+    collar: SHIRT_COLLAR_OPTIONS[0]?.id || "",
+    pocket: POCKET_OPTIONS[0]?.id || "",
+    fit: FIT_OPTIONS[0]?.id || "",
+    trouser: TROUSER_OPTIONS[0]?.id || "",
+    vent: VENT_OPTIONS[0]?.id || "",
+    vest: VEST_OPTIONS[0]?.id || "",
+    lining: LINING_OPTIONS[0]?.id || "",
     measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "", notes: "" },
   });
+  
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
-  // ✅ FIX 2: Scroll to top whenever step changes
+  // Step change hone par scroll to top
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
-  useEffect(() => {
-    const fetchModel = async () => {
-      const { data } = await supabase.from("models").select("*").eq("id", id).single();
-      
-      const modelData = data || DEMO_MODEL;
-      setModel(modelData);
-      
-      // ✅ FIX 3: Pre-select first option if no default exists
-      setSelection((prev: any) => ({
-        ...prev,
-        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
-        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
-        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
-        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
-        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
-        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
-        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
-        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
-        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
-        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
-        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
-      }));
-      setLoading(false);
-    };
-    fetchModel();
-  }, [id]);
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <div className="text-center">
+          <h1 className="text-4xl font-serif text-neutral-900 mb-4">Product Not Found</h1>
+          <Link href="/men" className="text-amber-600 hover:underline">← Back to Men's Collection</Link>
+        </div>
+      </div>
+    );
+  }
 
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
   const totalPrice = useMemo(() => {
-    if (!model) return 0;
-    let price = model.price;
+    let price = product.price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
     add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
@@ -102,25 +78,22 @@ export default function MenBespokePage() {
     add(VEST_OPTIONS.find((v) => v.id === selection.vest));
     add(LINING_OPTIONS.find((l) => l.id === selection.lining));
     return price;
-  }, [selection, currentFabric, model]);
+  }, [selection, currentFabric, product]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${model.id}-custom-${Date.now()}`,
-      name: `${model.name} (Custom)`,
+      id: `${product.id}-bespoke-${Date.now()}`,
+      name: `${product.name} (Bespoke)`,
       price: totalPrice,
-      image: model.image_url,
+      image: product.image,
       quantity: 1,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);
   };
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]"><p className="text-neutral-400">Loading...</p></div>;
-  if (!model) return <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]"><p>Model not found</p></div>;
 
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
@@ -131,16 +104,19 @@ export default function MenBespokePage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-16 px-6">
       <div className="max-w-4xl mx-auto">
-        <Link href="/custom/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">← Back to Models</Link>
+        <Link href="/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
+          ← Back to Men's Collection
+        </Link>
 
         <div className="text-center mb-12">
-          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Customize Your Model</p>
-          <h1 className="text-3xl md:text-5xl font-serif mb-4">{model.name}</h1>
+          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Bespoke Customizer</p>
+          <h1 className="text-3xl md:text-5xl font-serif mb-4">{product.name}</h1>
           <p className="text-neutral-500 text-sm">
             Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
           </p>
         </div>
 
+        {/* Progress Bar */}
         <div className="flex items-center justify-center gap-2 mb-12">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex items-center">
@@ -157,6 +133,7 @@ export default function MenBespokePage() {
         <AnimatePresence mode="wait">
           <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-10">
 
+            {/* Step 1: Fabric & Style */}
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -212,6 +189,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
+            {/* Step 2: Details */}
             {step === 2 && (
               <div className="space-y-10">
                 <h2 className="text-2xl font-serif mb-6">Step 02 — Customize Details</h2>
@@ -276,6 +254,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
+            {/* Step 3: Measurements */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6">Step 03 — Your Measurements</h2>
@@ -293,13 +272,14 @@ export default function MenBespokePage() {
               </div>
             )}
 
+            {/* Step 4: Final Review */}
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6">Step 04 — Final Review</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
-                    <p className="text-neutral-400 mb-1 text-xs uppercase">Model</p>
-                    <p className="font-medium">{model.name}</p>
+                    <p className="text-neutral-400 mb-1 text-xs uppercase">Product</p>
+                    <p className="font-medium">{product.name}</p>
                   </div>
                   <div className="bg-neutral-50 p-3 rounded border border-neutral-200">
                     <p className="text-neutral-400 mb-1 text-xs uppercase">Fabric</p>
@@ -320,6 +300,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
+            {/* Price + Navigation */}
             <div className="mt-10 pt-6 border-t border-neutral-100">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-neutral-500">Total Price</span>
