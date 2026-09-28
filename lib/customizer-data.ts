@@ -76,7 +76,7 @@ export const TROUSER_OPTIONS = [
 export const SKIRT_OPTIONS = [
   { id: "pencil-skirt", name: "Pencil Skirt", price: 0, thumbnail: "/images/thumbnails/pencil-skirt.png" },
   { id: "a-line-skirt", name: "A-Line Skirt", price: 0, thumbnail: "/images/thumbnails/a-line-skirt.png" },
-  { id: "pleated-skirt", name: "Pleated Skirt", price: 1500, thumbnail: "/images/thumbnails/pleated-skirt.png" },
+  { id: "mini-skirt", name: "Mini Skirt", price: 0, thumbnail: "/images/thumbnails/mini-skirt.png" },
 ];
 
 // ============ VENT OPTIONS (3 icons) ============
