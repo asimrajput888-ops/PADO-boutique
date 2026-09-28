@@ -71,12 +71,8 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-neutral-900 mb-4">
-            Product Not Found
-          </h1>
-          <Link href="/shop" className="text-amber-600 hover:underline">
-            ← Back to Shop
-          </Link>
+          <h1 className="text-4xl font-serif text-neutral-900 mb-4">Product Not Found</h1>
+          <Link href="/shop" className="text-amber-600 hover:underline">← Back to Shop</Link>
         </div>
       </div>
     );
@@ -101,22 +97,14 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-24 px-6">
       <div className="max-w-6xl mx-auto">
-        <Link
-          href="/shop"
-          className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block"
-        >
+        <Link href="/shop" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
           ← Back to Shop
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* LEFT: Product Image */}
           <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
+            <Image src={product.image} alt={product.name} fill className="object-cover" />
           </div>
 
           {/* RIGHT: Product Details */}
@@ -135,7 +123,7 @@ export default function ProductDetailPage() {
             </p>
 
             <div className="space-y-4">
-              {/* CUSTOM MADE: Only Customize Button */}
+              {/* CUSTOM MADE: Only Customize Button (links to /men/[id] or /women/[id]) */}
               {isCustomMade && (
                 <>
                   <Link
@@ -150,7 +138,7 @@ export default function ProductDetailPage() {
                 </>
               )}
 
-              {/* READY TO WEAR: Only Add to Cart Button */}
+              {/* READY TO WEAR: Only Add to Cart */}
               {isReadyToWear && (
                 <>
                   <button
@@ -162,24 +150,6 @@ export default function ProductDetailPage() {
                   <p className="text-xs text-neutral-500 text-center">
                     Ready to wear — immediate delivery
                   </p>
-                </>
-              )}
-
-              {/* FALLBACK: If category is not set, show both */}
-              {!isCustomMade && !isReadyToWear && (
-                <>
-                  <button
-                    onClick={handleAddToCart}
-                    className="w-full bg-neutral-900 text-white py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:bg-amber-600 transition"
-                  >
-                    {added ? "✓ Added to Cart" : "Add to Cart"}
-                  </button>
-                  <Link
-                    href={`/custom/${product.id}`}
-                    className="block w-full text-center border border-neutral-300 py-5 text-xs uppercase tracking-[0.3em] font-semibold hover:border-amber-600 hover:text-amber-600 transition"
-                  >
-                    Customize This Piece
-                  </Link>
                 </>
               )}
             </div>
