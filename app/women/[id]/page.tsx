@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
-import { supabase } from "@/lib/supabase";
+import { getProductById } from "@/lib/products";
 import {
   FABRICS, LAPEL_OPTIONS, BUTTON_OPTIONS, SLEEVE_OPTIONS,
   SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS, TROUSER_OPTIONS,
@@ -20,49 +20,51 @@ import SimpleOption from "@/components/customizer/SimpleOption";
 export default function WomenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
+  const product = getProductById(id);
   const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
-  const [model, setModel] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
+  
+  // Pre-selected defaults set karna
   const [selection, setSelection] = useState<any>({
-    fabric: "", lapel: "", buttons: "", sleeve: "", collar: "",
-    pocket: "", fit: "", trouser: "", vent: "", vest: "", lining: "",
+    fabric: FABRICS[0]?.id || "",
+    lapel: LAPEL_OPTIONS[0]?.id || "",
+    buttons: BUTTON_OPTIONS[0]?.id || "",
+    sleeve: SLEEVE_OPTIONS[0]?.id || "",
+    collar: SHIRT_COLLAR_OPTIONS[0]?.id || "",
+    pocket: POCKET_OPTIONS[0]?.id || "",
+    fit: FIT_OPTIONS[0]?.id || "",
+    trouser: TROUSER_OPTIONS[0]?.id || "",
+    vent: VENT_OPTIONS[0]?.id || "",
+    vest: VEST_OPTIONS[0]?.id || "",
+    lining: LINING_OPTIONS[0]?.id || "",
     measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "", notes: "" },
   });
+  
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
+  // Step change hone par scroll to top
   useEffect(() => {
-    const fetchModel = async () => {
-      const { data } = await supabase.from("models").select("*").eq("id", id).single();
-      if (data) {
-        setModel(data);
-        setSelection((prev: any) => ({
-          ...prev,
-          fabric: data.default_fabric || "",
-          lapel: data.default_lapel || "",
-          buttons: data.default_buttons || "",
-          sleeve: data.default_sleeve || "",
-          pocket: data.default_pocket || "",
-          fit: data.default_fit || "",
-          trouser: data.default_trouser || "",
-          vent: data.default_vent || "",
-          vest: data.default_vest || "",
-          lining: data.default_lining || "",
-        }));
-      }
-      setLoading(false);
-    };
-    if (id) fetchModel();
-  }, [id]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+        <div className="text-center">
+          <h1 className="text-4xl font-serif text-[#1E1E2C] mb-4">Product Not Found</h1>
+          <Link href="/women" className="text-[#5D1A24] hover:underline">← Back to Women's Collection</Link>
+        </div>
+      </div>
+    );
+  }
 
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
   const totalPrice = useMemo(() => {
-    if (!model) return 0;
-    let price = model.price;
+    let price = product.price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
     add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
@@ -76,25 +78,22 @@ export default function WomenBespokePage() {
     add(VEST_OPTIONS.find((v) => v.id === selection.vest));
     add(LINING_OPTIONS.find((l) => l.id === selection.lining));
     return price;
-  }, [selection, currentFabric, model]);
+  }, [selection, currentFabric, product]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${model.id}-custom-${Date.now()}`,
-      name: `${model.name} (Custom)`,
+      id: `${product.id}-bespoke-${Date.now()}`,
+      name: `${product.name} (Bespoke)`,
       price: totalPrice,
-      image: model.image_url,
+      image: product.image,
       quantity: 1,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);
   };
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]"><p className="text-[#1E1E2C]/40">Loading...</p></div>;
-  if (!model) return <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]"><p>Model not found</p></div>;
 
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
@@ -105,16 +104,19 @@ export default function WomenBespokePage() {
   return (
     <div className="min-h-screen bg-[#FFF8F0] py-16 px-6">
       <div className="max-w-4xl mx-auto">
-        <Link href="/custom/women" className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block">← Back to Models</Link>
+        <Link href="/women" className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block">
+          ← Back to Women's Collection
+        </Link>
 
         <div className="text-center mb-12">
-          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Customize Your Model</p>
-          <h1 className="text-3xl md:text-5xl font-serif mb-4 text-[#1E1E2C]">{model.name}</h1>
+          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Bespoke Customizer</p>
+          <h1 className="text-3xl md:text-5xl font-serif mb-4 text-[#1E1E2C]">{product.name}</h1>
           <p className="text-[#1E1E2C]/50 text-sm">
             Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
           </p>
         </div>
 
+        {/* Progress Bar */}
         <div className="flex items-center justify-center gap-2 mb-12">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex items-center">
@@ -131,6 +133,7 @@ export default function WomenBespokePage() {
         <AnimatePresence mode="wait">
           <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10">
 
+            {/* Step 1: Fabric & Style */}
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -186,6 +189,7 @@ export default function WomenBespokePage() {
               </div>
             )}
 
+            {/* Step 2: Details */}
             {step === 2 && (
               <div className="space-y-10">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 02 — Customize Details</h2>
@@ -250,6 +254,7 @@ export default function WomenBespokePage() {
               </div>
             )}
 
+            {/* Step 3: Measurements */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 03 — Your Measurements</h2>
@@ -267,13 +272,14 @@ export default function WomenBespokePage() {
               </div>
             )}
 
+            {/* Step 4: Final Review */}
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 04 — Final Review</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10">
-                    <p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Model</p>
-                    <p className="font-medium text-[#1E1E2C]">{model.name}</p>
+                    <p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Product</p>
+                    <p className="font-medium text-[#1E1E2C]">{product.name}</p>
                   </div>
                   <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10">
                     <p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Fabric</p>
@@ -294,6 +300,7 @@ export default function WomenBespokePage() {
               </div>
             )}
 
+            {/* Price + Navigation */}
             <div className="mt-10 pt-6 border-t border-[#1E1E2C]/10">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-[#1E1E2C]/50">Total Price</span>
