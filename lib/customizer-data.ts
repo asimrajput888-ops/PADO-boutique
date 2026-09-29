@@ -65,11 +65,18 @@ export const FIT_OPTIONS = [
   { id: "regular", name: "Regular Fit", price: 2000, thumbnail: "/images/thumbnails/regular-fit.png" },
 ];
 
-// ============ TROUSER OPTIONS (3 icons) ============
+// ============ MEN'S TROUSER OPTIONS (3 icons) ============
 export const TROUSER_OPTIONS = [
   { id: "flat-front", name: "Flat Front", price: 0, thumbnail: "/images/thumbnails/flat-front.png" },
   { id: "single-pleat", name: "Single Pleat", price: 500, thumbnail: "/images/thumbnails/single-pleat.png" },
   { id: "double-pleat", name: "Double Pleat", price: 1000, thumbnail: "/images/thumbnails/double-pleat.png" },
+];
+
+// ============ WOMEN'S TROUSER OPTIONS (3 icons) ============
+export const WOMEN_TROUSER_OPTIONS = [
+  { id: "straight-trouser", name: "Straight Leg", price: 0, thumbnail: "/images/thumbnails/straight-trouser.png" },
+  { id: "slim-trouser", name: "Slim Fit", price: 0, thumbnail: "/images/thumbnails/slim-trouser.png" },
+  { id: "wide-trouser", name: "Wide Leg", price: 1500, thumbnail: "/images/thumbnails/wide-trouser.png" },
 ];
 
 // ============ SKIRT OPTIONS (Women Only — 3 icons) ============
