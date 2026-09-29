@@ -19,7 +19,7 @@ export default function NewModel() {
     default_lapel: "notch",
     default_buttons: "2-button",
     default_sleeve: "4-sleeve",
-    default_pocket: "flap",
+    default_pocket: "patch",
     default_fit: "slim",
     default_trouser: "flat-front",
     default_vent: "double-vent",
@@ -79,19 +79,48 @@ export default function NewModel() {
       <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-neutral-200 p-8 rounded-lg">
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Model Name</label>
-          <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none" required />
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            placeholder="e.g., The Signature Navy"
+            required
+          />
         </div>
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Price (PKR)</label>
-          <input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none" required />
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Price (USD)</label>
+          <input
+            type="number"
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            placeholder="e.g., 300"
+            required
+          />
+          <p className="text-xs text-neutral-400 mt-1">
+            Enter price in USD (e.g., 300 for $300)
+          </p>
         </div>
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Description</label>
-          <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none" />
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows={3}
+            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none"
+            placeholder="Describe this model..."
+          />
         </div>
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Model Image</label>
-          <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} className="w-full border border-neutral-300 p-3 rounded-lg" required />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            className="w-full border border-neutral-300 p-3 rounded-lg"
+            required
+          />
         </div>
 
         <div className="border-t border-neutral-200 pt-6">
@@ -135,11 +164,49 @@ export default function NewModel() {
               </select>
             </div>
             <div>
+              <label className="block text-xs text-neutral-500 mb-1">Pocket</label>
+              <select value={formData.default_pocket} onChange={(e) => setFormData({ ...formData, default_pocket: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
+                <option value="ticket">Ticket Pocket</option>
+                <option value="patch">Patch Pocket</option>
+                <option value="double-welt">Double Welt Pocket</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-xs text-neutral-500 mb-1">Fit</label>
               <select value={formData.default_fit} onChange={(e) => setFormData({ ...formData, default_fit: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
                 <option value="slim">Slim</option>
                 <option value="modern">Modern</option>
                 <option value="regular">Regular</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Trouser</label>
+              <select value={formData.default_trouser} onChange={(e) => setFormData({ ...formData, default_trouser: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
+                <option value="flat-front">Flat Front</option>
+                <option value="single-pleat">Single Pleat</option>
+                <option value="double-pleat">Double Pleat</option>
+                <option value="straight-trouser">Straight Leg</option>
+                <option value="slim-trouser">Slim Fit</option>
+                <option value="wide-trouser">Wide Leg</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Vent</label>
+              <select value={formData.default_vent} onChange={(e) => setFormData({ ...formData, default_vent: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
+                <option value="single-vent">Single Vent</option>
+                <option value="double-vent">Double Vent</option>
+                <option value="no-vent">No Vent</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-neutral-500 mb-1">Vest</label>
+              <select value={formData.default_vest} onChange={(e) => setFormData({ ...formData, default_vest: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
+                <option value="without-vest">Without Vest</option>
+                <option value="vest-2-button">2 Button Vest</option>
+                <option value="vest-3-button">3 Button Vest</option>
+                <option value="vest-4-button">4 Button Vest</option>
+                <option value="vest-5-button">5 Button Vest</option>
+                <option value="vest-6-button">6 Button Vest</option>
               </select>
             </div>
             <div>
@@ -156,7 +223,11 @@ export default function NewModel() {
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="w-full bg-neutral-900 text-white py-4 rounded-lg font-semibold hover:bg-amber-600 transition disabled:opacity-50">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-neutral-900 text-white py-4 rounded-lg font-semibold hover:bg-amber-600 transition disabled:opacity-50"
+        >
           {loading ? "Saving..." : "Save Model"}
         </button>
       </form>
