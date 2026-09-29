@@ -109,7 +109,6 @@ export default function SiteHeader() {
                 scrolled ? "text-neutral-900" : "text-white"
               }`}
             >
-              <option value="PKR" className="text-neutral-900">PKR</option>
               <option value="USD" className="text-neutral-900">USD</option>
               <option value="CAD" className="text-neutral-900">CAD</option>
               <option value="EUR" className="text-neutral-900">EUR</option>
