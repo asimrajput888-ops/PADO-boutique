@@ -102,6 +102,7 @@ export default function SiteHeader() {
 
           {/* RIGHT: Currency + Cart */}
           <div className="flex items-center gap-5 z-10">
+            {/* ✅ Auto-detected Currency Dropdown */}
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
@@ -109,11 +110,11 @@ export default function SiteHeader() {
                 scrolled ? "text-neutral-900" : "text-white"
               }`}
             >
-              <option value="USD" className="text-neutral-900">USD</option>
-              <option value="CAD" className="text-neutral-900">CAD</option>
-              <option value="EUR" className="text-neutral-900">EUR</option>
-              <option value="AUD" className="text-neutral-900">AUD</option>
-              <option value="GBP" className="text-neutral-900">GBP</option>
+              <option value="USD" className="text-neutral-900">USD ($)</option>
+              <option value="CAD" className="text-neutral-900">CAD (C$)</option>
+              <option value="EUR" className="text-neutral-900">EUR (€)</option>
+              <option value="AUD" className="text-neutral-900">AUD (A$)</option>
+              <option value="GBP" className="text-neutral-900">GBP (£)</option>
               <option value="AED" className="text-neutral-900">AED</option>
             </select>
 
