@@ -4,10 +4,9 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// ✅ Base currency PKR hai. Baaki currencies ke conversion rates yahan hain.
-// Aap in rates ko baad mein update kar sakte hain (ya live API use kar sakte hain).
+// ✅ Base currency PKR hai (prices PKR mein hain).
+// Conversion rates approximate hain — aap baad mein update kar sakte hain.
 const CONVERSION_RATES: Record<string, number> = {
-  PKR: 1,
   USD: 0.0036,    // 1 PKR = 0.0036 USD
   CAD: 0.0049,    // 1 PKR = 0.0049 CAD
   EUR: 0.0033,    // 1 PKR = 0.0033 EUR
@@ -18,7 +17,6 @@ const CONVERSION_RATES: Record<string, number> = {
 
 // ✅ Currency Symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
-  PKR: "Rs.",
   USD: "$",
   CAD: "C$",
   EUR: "€",
@@ -36,14 +34,14 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState("PKR");
+  // ✅ Default currency USD set kar di
+  const [currency, setCurrency] = useState("USD");
 
   const formatPrice = (priceInPKR: number) => {
     const rate = CONVERSION_RATES[currency] || 1;
     const converted = priceInPKR * rate;
-    const symbol = CURRENCY_SYMBOLS[currency] || "Rs.";
+    const symbol = CURRENCY_SYMBOLS[currency] || "$";
     
-    // Number formatting (2 decimal places for foreign currencies)
     return `${symbol} ${converted.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
