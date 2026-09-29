@@ -32,6 +32,8 @@ export default function SiteHeader() {
       id: "custom-made",
       title: "Custom Made",
       links: [
+        { name: "Men's Bespoke", href: "/men" },
+        { name: "Women's Bespoke", href: "/women" },
         { name: "Signature Designs", href: "/custom" },
       ],
     },
@@ -39,7 +41,8 @@ export default function SiteHeader() {
       id: "ready-to-wear",
       title: "Ready to Wear",
       links: [
-        { name: "Limited Designs", href: "/signature-suit" },
+        { name: "Men", href: "/signature-suit/men" },
+        { name: "Women", href: "/signature-suit/women" },
       ],
     },
     {
@@ -47,10 +50,10 @@ export default function SiteHeader() {
       title: "Shop All",
       links: [
         { name: "All Products", href: "/shop" },
-        { name: "Men", href: "/shop" },
-        { name: "Women", href: "/shop" },
-        { name: "Custom Made", href: "/shop" },
-        { name: "Ready to Wear", href: "/shop" },
+        { name: "Men", href: "/men" },
+        { name: "Women", href: "/women" },
+        { name: "Custom Made", href: "/custom" },
+        { name: "Ready to Wear", href: "/signature-suit" },
       ],
     },
     {
@@ -108,6 +111,11 @@ export default function SiteHeader() {
             >
               <option value="PKR" className="text-neutral-900">PKR</option>
               <option value="USD" className="text-neutral-900">USD</option>
+              <option value="CAD" className="text-neutral-900">CAD</option>
+              <option value="EUR" className="text-neutral-900">EUR</option>
+              <option value="AUD" className="text-neutral-900">AUD</option>
+              <option value="GBP" className="text-neutral-900">GBP</option>
+              <option value="AED" className="text-neutral-900">AED</option>
             </select>
 
             <Link href="/checkout" className="relative">
@@ -203,7 +211,7 @@ export default function SiteHeader() {
 
               <div className="px-8 py-6 border-t border-neutral-200">
                 <p className="text-xs text-neutral-400 uppercase tracking-widest mb-3">Contact</p>
-                <p className="text-sm text-neutral-700">www.joinpado.com</p>
+                <p className="text-sm text-neutral-700">www.padoshop.com</p>
                 <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
               </div>
             </motion.div>
