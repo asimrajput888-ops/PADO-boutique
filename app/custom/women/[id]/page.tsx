@@ -61,19 +61,11 @@ export default function WomenSignatureDetail() {
 
   useEffect(() => {
     const fetchModel = async () => {
-      // Pehle Supabase se try karein
       const { data } = await supabase.from("models").select("*").eq("id", id).single();
       
-      let modelData;
-      if (data) {
-        modelData = data;
-      } else {
-        modelData = DEMO_MODEL;
-      }
-      
+      const modelData = data || DEMO_MODEL;
       setModel(modelData);
       
-      // Pre-selection with defaults
       setSelection((prev: any) => ({
         ...prev,
         fabric: modelData.default_fabric || FABRICS[0]?.id || "",
@@ -84,7 +76,7 @@ export default function WomenSignatureDetail() {
         pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
         fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
         trouser: modelData.default_trouser || WOMEN_TROUSER_OPTIONS[0]?.id || "",
-        skirt: modelData.default_skirt || SKIRT_OPTIONS[0]?.id || "",
+        skirt: modelData.default_skirt || "",
         vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
         vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
         lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
@@ -185,7 +177,6 @@ export default function WomenSignatureDetail() {
         <AnimatePresence mode="wait">
           <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10">
 
-            {/* ============ STEP 1: Fabric & Style ============ */}
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -243,7 +234,6 @@ export default function WomenSignatureDetail() {
               </div>
             )}
 
-            {/* ============ STEP 2: Details ============ */}
             {step === 2 && (
               <div className="space-y-10">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 02 — Customize Details</h2>
@@ -337,7 +327,6 @@ export default function WomenSignatureDetail() {
               </div>
             )}
 
-            {/* ============ STEP 3: Measurements ============ */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 03 — Your Measurements</h2>
@@ -355,7 +344,6 @@ export default function WomenSignatureDetail() {
               </div>
             )}
 
-            {/* ============ STEP 4: Final Review ============ */}
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-6 text-[#1E1E2C]">Step 04 — Final Review</h2>
@@ -385,7 +373,6 @@ export default function WomenSignatureDetail() {
               </div>
             )}
 
-            {/* Price + Navigation */}
             <div className="mt-10 pt-6 border-t border-[#1E1E2C]/10">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-sm text-[#1E1E2C]/50">Total Price</span>
@@ -393,18 +380,14 @@ export default function WomenSignatureDetail() {
               </div>
               <div className="flex justify-between">
                 {step > 1 ? (
-                  <button onClick={prevStep} className="text-[#1E1E2C]/50 hover:text-[#1E1E2C] font-medium text-sm">
-                    ← Back
-                  </button>
+                  <button onClick={prevStep} className="text-[#1E1E2C]/50 hover:text-[#1E1E2C] font-medium text-sm">← Back</button>
                 ) : <div />}
                 {step < totalSteps ? (
-                  <button onClick={nextStep}
-                    className="bg-[#1E1E2C] text-white px-8 py-3 font-semibold hover:bg-[#5D1A24] transition rounded-lg text-sm">
+                  <button onClick={nextStep} className="bg-[#1E1E2C] text-white px-8 py-3 font-semibold hover:bg-[#5D1A24] transition rounded-lg text-sm">
                     Next Step
                   </button>
                 ) : (
-                  <button onClick={handleAddToCart}
-                    className="bg-[#5D1A24] text-white px-8 py-3 font-semibold hover:bg-[#1E1E2C] transition rounded-lg text-sm">
+                  <button onClick={handleAddToCart} className="bg-[#5D1A24] text-white px-8 py-3 font-semibold hover:bg-[#1E1E2C] transition rounded-lg text-sm">
                     {added ? "✓ Added to Cart" : "Add to Cart"}
                   </button>
                 )}
