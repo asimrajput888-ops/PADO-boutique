@@ -69,29 +69,40 @@ export default function NewProduct() {
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-neutral-200 p-8 rounded-lg">
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Product Name</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Product Name
+          </label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            placeholder="e.g., The Italian Wool Suit"
             required
           />
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Price (PKR)</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Price (USD)
+          </label>
           <input
             type="number"
             value={formData.price}
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            placeholder="e.g., 300"
             required
           />
+          <p className="text-xs text-neutral-400 mt-1">
+            Enter price in USD (e.g., 300 for $300)
+          </p>
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Category</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Category
+          </label>
           <select
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -105,17 +116,22 @@ export default function NewProduct() {
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Description</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Description
+          </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={4}
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none"
+            placeholder="Describe the product..."
           />
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Product Image</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Product Image
+          </label>
           <input
             type="file"
             accept="image/*"
