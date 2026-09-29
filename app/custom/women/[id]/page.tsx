@@ -11,8 +11,9 @@ import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import {
   FABRICS, LAPEL_OPTIONS, BUTTON_OPTIONS, SLEEVE_OPTIONS,
-  SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS, TROUSER_OPTIONS,
-  SKIRT_OPTIONS, VENT_OPTIONS, VEST_OPTIONS, LINING_OPTIONS,
+  SHIRT_COLLAR_OPTIONS, POCKET_OPTIONS, FIT_OPTIONS,
+  WOMEN_TROUSER_OPTIONS, SKIRT_OPTIONS,
+  VENT_OPTIONS, VEST_OPTIONS, LINING_OPTIONS,
 } from "@/lib/customizer-data";
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
@@ -29,7 +30,8 @@ const DEMO_MODEL = {
   default_sleeve: "4-sleeve",
   default_pocket: "patch",
   default_fit: "slim",
-  default_trouser: "flat-front",
+  default_trouser: "straight-trouser",
+  default_skirt: "pencil-skirt",
   default_vent: "double-vent",
   default_vest: "without-vest",
   default_lining: "navy",
@@ -52,7 +54,7 @@ export default function WomenSignatureDetail() {
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
-  // Step change hone par scroll to top
+  // Step change par scroll to top
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
@@ -66,7 +68,6 @@ export default function WomenSignatureDetail() {
       if (data) {
         modelData = data;
       } else {
-        // Fallback: demo model
         modelData = DEMO_MODEL;
       }
       
@@ -82,7 +83,7 @@ export default function WomenSignatureDetail() {
         collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
         pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
         fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
-        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
+        trouser: modelData.default_trouser || WOMEN_TROUSER_OPTIONS[0]?.id || "",
         skirt: modelData.default_skirt || SKIRT_OPTIONS[0]?.id || "",
         vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
         vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
@@ -106,7 +107,7 @@ export default function WomenSignatureDetail() {
     add(SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar));
     add(POCKET_OPTIONS.find((p) => p.id === selection.pocket));
     add(FIT_OPTIONS.find((f) => f.id === selection.fit));
-    add(TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
+    add(WOMEN_TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
     add(SKIRT_OPTIONS.find((s) => s.id === selection.skirt));
     add(VENT_OPTIONS.find((v) => v.id === selection.vent));
     add(VEST_OPTIONS.find((v) => v.id === selection.vest));
@@ -204,7 +205,6 @@ export default function WomenSignatureDetail() {
                   </div>
                 </div>
 
-                {/* ✅ STYLE SECTION (Lapel, Buttons, Sleeve, Collar) */}
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Lapel Style</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -266,11 +266,20 @@ export default function WomenSignatureDetail() {
                   </div>
                 </div>
 
+                {/* ✅ WOMEN'S TROUSER OPTIONS (Straight, Slim, Wide) */}
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Bottoms (Trousers)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {TROUSER_OPTIONS.map((t) => (
-                      <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })} />
+                    {WOMEN_TROUSER_OPTIONS.map((t) => (
+                      <ThumbnailOption 
+                        key={t.id} 
+                        id={t.id} 
+                        name={t.name} 
+                        price={t.price} 
+                        thumbnail={t.thumbnail} 
+                        selected={selection.trouser === t.id} 
+                        onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })} 
+                      />
                     ))}
                   </div>
                 </div>
@@ -280,7 +289,15 @@ export default function WomenSignatureDetail() {
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Or Choose a Skirt</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {SKIRT_OPTIONS.map((s) => (
-                      <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.skirt === s.id} onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })} />
+                      <ThumbnailOption 
+                        key={s.id} 
+                        id={s.id} 
+                        name={s.name} 
+                        price={s.price} 
+                        thumbnail={s.thumbnail} 
+                        selected={selection.skirt === s.id} 
+                        onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })} 
+                      />
                     ))}
                   </div>
                 </div>
@@ -355,7 +372,7 @@ export default function WomenSignatureDetail() {
                   {selection.buttons && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Buttons</p><p className="font-medium text-[#1E1E2C]">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
                   {selection.collar && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Collar</p><p className="font-medium text-[#1E1E2C]">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
                   {selection.fit && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Fit</p><p className="font-medium text-[#1E1E2C]">{FIT_OPTIONS.find((f) => f.id === selection.fit)?.name}</p></div>}
-                  {selection.trouser && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Trouser</p><p className="font-medium text-[#1E1E2C]">{TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
+                  {selection.trouser && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Trouser</p><p className="font-medium text-[#1E1E2C]">{WOMEN_TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
                   {selection.skirt && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Skirt</p><p className="font-medium text-[#1E1E2C]">{SKIRT_OPTIONS.find((s) => s.id === selection.skirt)?.name}</p></div>}
                   {selection.vent && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Vent</p><p className="font-medium text-[#1E1E2C]">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
                   {selection.lining && <div className="bg-[#1E1E2C]/5 p-3 rounded border border-[#1E1E2C]/10"><p className="text-[#1E1E2C]/40 mb-1 text-xs uppercase">Lining</p><p className="font-medium text-[#1E1E2C]">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
