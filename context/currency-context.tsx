@@ -2,18 +2,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
-
-// ✅ Base currency PKR hai (prices PKR mein hain).
-// Conversion rates approximate hain — aap baad mein update kar sakte hain.
-const CONVERSION_RATES: Record<string, number> = {
-  USD: 0.0036,    // 1 PKR = 0.0036 USD
-  CAD: 0.0049,    // 1 PKR = 0.0049 CAD
-  EUR: 0.0033,    // 1 PKR = 0.0033 EUR
-  AUD: 0.0054,    // 1 PKR = 0.0054 AUD
-  GBP: 0.0028,    // 1 PKR = 0.0028 GBP
-  AED: 0.013,     // 1 PKR = 0.013 AED
-};
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 // ✅ Currency Symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -28,20 +17,89 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 interface CurrencyContextType {
   currency: string;
   setCurrency: (currency: string) => void;
-  formatPrice: (priceInPKR: number) => string;
+  formatPrice: (priceInUSD: number) => string;
+  loadingRates: boolean;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  // ✅ Default currency USD set kar di
   const [currency, setCurrency] = useState("USD");
+  const [rates, setRates] = useState<Record<string, number>>({ USD: 1 });
+  const [loadingRates, setLoadingRates] = useState(true);
 
-  const formatPrice = (priceInPKR: number) => {
-    const rate = CONVERSION_RATES[currency] || 1;
-    const converted = priceInPKR * rate;
+  // ✅ Step 1: Customer ki location detect karke currency set karein
+  useEffect(() => {
+    const detectUserCurrency = () => {
+      try {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        let detectedCurrency = "USD"; // Default
+
+        if (timezone.includes("Asia/Dubai") || timezone.includes("Asia/Muscat")) {
+          detectedCurrency = "AED";
+        } else if (timezone.includes("Europe/London")) {
+          detectedCurrency = "GBP";
+        } else if (timezone.includes("Europe")) {
+          detectedCurrency = "EUR";
+        } else if (timezone.includes("Australia")) {
+          detectedCurrency = "AUD";
+        } else if (timezone.includes("America/Toronto") || timezone.includes("America/Vancouver")) {
+          detectedCurrency = "CAD";
+        } else if (timezone.includes("America")) {
+          detectedCurrency = "USD";
+        }
+
+        setCurrency(detectedCurrency);
+      } catch (error) {
+        console.error("Currency detection failed:", error);
+        setCurrency("USD");
+      }
+    };
+
+    detectUserCurrency();
+  }, []);
+
+  // ✅ Step 2: Live exchange rates fetch karein (Frankfurter API - Free, No Key)
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        // Frankfurter API - Free, No API Key, 170+ currencies
+        const response = await fetch("https://api.frankfurter.app/latest?from=USD");
+        if (!response.ok) throw new Error("Failed to fetch rates");
+        
+        const data = await response.json();
+        // ✅ Rates ko base USD ke hisaab se set karein
+        setRates({
+          USD: 1,
+          ...data.rates,
+        });
+      } catch (error) {
+        console.error("Failed to fetch exchange rates:", error);
+        // Fallback: Approximate rates (agar API fail ho jaye)
+        setRates({
+          USD: 1,
+          CAD: 1.36,
+          EUR: 0.92,
+          AUD: 1.52,
+          GBP: 0.79,
+          AED: 3.67,
+        });
+      } finally {
+        setLoadingRates(false);
+      }
+    };
+
+    fetchRates();
+    // Har 6 ghante baad rates refresh karein
+    const interval = setInterval(fetchRates, 6 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatPrice = (priceInUSD: number) => {
+    const rate = rates[currency] || 1;
+    const converted = priceInUSD * rate;
     const symbol = CURRENCY_SYMBOLS[currency] || "$";
-    
+
     return `${symbol} ${converted.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
@@ -49,7 +107,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, loadingRates }}>
       {children}
     </CurrencyContext.Provider>
   );
