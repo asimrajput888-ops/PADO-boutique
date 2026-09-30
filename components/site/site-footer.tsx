@@ -1,50 +1,50 @@
-// components/Footer.tsx (ya jo bhi file ka naam hai)
+// components/site/site-footer.tsx
 
 import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-[#FFF8F0] border-t border-[#1E1E2C]/10 text-[#1E1E2C]/70 pt-20 pb-10">
+    <footer className="bg-white border-t border-neutral-200 text-neutral-600 pt-20 pb-10">
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
 
         {/* Brand */}
         <div>
-          <h3 className="text-2xl font-serif text-[#1E1E2C] mb-6 tracking-[0.2em]">
-            PADO<span className="text-[#C5A059]">.</span>
+          <h3 className="text-xl font-serif text-neutral-900 mb-6 tracking-[0.3em]">
+            PADO
           </h3>
-          <p className="text-sm leading-relaxed mb-6 max-w-xs">
+          <p className="text-sm leading-relaxed mb-6 max-w-xs text-neutral-500">
             Luxury bespoke tailoring and silk loungewear. Crafted for the modern individual.
           </p>
         </div>
 
         {/* Customer Care */}
         <div>
-          <h4 className="text-[#1E1E2C] font-serif mb-6 text-sm tracking-[0.15em] uppercase">
+          <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
             Customer Care
           </h4>
-          <ul className="space-y-4 text-sm">
+          <ul className="space-y-3 text-sm">
             <li>
-              <Link href="/contact" className="hover:text-[#5D1A24] transition">
+              <Link href="/contact" className="hover:text-neutral-900 transition-colors duration-300">
                 Contact
               </Link>
             </li>
             <li>
-              <Link href="/measurements" className="hover:text-[#5D1A24] transition">
+              <Link href="/measurements" className="hover:text-neutral-900 transition-colors duration-300">
                 Measurements
               </Link>
             </li>
             <li>
-              <Link href="/shipping" className="hover:text-[#5D1A24] transition">
+              <Link href="/shipping" className="hover:text-neutral-900 transition-colors duration-300">
                 Shipping
               </Link>
             </li>
             <li>
-              <Link href="/return" className="hover:text-[#5D1A24] transition">
+              <Link href="/return" className="hover:text-neutral-900 transition-colors duration-300">
                 Returns
               </Link>
             </li>
             <li>
-              <Link href="/track-order" className="hover:text-[#5D1A24] transition">
+              <Link href="/track-order" className="hover:text-neutral-900 transition-colors duration-300">
                 Track Order
               </Link>
             </li>
@@ -53,22 +53,22 @@ export default function SiteFooter() {
 
         {/* Company */}
         <div>
-          <h4 className="text-[#1E1E2C] font-serif mb-6 text-sm tracking-[0.15em] uppercase">
+          <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
             Company
           </h4>
-          <ul className="space-y-4 text-sm">
+          <ul className="space-y-3 text-sm">
             <li>
-              <Link href="/about" className="hover:text-[#5D1A24] transition">
+              <Link href="/about" className="hover:text-neutral-900 transition-colors duration-300">
                 About
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-[#5D1A24] transition">
+              <Link href="/about" className="hover:text-neutral-900 transition-colors duration-300">
                 Our Story
               </Link>
             </li>
             <li>
-              <Link href="/journal" className="hover:text-[#5D1A24] transition">
+              <Link href="/journal" className="hover:text-neutral-900 transition-colors duration-300">
                 Journal
               </Link>
             </li>
@@ -77,27 +77,27 @@ export default function SiteFooter() {
 
         {/* Policies */}
         <div>
-          <h4 className="text-[#1E1E2C] font-serif mb-6 text-sm tracking-[0.15em] uppercase">
+          <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
             Policies
           </h4>
-          <ul className="space-y-4 text-sm">
+          <ul className="space-y-3 text-sm">
             <li>
-              <Link href="/privacy" className="hover:text-[#5D1A24] transition">
+              <Link href="/privacy" className="hover:text-neutral-900 transition-colors duration-300">
                 Privacy
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="hover:text-[#5D1A24] transition">
+              <Link href="/terms" className="hover:text-neutral-900 transition-colors duration-300">
                 Terms
               </Link>
             </li>
             <li>
-              <Link href="/shipping" className="hover:text-[#5D1A24] transition">
+              <Link href="/shipping" className="hover:text-neutral-900 transition-colors duration-300">
                 Shipping Policy
               </Link>
             </li>
             <li>
-              <Link href="/return" className="hover:text-[#5D1A24] transition">
+              <Link href="/return" className="hover:text-neutral-900 transition-colors duration-300">
                 Returns
               </Link>
             </li>
@@ -105,8 +105,8 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 pt-8 border-t border-[#1E1E2C]/10 text-xs text-center text-[#1E1E2C]/40 tracking-widest">
-        &copy; {new Date().getFullYear()} PADO BOUTIQUE. ALL RIGHTS RESERVED.
+      <div className="container mx-auto px-6 pt-8 border-t border-neutral-200 text-[10px] text-center text-neutral-400 tracking-[0.3em] uppercase">
+        © {new Date().getFullYear()} PADO BOUTIQUE. ALL RIGHTS RESERVED.
       </div>
     </footer>
   );
