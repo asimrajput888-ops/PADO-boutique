@@ -16,7 +16,7 @@ export default function SiteHeader() {
   const { currency, setCurrency } = useCurrency();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -70,30 +70,43 @@ export default function SiteHeader() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-[#FDFBF7]/95 backdrop-blur-md border-b border-neutral-200"
-            : "bg-gradient-to-b from-black/50 to-transparent"
+            ? "bg-white/95 backdrop-blur-md border-b border-neutral-200/60"
+            : "bg-transparent"
         }`}
       >
-        <div className="relative flex items-center justify-between px-6 py-5">
+        <div className="relative flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
           
-          {/* LEFT: Hamburger Menu */}
+          {/* LEFT: Hamburger */}
           <button
             onClick={() => setMenuOpen(true)}
-            className="flex items-center gap-3 group z-10"
+            className="flex items-center gap-3 z-10 group"
+            aria-label="Menu"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className={`w-6 h-[1.5px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
-              <span className={`w-6 h-[1.5px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
-              <span className={`w-4 h-[1.5px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
+            <div className="flex flex-col gap-[5px]">
+              <span
+                className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                  scrolled ? "bg-neutral-900" : "bg-white"
+                }`}
+              />
+              <span
+                className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                  scrolled ? "bg-neutral-900" : "bg-white"
+                }`}
+              />
+              <span
+                className={`w-4 h-[1.2px] transition-colors duration-500 ${
+                  scrolled ? "bg-neutral-900" : "bg-white"
+                } group-hover:w-6`}
+              />
             </div>
           </button>
 
           {/* CENTER: Logo */}
           <Link
             href="/"
-            className={`absolute left-1/2 -translate-x-1/2 text-sm md:text-lg font-serif tracking-[0.35em] transition-colors duration-500 ${
+            className={`absolute left-1/2 -translate-x-1/2 text-[11px] md:text-sm font-serif tracking-[0.4em] transition-colors duration-500 ${
               scrolled ? "text-neutral-900" : "text-white"
             }`}
           >
@@ -101,12 +114,13 @@ export default function SiteHeader() {
           </Link>
 
           {/* RIGHT: Currency + Cart */}
-          <div className="flex items-center gap-5 z-10">
-            {/* ✅ Auto-detected Currency Dropdown */}
+          <div className="flex items-center gap-4 md:gap-6 z-10">
+            
+            {/* Currency */}
             <select
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className={`bg-transparent text-xs uppercase tracking-widest border-0 outline-none cursor-pointer transition-colors duration-500 ${
+              onChange={(e) => setCurrency(e.target.value as any)}
+              className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 ${
                 scrolled ? "text-neutral-900" : "text-white"
               }`}
             >
@@ -118,13 +132,26 @@ export default function SiteHeader() {
               <option value="AED" className="text-neutral-900">AED</option>
             </select>
 
+            {/* Cart */}
             <Link href="/checkout" className="relative">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor"
-                className={`w-5 h-5 transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1}
+                stroke="currentColor"
+                className={`w-[18px] h-[18px] md:w-5 md:h-5 transition-colors duration-500 ${
+                  scrolled ? "text-neutral-900" : "text-white"
+                }`}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"
+                />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
                   {cartCount}
                 </span>
               )}
@@ -142,7 +169,7 @@ export default function SiteHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
               onClick={() => setMenuOpen(false)}
             />
 
@@ -150,32 +177,37 @@ export default function SiteHeader() {
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              className="fixed top-0 left-0 h-full w-full md:w-[520px] bg-[#FDFBF7] z-[70] overflow-y-auto"
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
             >
+              {/* Drawer header */}
               <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200">
-                <span className="text-xs uppercase tracking-[0.3em] text-neutral-500">Menu</span>
+                <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
+                  Menu
+                </span>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="text-2xl text-neutral-900 hover:text-amber-600 transition"
+                  className="text-xl text-neutral-900 hover:text-neutral-500 transition"
+                  aria-label="Close"
                 >
                   ✕
                 </button>
               </div>
 
+              {/* Menu content */}
               <div className="px-8 py-10">
                 {menuSections.map((section) => (
-                  <div key={section.id} className="mb-10">
+                  <div key={section.id} className="mb-8">
                     <button
                       onClick={() =>
                         setOpenSubmenu(openSubmenu === section.id ? null : section.id)
                       }
                       className="w-full text-left flex items-center justify-between mb-4 group"
                     >
-                      <span className="text-2xl md:text-3xl font-serif text-neutral-900 group-hover:text-amber-600 transition">
+                      <span className="text-xl md:text-2xl font-serif text-neutral-900 group-hover:text-neutral-500 transition">
                         {section.title}
                       </span>
-                      <span className="text-neutral-400 text-sm">
+                      <span className="text-neutral-400 text-lg font-light">
                         {openSubmenu === section.id ? "−" : "+"}
                       </span>
                     </button>
@@ -195,7 +227,7 @@ export default function SiteHeader() {
                                 <Link
                                   href={link.href}
                                   onClick={() => setMenuOpen(false)}
-                                  className="block text-base text-neutral-600 hover:text-amber-600 transition tracking-wide"
+                                  className="block text-sm text-neutral-600 hover:text-neutral-900 transition tracking-wide"
                                 >
                                   {link.name}
                                 </Link>
@@ -209,8 +241,11 @@ export default function SiteHeader() {
                 ))}
               </div>
 
+              {/* Drawer footer */}
               <div className="px-8 py-6 border-t border-neutral-200">
-                <p className="text-xs text-neutral-400 uppercase tracking-widest mb-3">Contact</p>
+                <p className="text-[10px] text-neutral-400 uppercase tracking-[0.3em] mb-3">
+                  Contact
+                </p>
                 <p className="text-sm text-neutral-700">www.padoshop.com</p>
                 <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
               </div>
