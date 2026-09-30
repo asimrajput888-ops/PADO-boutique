@@ -18,25 +18,6 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
-const DEMO_MODEL = {
-  id: "demo-women-1",
-  name: "The Signature Ivory",
-  price: 55000,
-  description: "Classic ivory suit with peak lapel",
-  image_url: "/images/garments/suit.webp",
-  default_fabric: "premium-wool",
-  default_lapel: "peak",
-  default_buttons: "2-button",
-  default_sleeve: "4-sleeve",
-  default_pocket: "patch",
-  default_fit: "slim",
-  default_trouser: "straight-trouser",
-  default_skirt: "pencil-skirt",
-  default_vent: "double-vent",
-  default_vest: "without-vest",
-  default_lining: "navy",
-};
-
 export default function WomenSignatureDetail() {
   const params = useParams();
   const id = params?.id as string;
@@ -61,25 +42,33 @@ export default function WomenSignatureDetail() {
 
   useEffect(() => {
     const fetchModel = async () => {
-      const { data } = await supabase.from("models").select("*").eq("id", id).single();
-      
-      const modelData = data || DEMO_MODEL;
-      setModel(modelData);
-      
+      const { data } = await supabase
+        .from("models")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      setModel(data);
+
       setSelection((prev: any) => ({
         ...prev,
-        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
-        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
-        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
-        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
-        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
-        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
-        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
-        trouser: modelData.default_trouser || WOMEN_TROUSER_OPTIONS[0]?.id || "",
-        skirt: modelData.default_skirt || "",
-        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
-        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
-        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
+        fabric: data.default_fabric || FABRICS[0]?.id || "",
+        lapel: data.default_lapel || LAPEL_OPTIONS[0]?.id || "",
+        buttons: data.default_buttons || BUTTON_OPTIONS[0]?.id || "",
+        sleeve: data.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
+        collar: data.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
+        pocket: data.default_pocket || POCKET_OPTIONS[0]?.id || "",
+        fit: data.default_fit || FIT_OPTIONS[0]?.id || "",
+        trouser: data.default_trouser || WOMEN_TROUSER_OPTIONS[0]?.id || "",
+        skirt: data.default_skirt || "",
+        vent: data.default_vent || VENT_OPTIONS[0]?.id || "",
+        vest: data.default_vest || VEST_OPTIONS[0]?.id || "",
+        lining: data.default_lining || LINING_OPTIONS[0]?.id || "",
       }));
       setLoading(false);
     };
@@ -135,7 +124,9 @@ export default function WomenSignatureDetail() {
       <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
         <div className="text-center">
           <h1 className="text-4xl font-serif text-[#1E1E2C] mb-4">Model Not Found</h1>
-          <Link href="/custom/women" className="text-[#5D1A24] hover:underline">← Back to Women's Signature</Link>
+          <Link href="/custom/women" className="text-[#5D1A24] hover:underline">
+            ← Back to Women&apos;s Signature
+          </Link>
         </div>
       </div>
     );
@@ -150,10 +141,14 @@ export default function WomenSignatureDetail() {
   return (
     <div className="min-h-screen bg-[#FFF8F0] py-16 px-6">
       <div className="max-w-4xl mx-auto">
-        <Link href="/custom/women" className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block">← Back to Models</Link>
+        <Link href="/custom/women" className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block">
+          ← Back to Models
+        </Link>
 
         <div className="text-center mb-12">
-          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Customize Your Model</p>
+          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
+            Customize Your Model
+          </p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4 text-[#1E1E2C]">{model.name}</h1>
           <p className="text-[#1E1E2C]/50 text-sm">
             Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
@@ -175,8 +170,14 @@ export default function WomenSignatureDetail() {
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10">
-
+          <motion.div
+            key={step}
+            variants={cardVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="bg-white/80 backdrop-blur-xl border border-[#1E1E2C]/10 shadow-2xl rounded-2xl p-6 md:p-10"
+          >
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -184,13 +185,18 @@ export default function WomenSignatureDetail() {
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Fabric</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {FABRICS.map((f) => (
-                      <button key={f.id} onClick={() => setSelection({ ...selection, fabric: f.id })}
+                      <button
+                        key={f.id}
+                        onClick={() => setSelection({ ...selection, fabric: f.id })}
                         className={`p-4 border rounded-xl flex flex-col items-center gap-2 transition-all ${
                           selection.fabric === f.id ? "border-[#5D1A24] bg-[#5D1A24]/5 shadow-md" : "border-[#1E1E2C]/10 hover:border-[#C5A059]"
-                        }`}>
+                        }`}
+                      >
                         <div className="w-12 h-12 rounded-full border-2 border-[#1E1E2C]/20" style={{ backgroundColor: f.color }} />
                         <span className="text-sm font-medium text-[#1E1E2C]">{f.name}</span>
-                        <span className="text-xs text-[#1E1E2C]/50">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
+                        <span className="text-xs text-[#1E1E2C]/50">
+                          {f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -256,37 +262,37 @@ export default function WomenSignatureDetail() {
                   </div>
                 </div>
 
-                {/* ✅ WOMEN'S TROUSER OPTIONS (Straight, Slim, Wide) */}
+                {/* WOMEN'S TROUSER OPTIONS */}
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Bottoms (Trousers)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {WOMEN_TROUSER_OPTIONS.map((t) => (
-                      <ThumbnailOption 
-                        key={t.id} 
-                        id={t.id} 
-                        name={t.name} 
-                        price={t.price} 
-                        thumbnail={t.thumbnail} 
-                        selected={selection.trouser === t.id} 
-                        onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })} 
+                      <ThumbnailOption
+                        key={t.id}
+                        id={t.id}
+                        name={t.name}
+                        price={t.price}
+                        thumbnail={t.thumbnail}
+                        selected={selection.trouser === t.id}
+                        onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })}
                       />
                     ))}
                   </div>
                 </div>
 
-                {/* ✅ SKIRT SECTION */}
+                {/* SKIRT SECTION */}
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Or Choose a Skirt</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {SKIRT_OPTIONS.map((s) => (
-                      <ThumbnailOption 
-                        key={s.id} 
-                        id={s.id} 
-                        name={s.name} 
-                        price={s.price} 
-                        thumbnail={s.thumbnail} 
-                        selected={selection.skirt === s.id} 
-                        onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })} 
+                      <ThumbnailOption
+                        key={s.id}
+                        id={s.id}
+                        name={s.name}
+                        price={s.price}
+                        thumbnail={s.thumbnail}
+                        selected={selection.skirt === s.id}
+                        onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })}
                       />
                     ))}
                   </div>
@@ -314,10 +320,13 @@ export default function WomenSignatureDetail() {
                   <h3 className="text-xs uppercase tracking-[0.3em] text-[#1E1E2C]/40 mb-4 font-semibold">Lining Color</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {LINING_OPTIONS.map((l) => (
-                      <button key={l.id} onClick={() => setSelection({ ...selection, lining: l.id })}
+                      <button
+                        key={l.id}
+                        onClick={() => setSelection({ ...selection, lining: l.id })}
                         className={`p-3 border rounded-xl flex flex-col items-center gap-2 transition-all ${
                           selection.lining === l.id ? "border-[#5D1A24] bg-[#5D1A24]/5 shadow-md" : "border-[#1E1E2C]/10 hover:border-[#C5A059]"
-                        }`}>
+                        }`}
+                      >
                         <div className="w-10 h-10 rounded-full border-2 border-[#1E1E2C]/20" style={{ backgroundColor: l.color }} />
                         <span className="text-xs font-medium text-center text-[#1E1E2C]">{l.name}</span>
                       </button>
