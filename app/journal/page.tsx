@@ -1,6 +1,7 @@
 // app/journal/page.tsx
 
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   title: "Journal | PADO Boutique",
@@ -13,18 +14,21 @@ export default function JournalPage() {
       slug: "art-of-bespoke",
       title: "The Art of Bespoke Tailoring",
       excerpt: "Why a made-to-measure suit changes how you carry yourself.",
+      image: "/images/journal-1.png",
       date: "Coming soon",
     },
     {
       slug: "fabric-guide",
       title: "A Gentleman's Guide to Fabric",
       excerpt: "Wool, cashmere, linen — what to pick and when.",
+      image: "/images/journal-2.png",
       date: "Coming soon",
     },
     {
       slug: "perfect-fit",
       title: "The Perfect Fit",
       excerpt: "How to measure yourself for a bespoke suit.",
+      image: "/images/journal-3.png",
       date: "Coming soon",
     },
   ];
@@ -36,7 +40,9 @@ export default function JournalPage() {
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
             PADO Journal
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">Stories &amp; Style</h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">
+            Stories &amp; Style
+          </h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
             Notes on craft, fabric, and the art of dressing well.
           </p>
@@ -44,14 +50,15 @@ export default function JournalPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {articles.map((a) => (
-            <article
-              key={a.slug}
-              className="group cursor-pointer"
-            >
-              <div className="aspect-[4/5] bg-neutral-100 mb-4 overflow-hidden">
-                <div className="w-full h-full flex items-center justify-center text-neutral-300 text-xs">
-                  Image coming soon
-                </div>
+            <article key={a.slug} className="group cursor-pointer">
+              <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100 mb-4">
+                <Image
+                  src={a.image}
+                  alt={a.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition duration-700"
+                />
               </div>
               <p className="text-[10px] uppercase tracking-[0.2em] text-amber-600 mb-2">
                 {a.date}
