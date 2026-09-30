@@ -3,27 +3,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { PRODUCTS } from "@/lib/products";
 
 export default async function ShopPage() {
-  // Supabase se saare products fetch karein
-  const { data: supabaseProducts } = await supabase
+  const { data: products } = await supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Agar Supabase mein products hain, toh woh use karein; warna fallback
-  const products =
-    supabaseProducts && supabaseProducts.length > 0
-      ? supabaseProducts
-      : PRODUCTS;
-
-  // Data normalize karein (Supabase mein "image_url", fallback mein "image")
-  const normalizedProducts = products.map((p: any) => ({
+  const normalizedProducts = (products || []).map((p: any) => ({
     id: p.id,
     name: p.name,
     price: p.price,
-    image: p.image_url || p.image,
+    image: p.image_url,
     category: p.category,
     description: p.description,
   }));
@@ -31,7 +22,6 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-16">
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
             The Collection
@@ -44,7 +34,6 @@ export default async function ShopPage() {
           </p>
         </div>
 
-        {/* Products Grid */}
         {normalizedProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {normalizedProducts.map((product: any) => (
@@ -54,12 +43,14 @@ export default async function ShopPage() {
                 className="group cursor-pointer"
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-700"
-                  />
+                  {product.image && (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition duration-700"
+                    />
+                  )}
                 </div>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-amber-600 mb-1">
                   {product.category}
@@ -68,7 +59,7 @@ export default async function ShopPage() {
                   {product.name}
                 </h3>
                 <p className="text-sm text-neutral-500">
-                  Rs. {product.price.toLocaleString()}
+                  Rs. {product.price?.toLocaleString()}
                 </p>
               </Link>
             ))}
