@@ -2,112 +2,81 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-// ✅ Currency Symbols
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  CAD: "C$",
-  EUR: "€",
-  AUD: "A$",
-  GBP: "£",
-  AED: "AED",
-};
+type Currency = "USD" | "PKR" | "AED" | "GBP" | "EUR";
 
 interface CurrencyContextType {
-  currency: string;
-  setCurrency: (currency: string) => void;
-  formatPrice: (priceInUSD: number) => string;
-  loadingRates: boolean;
+  currency: Currency;
+  setCurrency: (c: Currency) => void;
+  formatPrice: (amount: number) => string;
+  rates: Record<string, number>;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
+// Fallback rates (agar API fail ho jaye)
+const FALLBACK_RATES: Record<string, number> = {
+  USD: 1,
+  PKR: 278,
+  AED: 3.67,
+  GBP: 0.79,
+  EUR: 0.92,
+};
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState("USD");
-  const [rates, setRates] = useState<Record<string, number>>({ USD: 1 });
-  const [loadingRates, setLoadingRates] = useState(true);
+  const [currency, setCurrency] = useState<Currency>("USD");
+  const [rates, setRates] = useState<Record<string, number>>(FALLBACK_RATES);
 
-  // ✅ Step 1: Customer ki location detect karke currency set karein
-  useEffect(() => {
-    const detectUserCurrency = () => {
-      try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        let detectedCurrency = "USD"; // Default
-
-        if (timezone.includes("Asia/Dubai") || timezone.includes("Asia/Muscat")) {
-          detectedCurrency = "AED";
-        } else if (timezone.includes("Europe/London")) {
-          detectedCurrency = "GBP";
-        } else if (timezone.includes("Europe")) {
-          detectedCurrency = "EUR";
-        } else if (timezone.includes("Australia")) {
-          detectedCurrency = "AUD";
-        } else if (timezone.includes("America/Toronto") || timezone.includes("America/Vancouver")) {
-          detectedCurrency = "CAD";
-        } else if (timezone.includes("America")) {
-          detectedCurrency = "USD";
-        }
-
-        setCurrency(detectedCurrency);
-      } catch (error) {
-        console.error("Currency detection failed:", error);
-        setCurrency("USD");
-      }
-    };
-
-    detectUserCurrency();
-  }, []);
-
-  // ✅ Step 2: Live exchange rates fetch karein (Frankfurter API - Free, No Key)
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        // Frankfurter API - Free, No API Key, 170+ currencies
-        const response = await fetch("https://api.frankfurter.app/latest?from=USD");
-        if (!response.ok) throw new Error("Failed to fetch rates");
-        
+        const response = await fetch(
+          "https://api.frankfurter.app/latest?from=USD",
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          console.warn("Currency API failed, using fallback rates");
+          return;
+        }
+
         const data = await response.json();
-        // ✅ Rates ko base USD ke hisaab se set karein
-        setRates({
-          USD: 1,
-          ...data.rates,
-        });
-      } catch (error) {
-        console.error("Failed to fetch exchange rates:", error);
-        // Fallback: Approximate rates (agar API fail ho jaye)
-        setRates({
-          USD: 1,
-          CAD: 1.36,
-          EUR: 0.92,
-          AUD: 1.52,
-          GBP: 0.79,
-          AED: 3.67,
-        });
-      } finally {
-        setLoadingRates(false);
+
+        if (data?.rates) {
+          setRates({
+            USD: 1,
+            ...data.rates,
+          });
+        }
+      } catch (err) {
+        // Silent fail — fallback rates already set
+        console.warn("Currency API unreachable, using fallback rates");
       }
     };
 
     fetchRates();
-    // Har 6 ghante baad rates refresh karein
-    const interval = setInterval(fetchRates, 6 * 60 * 60 * 1000);
-    return () => clearInterval(interval);
   }, []);
 
-  const formatPrice = (priceInUSD: number) => {
+  const formatPrice = (amount: number) => {
     const rate = rates[currency] || 1;
-    const converted = priceInUSD * rate;
-    const symbol = CURRENCY_SYMBOLS[currency] || "$";
+    const converted = amount * rate;
 
-    return `${symbol} ${converted.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
+    const symbols: Record<Currency, string> = {
+      USD: "$",
+      PKR: "Rs. ",
+      AED: "AED ",
+      GBP: "£",
+      EUR: "€",
+    };
+
+    return `${symbols[currency]}${converted.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
     })}`;
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, loadingRates }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, rates }}>
       {children}
     </CurrencyContext.Provider>
   );
@@ -115,6 +84,8 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
 export function useCurrency() {
   const context = useContext(CurrencyContext);
-  if (!context) throw new Error("useCurrency must be used within CurrencyProvider");
+  if (!context) {
+    throw new Error("useCurrency must be used within CurrencyProvider");
+  }
   return context;
 }
