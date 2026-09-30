@@ -27,7 +27,10 @@ export default function CustomMenGallery() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
       <div className="max-w-7xl mx-auto">
-        <Link href="/custom" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
+        <Link
+          href="/custom"
+          className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block"
+        >
           ← Back to Collections
         </Link>
 
@@ -36,7 +39,7 @@ export default function CustomMenGallery() {
             PADO Signature Designs
           </p>
           <h1 className="text-4xl md:text-5xl font-serif mb-4">
-            Men's Bespoke Models
+            Men&apos;s Bespoke Models
           </h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
             Choose a model, then customize fabric, lapel, buttons, and measurements.
@@ -55,7 +58,11 @@ export default function CustomMenGallery() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {models.map((m) => (
-              <Link key={m.id} href={`/custom/men/${m.id}`} className="group cursor-pointer">
+              <Link
+                key={m.id}
+                href={`/custom/men/${m.id}`}
+                className="group cursor-pointer"
+              >
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
                   {m.image_url && (
                     <Image
