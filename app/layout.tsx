@@ -1,27 +1,39 @@
+// app/layout.tsx
+
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google"; // 1. Fonts import karein
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
 import Header from "@/components/site/site-header";
 import SiteFooter from "@/components/site/site-footer";
 
-// 2. Fonts configure karein
-const playfair = Playfair_Display({ 
-  subsets: ["latin"], 
-  variable: "--font-playfair",
+// Serif — Suitsupply jaisa elegant
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-serif",
   display: "swap",
 });
 
-const inter = Inter({ 
-  subsets: ["latin"], 
-  variable: "--font-inter",
+// Sans — clean body text
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "PADO BOUTIQUE | Bespoke Luxury",
-  description: "Luxury bespoke tailoring, silk loungewear, and custom garments.",
+  title: "PADO BOUTIQUE | Bespoke Luxury Tailoring",
+  description:
+    "Luxury bespoke tailoring, silk loungewear, and custom garments crafted to your exact measurements.",
+  keywords: ["bespoke", "tailoring", "custom suits", "luxury menswear", "PADO Boutique"],
+  openGraph: {
+    title: "PADO BOUTIQUE",
+    description: "Bespoke luxury tailoring and custom garments.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -30,10 +42,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      {/* 3. Body par fonts aur colors apply karein */}
-      <body 
-        className={`${playfair.variable} ${inter.variable} font-sans bg-[#FFF8F0] text-[#1E1E2C] min-h-screen flex flex-col`}
+    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+      <body
+        className="
+          font-sans 
+          bg-white 
+          text-neutral-900 
+          min-h-screen 
+          flex 
+          flex-col 
+          antialiased
+          selection:bg-neutral-900 
+          selection:text-white
+        "
       >
         <CurrencyProvider>
           <CartProvider>
