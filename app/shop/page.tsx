@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export default async function ShopPage() {
   const { data: products } = await supabase
     .from("products")
@@ -26,9 +28,7 @@ export default async function ShopPage() {
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
             The Collection
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">
-            All Products
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">All Products</h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
             Explore our complete collection of bespoke tailoring and ready-to-wear garments.
           </p>
@@ -43,13 +43,17 @@ export default async function ShopPage() {
                 className="group cursor-pointer"
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
-                  {product.image && (
+                  {product.image ? (
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
                       className="object-cover group-hover:scale-105 transition duration-700"
                     />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-neutral-300 text-xs">
+                      No image
+                    </div>
                   )}
                 </div>
                 <p className="text-[10px] uppercase tracking-[0.2em] text-amber-600 mb-1">
