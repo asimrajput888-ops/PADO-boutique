@@ -17,24 +17,6 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
-const DEMO_MODEL = {
-  id: "demo-1",
-  name: "The Signature Navy",
-  price: 55000,
-  description: "Classic navy suit with peak lapel",
-  image_url: "/images/garments/suit.webp",
-  default_fabric: "premium-wool",
-  default_lapel: "peak",
-  default_buttons: "2-button",
-  default_sleeve: "4-sleeve",
-  default_pocket: "patch",
-  default_fit: "slim",
-  default_trouser: "flat-front",
-  default_vent: "double-vent",
-  default_vest: "without-vest",
-  default_lining: "navy",
-};
-
 export default function MenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
@@ -52,32 +34,39 @@ export default function MenBespokePage() {
   const [added, setAdded] = useState(false);
   const totalSteps = 4;
 
-  // ✅ FIX 2: Scroll to top whenever step changes
+  // Scroll to top whenever step changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
 
   useEffect(() => {
     const fetchModel = async () => {
-      const { data } = await supabase.from("models").select("*").eq("id", id).single();
-      
-      const modelData = data || DEMO_MODEL;
-      setModel(modelData);
-      
-      // ✅ FIX 3: Pre-select first option if no default exists
+      const { data } = await supabase
+        .from("models")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      setModel(data);
+
       setSelection((prev: any) => ({
         ...prev,
-        fabric: modelData.default_fabric || FABRICS[0]?.id || "",
-        lapel: modelData.default_lapel || LAPEL_OPTIONS[0]?.id || "",
-        buttons: modelData.default_buttons || BUTTON_OPTIONS[0]?.id || "",
-        sleeve: modelData.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
-        collar: modelData.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
-        pocket: modelData.default_pocket || POCKET_OPTIONS[0]?.id || "",
-        fit: modelData.default_fit || FIT_OPTIONS[0]?.id || "",
-        trouser: modelData.default_trouser || TROUSER_OPTIONS[0]?.id || "",
-        vent: modelData.default_vent || VENT_OPTIONS[0]?.id || "",
-        vest: modelData.default_vest || VEST_OPTIONS[0]?.id || "",
-        lining: modelData.default_lining || LINING_OPTIONS[0]?.id || "",
+        fabric: data.default_fabric || FABRICS[0]?.id || "",
+        lapel: data.default_lapel || LAPEL_OPTIONS[0]?.id || "",
+        buttons: data.default_buttons || BUTTON_OPTIONS[0]?.id || "",
+        sleeve: data.default_sleeve || SLEEVE_OPTIONS[0]?.id || "",
+        collar: data.default_collar || SHIRT_COLLAR_OPTIONS[0]?.id || "",
+        pocket: data.default_pocket || POCKET_OPTIONS[0]?.id || "",
+        fit: data.default_fit || FIT_OPTIONS[0]?.id || "",
+        trouser: data.default_trouser || TROUSER_OPTIONS[0]?.id || "",
+        vent: data.default_vent || VENT_OPTIONS[0]?.id || "",
+        vest: data.default_vest || VEST_OPTIONS[0]?.id || "",
+        lining: data.default_lining || LINING_OPTIONS[0]?.id || "",
       }));
       setLoading(false);
     };
@@ -119,8 +108,26 @@ export default function MenBespokePage() {
     setTimeout(() => setAdded(false), 3000);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]"><p className="text-neutral-400">Loading...</p></div>;
-  if (!model) return <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]"><p>Model not found</p></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <p className="text-neutral-400">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!model) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <div className="text-center">
+          <h1 className="text-4xl font-serif text-neutral-900 mb-4">Model Not Found</h1>
+          <Link href="/custom/men" className="text-amber-600 hover:underline">
+            ← Back to Men&apos;s Signature
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
@@ -131,10 +138,14 @@ export default function MenBespokePage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-16 px-6">
       <div className="max-w-4xl mx-auto">
-        <Link href="/custom/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">← Back to Models</Link>
+        <Link href="/custom/men" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
+          ← Back to Models
+        </Link>
 
         <div className="text-center mb-12">
-          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">Customize Your Model</p>
+          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
+            Customize Your Model
+          </p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4">{model.name}</h1>
           <p className="text-neutral-500 text-sm">
             Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
@@ -155,8 +166,14 @@ export default function MenBespokePage() {
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={step} variants={cardVariants} initial="initial" animate="animate" exit="exit" className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-10">
-
+          <motion.div
+            key={step}
+            variants={cardVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 md:p-10"
+          >
             {step === 1 && (
               <div className="space-y-10">
                 <div>
@@ -164,11 +181,18 @@ export default function MenBespokePage() {
                   <h3 className="text-xs uppercase tracking-[0.3em] text-neutral-400 mb-4 font-semibold">Fabric</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {FABRICS.map((f) => (
-                      <button key={f.id} onClick={() => setSelection({ ...selection, fabric: f.id })}
-                        className={`p-4 border rounded-xl flex flex-col items-center gap-2 transition-all ${selection.fabric === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"}`}>
+                      <button
+                        key={f.id}
+                        onClick={() => setSelection({ ...selection, fabric: f.id })}
+                        className={`p-4 border rounded-xl flex flex-col items-center gap-2 transition-all ${
+                          selection.fabric === f.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"
+                        }`}
+                      >
                         <div className="w-12 h-12 rounded-full border-2 border-neutral-300" style={{ backgroundColor: f.color }} />
                         <span className="text-sm font-medium">{f.name}</span>
-                        <span className="text-xs text-neutral-500">{f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}</span>
+                        <span className="text-xs text-neutral-500">
+                          {f.price > 0 ? `+ Rs. ${f.price.toLocaleString()}` : "Included"}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -265,8 +289,13 @@ export default function MenBespokePage() {
                   <h3 className="text-xs uppercase tracking-[0.3em] text-neutral-400 mb-4 font-semibold">Lining Color</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {LINING_OPTIONS.map((l) => (
-                      <button key={l.id} onClick={() => setSelection({ ...selection, lining: l.id })}
-                        className={`p-3 border rounded-xl flex flex-col items-center gap-2 transition-all ${selection.lining === l.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"}`}>
+                      <button
+                        key={l.id}
+                        onClick={() => setSelection({ ...selection, lining: l.id })}
+                        className={`p-3 border rounded-xl flex flex-col items-center gap-2 transition-all ${
+                          selection.lining === l.id ? "border-amber-600 bg-amber-50 shadow-md" : "border-neutral-200 hover:border-amber-400"
+                        }`}
+                      >
                         <div className="w-10 h-10 rounded-full border-2 border-neutral-300" style={{ backgroundColor: l.color }} />
                         <span className="text-xs font-medium text-center">{l.name}</span>
                       </button>
