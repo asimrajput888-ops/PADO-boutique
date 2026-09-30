@@ -2,55 +2,87 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 
-const WOMEN_SUITS = [
-  { id: "signature-ivory-blazer", name: "Signature Ivory Blazer", price: 48000, image: "/images/editorial-women.png", colors: ["Ivory", "Cream", "White"] },
-  { id: "signature-charcoal-suit", name: "Signature Charcoal Suit", price: 62000, image: "/images/editorial-women.png", colors: ["Charcoal", "Black", "Navy"] },
-  { id: "signature-navy-blazer", name: "Signature Navy Blazer", price: 52000, image: "/images/editorial-women.png", colors: ["Navy", "Black", "Burgundy"] },
-  { id: "signature-black-tuxedo", name: "Signature Black Tuxedo", price: 68000, image: "/images/editorial-women.png", colors: ["Black", "Charcoal"] },
-];
+export const dynamic = "force-dynamic";
 
-export default function SignatureSuitWomenPage() {
+export default async function SignatureWomenPage() {
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .eq("category", "signature")
+    .order("created_at", { ascending: false });
+
+  const normalized = (products || []).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: p.image_url,
+    description: p.description,
+  }));
+
   return (
-    <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
+    <div className="min-h-screen bg-[#FFF8F0] py-32 px-6">
       <div className="max-w-7xl mx-auto">
-        
-        <Link href="/signature-suit" className="text-sm text-neutral-500 hover:text-amber-600 mb-8 inline-block">
+        <Link
+          href="/signature-suit"
+          className="text-sm text-[#1E1E2C]/50 hover:text-[#5D1A24] mb-8 inline-block"
+        >
           ← Back to Limited Designs
         </Link>
 
         <div className="text-center mb-16">
-          <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
+          <p className="text-[#C5A059] tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
             Ready to Wear
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">
-            Women's Limited Designs
+          <h1 className="text-4xl md:text-5xl font-serif mb-4 text-[#1E1E2C]">
+            Women&apos;s Limited Designs
           </h1>
-          <p className="text-neutral-500 max-w-xl mx-auto">
-            Ready-to-wear blazers and suits in limited colors.
+          <p className="text-[#1E1E2C]/50 max-w-xl mx-auto">
+            Ready-to-wear suits in limited colors. Available for immediate delivery.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {WOMEN_SUITS.map((suit) => (
-            <Link key={suit.id} href={`/signature-suit/women/${suit.id}`} className="group cursor-pointer">
-              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
-                <Image src={suit.image} alt={suit.name} fill className="object-cover group-hover:scale-105 transition duration-700" />
-              </div>
-              <h3 className="font-serif text-lg text-neutral-900 group-hover:text-amber-600 transition mb-2">
-                {suit.name}
-              </h3>
-              <p className="text-sm text-neutral-500 mb-2">Rs. {suit.price.toLocaleString()}</p>
-              <div className="flex gap-1 flex-wrap">
-                {suit.colors.map((c) => (
-                  <span key={c} className="text-[10px] uppercase tracking-widest text-neutral-400 border border-neutral-200 px-2 py-0.5">
-                    {c}
-                  </span>
-                ))}
-              </div>
-            </Link>
-          ))}
-        </div>
+        {normalized.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {normalized.map((product: any) => (
+              <Link
+                key={product.id}
+                href={`/signature-suit/${product.id}`}
+                className="group cursor-pointer"
+              >
+                <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-4">
+                  {product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-neutral-300 text-xs">
+                      No image
+                    </div>
+                  )}
+                </div>
+                <h3 className="font-serif text-lg text-[#1E1E2C] group-hover:text-[#5D1A24] transition">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-[#1E1E2C]/50 mt-1">
+                  Rs. {product.price?.toLocaleString()}
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <p className="text-[#1E1E2C]/40 text-lg">No products yet.</p>
+            <p className="text-[#1E1E2C]/40 text-sm mt-2">
+              Add products from Admin Panel with category &quot;signature&quot;.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
