@@ -7,11 +7,13 @@ import { supabase } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 
 export default async function ShopPage() {
+  // Supabase se saare products fetch karein
   const { data: products } = await supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
 
+  // Data normalize karein
   const normalizedProducts = (products || []).map((p: any) => ({
     id: p.id,
     name: p.name,
@@ -24,16 +26,20 @@ export default async function ShopPage() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] py-32 px-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-16">
           <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-4 uppercase">
             The Collection
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4">All Products</h1>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4">
+            All Products
+          </h1>
           <p className="text-neutral-500 max-w-xl mx-auto">
             Explore our complete collection of bespoke tailoring and ready-to-wear garments.
           </p>
         </div>
 
+        {/* Products Grid */}
         {normalizedProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {normalizedProducts.map((product: any) => (
@@ -48,6 +54,7 @@ export default async function ShopPage() {
                       src={product.image}
                       alt={product.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover group-hover:scale-105 transition duration-700"
                     />
                   ) : (
