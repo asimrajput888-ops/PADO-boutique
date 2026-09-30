@@ -15,7 +15,6 @@ interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-// Fallback rates (agar API fail ho jaye)
 const FALLBACK_RATES: Record<string, number> = {
   USD: 1,
   PKR: 278,
@@ -31,37 +30,22 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await fetch(
-          "https://api.frankfurter.app/latest?from=USD",
-          { cache: "no-store" }
-        );
-
-        if (!response.ok) {
-          console.warn("Currency API failed, using fallback rates");
-          return;
-        }
-
+        const response = await fetch("https://api.frankfurter.app/latest?from=USD");
+        if (!response.ok) return;
         const data = await response.json();
-
         if (data?.rates) {
-          setRates({
-            USD: 1,
-            ...data.rates,
-          });
+          setRates({ USD: 1, ...data.rates });
         }
-      } catch (err) {
+      } catch {
         // Silent fail — fallback rates already set
-        console.warn("Currency API unreachable, using fallback rates");
       }
     };
-
     fetchRates();
   }, []);
 
   const formatPrice = (amount: number) => {
     const rate = rates[currency] || 1;
     const converted = amount * rate;
-
     const symbols: Record<Currency, string> = {
       USD: "$",
       PKR: "Rs. ",
@@ -69,7 +53,6 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       GBP: "£",
       EUR: "€",
     };
-
     return `${symbols[currency]}${converted.toLocaleString(undefined, {
       maximumFractionDigits: 0,
     })}`;
