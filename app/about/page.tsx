@@ -28,7 +28,7 @@ export default function AboutPage() {
           {/* Atelier Image */}
           <div className="relative aspect-[4/5] overflow-hidden border border-[#1E1E2C]/10 bg-[#1E1E2C]/5">
             <Image
-              src="/images/atelier.jpg"
+              src="/images/atelier-fabric.png"
               alt="PADO Boutique atelier — bespoke tailoring workshop"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
