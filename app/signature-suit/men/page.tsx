@@ -19,6 +19,7 @@ export default function SignatureMenPage() {
         .from("products")
         .select("*")
         .eq("category", "signature")
+        .eq("gender", "men")
         .order("created_at", { ascending: false });
       setProducts(data || []);
       setLoading(false);
