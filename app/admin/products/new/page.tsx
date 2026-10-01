@@ -12,13 +12,11 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Form fields
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("men");
+  const [category, setCategory] = useState("signature");
+  const [gender, setGender] = useState("women");
   const [description, setDescription] = useState("");
-
-  // Multiple images
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
 
   const addImageField = () => {
@@ -47,7 +45,7 @@ export default function NewProductPage() {
 
     const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${index}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const filePath = fileName;
 
     const { error: uploadError } = await supabase.storage
       .from("product-images")
@@ -83,9 +81,10 @@ export default function NewProductPage() {
       name,
       price: Number(price),
       category,
+      gender,
       description,
-      image_url: cleanImages[0],   // main image (first one)
-      images: cleanImages,          // all images array
+      image_url: cleanImages[0],
+      images: cleanImages,
     });
 
     setLoading(false);
@@ -114,8 +113,6 @@ export default function NewProductPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-
-        {/* Name */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Product Name
@@ -125,12 +122,11 @@ export default function NewProductPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="e.g. The Navy Wool Suit — Women's 40R"
+            placeholder="e.g. The Navy Wool Suit"
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
           />
         </div>
 
-        {/* Price — USD */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Price (USD)
@@ -143,28 +139,40 @@ export default function NewProductPage() {
             placeholder="230"
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
           />
-          <p className="text-xs text-neutral-400 mt-2">
-            Enter price in USD (base currency). Website will auto-convert to other currencies.
-          </p>
         </div>
 
-        {/* Category */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Category
-          </label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
-          >
-            <option value="men">Men</option>
-            <option value="women">Women</option>
-            <option value="signature">Signature (Ready to Wear)</option>
-          </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            >
+              <option value="signature">Signature (Ready to Wear)</option>
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+              Gender
+            </label>
+            <select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            >
+              <option value="women">Women</option>
+              <option value="men">Men</option>
+              <option value="unisex">Unisex</option>
+            </select>
+          </div>
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Description
@@ -174,25 +182,22 @@ export default function NewProductPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
             rows={6}
-            placeholder="Premium navy wool-blend two-piece suit. Single-breasted jacket, notched lapel, tapered trouser..."
+            placeholder="Premium navy wool-blend two-piece suit..."
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none"
           />
         </div>
 
-        {/* Images */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Images ({imageUrls.filter((u) => u).length} added)
           </label>
           <p className="text-xs text-neutral-400 mb-4">
-            First image will be the main listing image. Add up to 8 images.
+            First image = main listing image. Add up to 8.
           </p>
 
           <div className="space-y-3">
             {imageUrls.map((url, index) => (
               <div key={index} className="flex gap-2 items-start">
-
-                {/* Preview */}
                 {url && (
                   <div className="w-16 h-20 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
                     <img
@@ -203,7 +208,6 @@ export default function NewProductPage() {
                   </div>
                 )}
 
-                {/* URL input */}
                 <input
                   type="text"
                   value={url}
@@ -212,7 +216,6 @@ export default function NewProductPage() {
                   className="flex-1 border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none text-sm"
                 />
 
-                {/* File upload */}
                 <label className="cursor-pointer border border-neutral-300 px-4 py-3 rounded-lg hover:border-amber-500 transition text-xs uppercase tracking-widest whitespace-nowrap">
                   Upload
                   <input
@@ -223,7 +226,6 @@ export default function NewProductPage() {
                   />
                 </label>
 
-                {/* Remove button */}
                 {imageUrls.length > 1 && (
                   <button
                     type="button"
@@ -237,7 +239,6 @@ export default function NewProductPage() {
             ))}
           </div>
 
-          {/* Add more */}
           {imageUrls.length < 8 && (
             <button
               type="button"
@@ -249,7 +250,6 @@ export default function NewProductPage() {
           )}
         </div>
 
-        {/* Submit */}
         <div className="pt-6 border-t border-neutral-200">
           <button
             type="submit"
@@ -263,7 +263,6 @@ export default function NewProductPage() {
               : "Save Product"}
           </button>
         </div>
-
       </form>
     </div>
   );
