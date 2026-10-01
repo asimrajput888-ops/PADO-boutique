@@ -67,7 +67,7 @@ export default function AdminProducts() {
                   </td>
                   <td className="p-4 font-medium text-sm">{product.name}</td>
                   <td className="p-4 text-neutral-500 text-sm capitalize">{product.category}</td>
-                  <td className="p-4 text-sm">Rs. {product.price.toLocaleString()}</td>
+                  <td className="p-4 text-sm">${product.price.toLocaleString()}</td>
                   <td className="p-4 space-x-3">
                     <Link
                       href={`/admin/products/edit/${product.id}`}
