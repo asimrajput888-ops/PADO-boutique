@@ -12,17 +12,14 @@ export default function NewProductPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Form fields
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("men");
   const [description, setDescription] = useState("");
-
-  // Multiple images
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
 
   const addImageField = () => {
-    setImageUrls([...imageUrls, ""]);
+    if (imageUrls.length < 8) setImageUrls([...imageUrls, ""]);
   };
 
   const updateImage = (index: number, value: string) => {
@@ -36,7 +33,6 @@ export default function NewProductPage() {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
   };
 
-  // Upload single file
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -72,7 +68,6 @@ export default function NewProductPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Filter empty URLs
     const cleanImages = imageUrls.filter((url) => url.trim() !== "");
 
     if (cleanImages.length === 0) {
@@ -86,8 +81,8 @@ export default function NewProductPage() {
       price: Number(price),
       category,
       description,
-      image_url: cleanImages[0],   // main image (first one)
-      images: cleanImages,          // all images as array
+      image_url: cleanImages[0],
+      images: cleanImages,
     });
 
     setLoading(false);
@@ -103,25 +98,17 @@ export default function NewProductPage() {
   return (
     <div className="p-10 max-w-3xl mx-auto">
       <div className="mb-8">
-        <Link
-          href="/admin/products"
-          className="text-sm text-neutral-500 hover:text-amber-600"
-        >
+        <Link href="/admin/products" className="text-sm text-neutral-500 hover:text-amber-600">
           ← Back to Products
         </Link>
         <h1 className="text-3xl font-serif mt-4 mb-1">Add New Product</h1>
-        <p className="text-neutral-500 text-sm">
-          Fill in the details and upload up to 8 images.
-        </p>
+        <p className="text-neutral-500 text-sm">Fill in the details and add up to 8 images.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* Name */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Product Name
-          </label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Product Name</label>
           <input
             type="text"
             value={name}
@@ -132,26 +119,20 @@ export default function NewProductPage() {
           />
         </div>
 
-        {/* Price */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Price (Rs.)
-          </label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Price (USD)</label>
           <input
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            placeholder="65000"
+            placeholder="300"
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
           />
         </div>
 
-        {/* Category */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Category
-          </label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Category</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -163,11 +144,8 @@ export default function NewProductPage() {
           </select>
         </div>
 
-        {/* Description */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Description
-          </label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -178,7 +156,7 @@ export default function NewProductPage() {
           />
         </div>
 
-        {/* Images */}
+        {/* IMAGES — 8 fields */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Images ({imageUrls.filter(u => u).length} added)
@@ -190,19 +168,11 @@ export default function NewProductPage() {
           <div className="space-y-3">
             {imageUrls.map((url, index) => (
               <div key={index} className="flex gap-2 items-start">
-
-                {/* Preview */}
                 {url && (
                   <div className="w-16 h-20 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
-                    <img
-                      src={url}
-                      alt={`Image ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={url} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
                   </div>
                 )}
-
-                {/* URL input */}
                 <input
                   type="text"
                   value={url}
@@ -210,8 +180,6 @@ export default function NewProductPage() {
                   placeholder={`Image ${index + 1} URL`}
                   className="flex-1 border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none text-sm"
                 />
-
-                {/* File upload */}
                 <label className="cursor-pointer border border-neutral-300 px-4 py-3 rounded-lg hover:border-amber-500 transition text-xs uppercase tracking-widest whitespace-nowrap">
                   Upload
                   <input
@@ -221,8 +189,6 @@ export default function NewProductPage() {
                     onChange={(e) => handleFileUpload(e, index)}
                   />
                 </label>
-
-                {/* Remove button */}
                 {imageUrls.length > 1 && (
                   <button
                     type="button"
@@ -236,7 +202,6 @@ export default function NewProductPage() {
             ))}
           </div>
 
-          {/* Add more */}
           {imageUrls.length < 8 && (
             <button
               type="button"
@@ -248,7 +213,6 @@ export default function NewProductPage() {
           )}
         </div>
 
-        {/* Submit */}
         <div className="pt-6 border-t border-neutral-200">
           <button
             type="submit"
