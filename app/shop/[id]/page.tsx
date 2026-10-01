@@ -10,17 +10,19 @@ export const dynamic = "force-dynamic";
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;   // ← Promise!
 }) {
+  const { id } = await params;       // ← await!
+
   const { data: product } = await supabase
     .from("products")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", Number(id))            // ← Number me convert
     .single();
 
   if (!product) notFound();
 
-  // Multiple images — agar `images` column hai to use karo
+  // Images array — agar images column hai to use karo
   const images: string[] =
     product.images && Array.isArray(product.images) && product.images.length > 0
       ? product.images
@@ -39,8 +41,8 @@ export default async function ProductDetailPage({
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          
-          {/* Images Gallery — Sab 8 images */}
+
+          {/* Images Gallery */}
           <div className="space-y-3">
             {images.length > 0 ? (
               images.map((img, i) => (
@@ -74,7 +76,7 @@ export default async function ProductDetailPage({
               {product.name}
             </h1>
             <p className="text-xl text-neutral-900 mb-8">
-              Rs. {product.price?.toLocaleString()}
+              ${product.price?.toLocaleString()}
             </p>
 
             <p className="text-neutral-600 leading-relaxed mb-8 text-sm whitespace-pre-line">
