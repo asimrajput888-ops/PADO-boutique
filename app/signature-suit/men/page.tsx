@@ -30,7 +30,6 @@ export default function SignatureMenPage() {
     <div className="min-h-screen bg-white pt-32 pb-24 px-5 md:px-10">
       <div className="max-w-[1400px] mx-auto">
 
-        {/* Back link */}
         <Link
           href="/signature-suit"
           className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
@@ -38,7 +37,6 @@ export default function SignatureMenPage() {
           ← Back to Limited Designs
         </Link>
 
-        {/* Header */}
         <div className="text-center mb-14 md:mb-20">
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
             Ready to Wear
@@ -51,7 +49,6 @@ export default function SignatureMenPage() {
           </p>
         </div>
 
-        {/* Products Grid */}
         {loading ? (
           <p className="text-center text-neutral-400 py-20">Loading...</p>
         ) : products.length > 0 ? (
@@ -62,7 +59,6 @@ export default function SignatureMenPage() {
                 href={`/shop/${product.id}`}
                 className="group block"
               >
-                {/* Image */}
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3 md:mb-4">
                   {product.image_url ? (
                     <Image
@@ -79,7 +75,6 @@ export default function SignatureMenPage() {
                   )}
                 </div>
 
-                {/* Text */}
                 <div className="space-y-1">
                   <h3 className="text-[13px] md:text-sm text-neutral-900 leading-snug transition-colors duration-300 group-hover:text-neutral-500">
                     {product.name}
