@@ -16,6 +16,7 @@ export default function NewProductPage() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("signature");
   const [gender, setGender] = useState("women");
+  const [subcategory, setSubcategory] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([""]);
 
@@ -82,6 +83,7 @@ export default function NewProductPage() {
       price: Number(price),
       category,
       gender,
+      subcategory: subcategory || null,
       description,
       image_url: cleanImages[0],
       images: cleanImages,
@@ -113,6 +115,7 @@ export default function NewProductPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Name */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Product Name
@@ -122,11 +125,12 @@ export default function NewProductPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="e.g. The Navy Wool Suit"
+            placeholder="e.g. Spider-Man Tuxedo Suit"
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
           />
         </div>
 
+        {/* Price */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Price (USD)
@@ -136,11 +140,12 @@ export default function NewProductPage() {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            placeholder="230"
+            placeholder="350"
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
           />
         </div>
 
+        {/* Category + Gender */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
@@ -152,8 +157,9 @@ export default function NewProductPage() {
               className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
             >
               <option value="signature">Signature (Ready to Wear)</option>
-              <option value="men">Men</option>
-              <option value="women">Women</option>
+              <option value="seasonal">Seasonal &amp; Novelty</option>
+              <option value="men">Men (Custom)</option>
+              <option value="women">Women (Custom)</option>
             </select>
           </div>
 
@@ -173,6 +179,28 @@ export default function NewProductPage() {
           </div>
         </div>
 
+        {/* Subcategory — only for seasonal */}
+        {category === "seasonal" && (
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+              Subcategory
+            </label>
+            <select
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
+            >
+              <option value="">— Select one —</option>
+              <option value="halloween">Halloween</option>
+              <option value="superhero">Superhero</option>
+              <option value="gothic">Gothic</option>
+              <option value="movie">Movie-Inspired</option>
+              <option value="party">Party &amp; Events</option>
+            </select>
+          </div>
+        )}
+
+        {/* Description */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Description
@@ -182,11 +210,12 @@ export default function NewProductPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
             rows={6}
-            placeholder="Premium navy wool-blend two-piece suit..."
+            placeholder="Custom Spider-Man inspired tuxedo suit with web embroidery..."
             className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none"
           />
         </div>
 
+        {/* Images */}
         <div>
           <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
             Images ({imageUrls.filter((u) => u).length} added)
