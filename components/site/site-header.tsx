@@ -29,6 +29,15 @@ export default function SiteHeader() {
 
   const menuSections = [
     {
+      id: "new",
+      title: "New & Featured",
+      links: [
+        { name: "New Arrivals", href: "/shop" },
+        { name: "Bestsellers", href: "/shop" },
+        { name: "Limited Editions", href: "/signature-suit" },
+      ],
+    },
+    {
       id: "for-him",
       title: "For Him",
       links: [
@@ -38,7 +47,7 @@ export default function SiteHeader() {
         { name: "Custom Pants", href: "/custom/men" },
         { name: "Custom Shirts", href: "/custom/men" },
         { name: "Custom Coats", href: "/custom/men" },
-        { name: "Tuxedo Suits", href: "/custom/men" },
+        { name: "Tuxedos", href: "/custom/men" },
         { name: "Ready to Wear — Suits", href: "/signature-suit/men" },
         { name: "Ready to Wear — Blazers", href: "/signature-suit/men" },
       ],
@@ -51,17 +60,29 @@ export default function SiteHeader() {
         { name: "Custom Jackets", href: "/custom/women" },
         { name: "Custom Coats", href: "/custom/women" },
         { name: "Custom Shirts", href: "/custom/women" },
-        { name: "Ready to Wear — Suits", href: "/signature-suit/women" },
+        { name: "Ready to Wear", href: "/signature-suit/women" },
       ],
     },
     {
-      id: "collections",
-      title: "Collections",
+      id: "seasonal",
+      title: "Seasonal & Novelty",
       links: [
-        { name: "New Arrivals", href: "/shop" },
-        { name: "Signature Designs", href: "/signature-suit" },
-        { name: "Limited Editions", href: "/signature-suit" },
-        { name: "All Products", href: "/shop" },
+        { name: "Halloween Collection", href: "/seasonal/halloween" },
+        { name: "Superhero Suits", href: "/seasonal/superhero" },
+        { name: "Gothic & Dark", href: "/seasonal/gothic" },
+        { name: "Movie-Inspired", href: "/seasonal/movie" },
+        { name: "Party & Events", href: "/seasonal/party" },
+      ],
+    },
+    {
+      id: "occasions",
+      title: "Occasions",
+      links: [
+        { name: "Weddings", href: "/shop" },
+        { name: "Halloween", href: "/seasonal/halloween" },
+        { name: "Cosplay & Events", href: "/seasonal" },
+        { name: "Black Tie", href: "/custom/men" },
+        { name: "Business & Formal", href: "/custom/men" },
       ],
     },
     {
@@ -86,7 +107,7 @@ export default function SiteHeader() {
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
-          
+
           {/* LEFT: Hamburger + Search */}
           <div className="flex items-center gap-5 z-10">
             <button
@@ -101,7 +122,6 @@ export default function SiteHeader() {
               </div>
             </button>
 
-            {/* Search icon */}
             <Link
               href="/shop"
               aria-label="Search"
@@ -125,8 +145,6 @@ export default function SiteHeader() {
 
           {/* RIGHT: Currency + Account + Cart */}
           <div className="flex items-center gap-4 md:gap-6 z-10">
-            
-            {/* Currency */}
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value as any)}
@@ -142,7 +160,6 @@ export default function SiteHeader() {
               <option value="AED" className="text-neutral-900">AED</option>
             </select>
 
-            {/* Account */}
             <Link
               href="/admin/login"
               aria-label="Account"
@@ -153,7 +170,6 @@ export default function SiteHeader() {
               </svg>
             </Link>
 
-            {/* Cart */}
             <Link href="/checkout" className="relative">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
