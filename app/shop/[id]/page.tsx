@@ -85,7 +85,7 @@ export default async function ProductDetailPage({
 
             <div className="space-y-4 mb-10">
               <a
-                href={`https://wa.me/+1 6393840265?text=Hi, I'm interested in: ${encodeURIComponent(product.name)}`}
+                href={`https://wa.me/16393840265?text=Hi, I'm interested in: ${encodeURIComponent(product.name)}`}
                 className="block w-full bg-neutral-900 text-white text-center py-4 text-[11px] font-medium tracking-[0.3em] uppercase hover:bg-neutral-700 transition"
               >
                 Enquire on WhatsApp
