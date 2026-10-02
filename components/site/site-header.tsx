@@ -29,40 +29,49 @@ export default function SiteHeader() {
 
   const menuSections = [
     {
-      id: "custom-made",
-      title: "Custom Made",
+      id: "for-him",
+      title: "For Him",
       links: [
-        { name: "Men's Bespoke", href: "/men" },
-        { name: "Women's Bespoke", href: "/women" },
-        { name: "Signature Designs", href: "/custom" },
+        { name: "Custom Suits", href: "/custom/men" },
+        { name: "Custom Jackets", href: "/custom/men" },
+        { name: "Custom Vests", href: "/custom/men" },
+        { name: "Custom Pants", href: "/custom/men" },
+        { name: "Custom Shirts", href: "/custom/men" },
+        { name: "Custom Coats", href: "/custom/men" },
+        { name: "Tuxedo Suits", href: "/custom/men" },
+        { name: "Ready to Wear — Suits", href: "/signature-suit/men" },
+        { name: "Ready to Wear — Blazers", href: "/signature-suit/men" },
       ],
     },
     {
-      id: "ready-to-wear",
-      title: "Ready to Wear",
+      id: "for-her",
+      title: "For Her",
       links: [
-        { name: "Men", href: "/signature-suit/men" },
-        { name: "Women", href: "/signature-suit/women" },
+        { name: "Custom Suits", href: "/custom/women" },
+        { name: "Custom Jackets", href: "/custom/women" },
+        { name: "Custom Coats", href: "/custom/women" },
+        { name: "Custom Shirts", href: "/custom/women" },
+        { name: "Ready to Wear — Suits", href: "/signature-suit/women" },
       ],
     },
     {
-      id: "shop",
-      title: "Shop All",
+      id: "collections",
+      title: "Collections",
       links: [
+        { name: "New Arrivals", href: "/shop" },
+        { name: "Signature Designs", href: "/signature-suit" },
+        { name: "Limited Editions", href: "/signature-suit" },
         { name: "All Products", href: "/shop" },
-        { name: "Men", href: "/men" },
-        { name: "Women", href: "/women" },
-        { name: "Custom Made", href: "/custom" },
-        { name: "Ready to Wear", href: "/signature-suit" },
       ],
     },
     {
-      id: "info",
-      title: "Highlights",
+      id: "atelier",
+      title: "Atelier",
       links: [
-        { name: "About", href: "/about" },
+        { name: "Our Story", href: "/about" },
         { name: "Journal", href: "/journal" },
-        { name: "How It Works", href: "/about" },
+        { name: "Book a Fitting", href: "/contact" },
+        { name: "Measurements Guide", href: "/measurements" },
       ],
     },
   ];
@@ -78,30 +87,31 @@ export default function SiteHeader() {
       >
         <div className="relative flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
           
-          {/* LEFT: Hamburger */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="flex items-center gap-3 z-10 group"
-            aria-label="Menu"
-          >
-            <div className="flex flex-col gap-[5px]">
-              <span
-                className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                  scrolled ? "bg-neutral-900" : "bg-white"
-                }`}
-              />
-              <span
-                className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                  scrolled ? "bg-neutral-900" : "bg-white"
-                }`}
-              />
-              <span
-                className={`w-4 h-[1.2px] transition-colors duration-500 ${
-                  scrolled ? "bg-neutral-900" : "bg-white"
-                } group-hover:w-6`}
-              />
-            </div>
-          </button>
+          {/* LEFT: Hamburger + Search */}
+          <div className="flex items-center gap-5 z-10">
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="group"
+              aria-label="Menu"
+            >
+              <div className="flex flex-col gap-[5px]">
+                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
+                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
+                <span className={`w-4 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"} group-hover:w-6`} />
+              </div>
+            </button>
+
+            {/* Search icon */}
+            <Link
+              href="/shop"
+              aria-label="Search"
+              className={`transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </Link>
+          </div>
 
           {/* CENTER: Logo */}
           <Link
@@ -113,14 +123,14 @@ export default function SiteHeader() {
             PADO BOUTIQUE
           </Link>
 
-          {/* RIGHT: Currency + Cart */}
+          {/* RIGHT: Currency + Account + Cart */}
           <div className="flex items-center gap-4 md:gap-6 z-10">
             
             {/* Currency */}
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value as any)}
-              className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 ${
+              className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 hidden md:block ${
                 scrolled ? "text-neutral-900" : "text-white"
               }`}
             >
@@ -131,6 +141,17 @@ export default function SiteHeader() {
               <option value="GBP" className="text-neutral-900">GBP (£)</option>
               <option value="AED" className="text-neutral-900">AED</option>
             </select>
+
+            {/* Account */}
+            <Link
+              href="/admin/login"
+              aria-label="Account"
+              className={`transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+            </Link>
 
             {/* Cart */}
             <Link href="/checkout" className="relative">
@@ -181,7 +202,7 @@ export default function SiteHeader() {
               className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
             >
               {/* Drawer header */}
-              <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200">
+              <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
                 <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
                   Menu
                 </span>
@@ -242,12 +263,28 @@ export default function SiteHeader() {
               </div>
 
               {/* Drawer footer */}
-              <div className="px-8 py-6 border-t border-neutral-200">
-                <p className="text-[10px] text-neutral-400 uppercase tracking-[0.3em] mb-3">
+              <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
+                <Link
+                  href="/track-order"
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-sm text-neutral-700 hover:text-neutral-900"
+                >
+                  Track Order
+                </Link>
+                <Link
+                  href="/contact"
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-sm text-neutral-700 hover:text-neutral-900"
+                >
                   Contact
-                </p>
-                <p className="text-sm text-neutral-700">www.padoshop.com</p>
-                <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
+                </Link>
+                <div className="pt-4 border-t border-neutral-200 mt-4">
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-[0.3em] mb-3">
+                    Get in touch
+                  </p>
+                  <p className="text-sm text-neutral-700">www.padoshop.com</p>
+                  <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
+                </div>
               </div>
             </motion.div>
           </>
