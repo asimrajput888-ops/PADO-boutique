@@ -79,8 +79,8 @@ export default function SiteHeader() {
       title: "Occasions",
       links: [
         { name: "Weddings", href: "/shop" },
-        { name: "Halloween", href: "/seasonal/halloween" },
-        { name: "Cosplay & Events", href: "/seasonal" },
+        { name: "Halloween", href: "/seasonal?type=halloween" },
+{ name: "Cosplay & Events", href: "/seasonal" },
         { name: "Black Tie", href: "/custom/men" },
         { name: "Business & Formal", href: "/custom/men" },
       ],
