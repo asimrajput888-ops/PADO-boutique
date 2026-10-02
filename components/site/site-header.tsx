@@ -67,11 +67,11 @@ export default function SiteHeader() {
       id: "seasonal",
       title: "Seasonal & Novelty",
       links: [
-        { name: "Halloween Collection", href: "/seasonal/halloween" },
-        { name: "Superhero Suits", href: "/seasonal/superhero" },
-        { name: "Gothic & Dark", href: "/seasonal/gothic" },
-        { name: "Movie-Inspired", href: "/seasonal/movie" },
-        { name: "Party & Events", href: "/seasonal/party" },
+       { name: "Halloween Collection", href: "/seasonal?type=halloween" },
+{ name: "Superhero Suits", href: "/seasonal?type=superhero" },
+{ name: "Gothic & Dark", href: "/seasonal?type=gothic" },
+{ name: "Movie-Inspired", href: "/seasonal?type=movie" },
+{ name: "Party & Events", href: "/seasonal?type=party" },
       ],
     },
     {
