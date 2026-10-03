@@ -1,11 +1,27 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
-import { journalPosts } from '@/lib/data'
-import { Reveal } from '@/components/site/reveal'
+// components/home/journal-preview.tsx
+
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+import { journalPosts } from "@/lib/data";
+import { Reveal } from "@/components/site/reveal";
+
+interface JournalPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  image?: string;
+  category: string;
+  readTime: string;
+}
 
 export function JournalPreview() {
-  const [lead, ...rest] = journalPosts.slice(0, 3)
+  const posts = (journalPosts as JournalPost[]) || [];
+  const [lead, ...rest] = posts.slice(0, 3);
+
+  if (!lead) {
+    return null;
+  }
 
   return (
     <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
@@ -34,7 +50,7 @@ export function JournalPreview() {
           <Link href={`/journal/${lead.slug}`} className="group block">
             <div className="relative aspect-[16/11] overflow-hidden bg-muted">
               <Image
-                src={lead.image || '/placeholder.svg'}
+                src={lead.image || "/placeholder.svg"}
                 alt={lead.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -52,12 +68,12 @@ export function JournalPreview() {
         </Reveal>
 
         <div className="flex flex-col gap-8">
-          {rest.map((post, i) => (
+          {rest.map((post: JournalPost, i: number) => (
             <Reveal key={post.slug} delay={i * 90}>
               <Link href={`/journal/${post.slug}`} className="group flex gap-6">
                 <div className="relative aspect-[4/3] w-40 shrink-0 overflow-hidden bg-muted sm:w-52">
                   <Image
-                    src={post.image || '/placeholder.svg'}
+                    src={post.image || "/placeholder.svg"}
                     alt={post.title}
                     fill
                     sizes="200px"
@@ -79,5 +95,5 @@ export function JournalPreview() {
         </div>
       </div>
     </section>
-  )
+  );
 }
