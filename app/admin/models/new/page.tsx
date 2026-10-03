@@ -3,233 +3,225 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
-export default function NewModel() {
+const PRODUCT_TYPES = [
+  { id: "suit", name: "Suit" },
+  { id: "blazer", name: "Blazer" },
+  { id: "coat", name: "Coat" },
+  { id: "tuxedo", name: "Tuxedo" },
+  { id: "shirt", name: "Shirt" },
+  { id: "vest", name: "Vest" },
+  { id: "trouser", name: "Trouser" },
+];
+
+export default function NewModelPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    description: "",
-    default_fabric: "premium-wool",
-    default_lapel: "notch",
-    default_buttons: "2-button",
-    default_sleeve: "4-sleeve",
-    default_pocket: "patch",
-    default_fit: "slim",
-    default_trouser: "flat-front",
-    default_vent: "double-vent",
-    default_vest: "without-vest",
-    default_lining: "navy",
-  });
+  const [uploading, setUploading] = useState(false);
+
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("men");
+  const [productType, setProductType] = useState("suit");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+
+    const fileExt = file.name.split(".").pop();
+    const fileName = `model-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, file);
+
+    if (uploadError) {
+      alert("Upload failed: " + uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+
+    setImageUrl(data.publicUrl);
+    setUploading(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    let imageUrl = "";
 
-    if (imageFile) {
-      const fileExt = imageFile.name.split(".").pop();
-      const fileName = `model-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from("product-images").upload(fileName, imageFile);
-      if (uploadError) {
-        alert("Image upload failed: " + uploadError.message);
-        setLoading(false);
-        return;
-      }
-      const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
-      imageUrl = urlData.publicUrl;
+    if (!imageUrl) {
+      alert("Please upload a model image");
+      setLoading(false);
+      return;
     }
 
     const { error } = await supabase.from("models").insert({
-      name: formData.name,
-      price: parseInt(formData.price),
-      description: formData.description,
+      name,
+      price: Number(price),
+      description,
+      category,
+      product_type: productType,
       image_url: imageUrl,
-      default_fabric: formData.default_fabric,
-      default_lapel: formData.default_lapel,
-      default_buttons: formData.default_buttons,
-      default_sleeve: formData.default_sleeve,
-      default_pocket: formData.default_pocket,
-      default_fit: formData.default_fit,
-      default_trouser: formData.default_trouser,
-      default_vent: formData.default_vent,
-      default_vest: formData.default_vest,
-      default_lining: formData.default_lining,
     });
+
+    setLoading(false);
 
     if (error) {
       alert("Error: " + error.message);
-      setLoading(false);
-    } else {
-      router.push("/admin/models");
+      return;
     }
+
+    router.push("/admin/models");
   };
 
   return (
-    <div className="p-10 max-w-3xl">
-      <Link href="/admin/models" className="text-sm text-neutral-500 hover:text-amber-600 mb-6 inline-block">
-        ← Back to Models
-      </Link>
-      <h1 className="text-3xl font-serif mb-8">Add New Model</h1>
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-neutral-200 p-8 rounded-lg">
+    <div className="p-10 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <Link
+          href="/admin/models"
+          className="text-sm text-neutral-500 hover:text-neutral-900"
+        >
+          ← Back to Models
+        </Link>
+        <h1 className="text-3xl font-serif mt-4 mb-1">Add New Model</h1>
+        <p className="text-neutral-500 text-sm">
+          Create a new customizer model.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Model Name</label>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Model Name
+          </label>
           <input
             type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
-            placeholder="e.g., The Signature Navy"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
-          />
-        </div>
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Price (USD)</label>
-          <input
-            type="number"
-            value={formData.price}
-            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
-            placeholder="e.g., 300"
-            required
-          />
-          <p className="text-xs text-neutral-400 mt-1">
-            Enter price in USD (e.g., 300 for $300)
-          </p>
-        </div>
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Description</label>
-          <textarea
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={3}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none resize-none"
-            placeholder="Describe this model..."
-          />
-        </div>
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Model Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-            className="w-full border border-neutral-300 p-3 rounded-lg"
-            required
+            placeholder="e.g. The Navy Windowpane Blazer"
+            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
           />
         </div>
 
-        <div className="border-t border-neutral-200 pt-6">
-          <h3 className="text-sm font-semibold mb-4">Default Selections</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Fabric</label>
-              <select value={formData.default_fabric} onChange={(e) => setFormData({ ...formData, default_fabric: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="premium-wool">Premium Wool</option>
-                <option value="super-120s">Super 120s</option>
-                <option value="super-130s">Super 130s</option>
-                <option value="linen">Linen</option>
-                <option value="wool-blend">Wool Blend</option>
-                <option value="seasonal">Seasonal Fabrics</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Lapel</label>
-              <select value={formData.default_lapel} onChange={(e) => setFormData({ ...formData, default_lapel: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="notch">Notch</option>
-                <option value="peak">Peak</option>
-                <option value="shawl">Shawl</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Buttons</label>
-              <select value={formData.default_buttons} onChange={(e) => setFormData({ ...formData, default_buttons: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="1-button">1 Button</option>
-                <option value="2-button">2 Button</option>
-                <option value="3-button">3 Button</option>
-                <option value="double-breasted">Double Breasted</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Sleeve</label>
-              <select value={formData.default_sleeve} onChange={(e) => setFormData({ ...formData, default_sleeve: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="1-sleeve">1 Sleeve</option>
-                <option value="2-sleeve">2 Sleeve</option>
-                <option value="3-sleeve">3 Sleeve</option>
-                <option value="4-sleeve">4 Sleeve</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Pocket</label>
-              <select value={formData.default_pocket} onChange={(e) => setFormData({ ...formData, default_pocket: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="ticket">Ticket Pocket</option>
-                <option value="patch">Patch Pocket</option>
-                <option value="double-welt">Double Welt Pocket</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Fit</label>
-              <select value={formData.default_fit} onChange={(e) => setFormData({ ...formData, default_fit: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="slim">Slim</option>
-                <option value="modern">Modern</option>
-                <option value="regular">Regular</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Trouser</label>
-              <select value={formData.default_trouser} onChange={(e) => setFormData({ ...formData, default_trouser: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="flat-front">Flat Front</option>
-                <option value="single-pleat">Single Pleat</option>
-                <option value="double-pleat">Double Pleat</option>
-                <option value="straight-trouser">Straight Leg</option>
-                <option value="slim-trouser">Slim Fit</option>
-                <option value="wide-trouser">Wide Leg</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Vent</label>
-              <select value={formData.default_vent} onChange={(e) => setFormData({ ...formData, default_vent: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="single-vent">Single Vent</option>
-                <option value="double-vent">Double Vent</option>
-                <option value="no-vent">No Vent</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Vest</label>
-              <select value={formData.default_vest} onChange={(e) => setFormData({ ...formData, default_vest: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="without-vest">Without Vest</option>
-                <option value="vest-2-button">2 Button Vest</option>
-                <option value="vest-3-button">3 Button Vest</option>
-                <option value="vest-4-button">4 Button Vest</option>
-                <option value="vest-5-button">5 Button Vest</option>
-                <option value="vest-6-button">6 Button Vest</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-neutral-500 mb-1">Lining</label>
-              <select value={formData.default_lining} onChange={(e) => setFormData({ ...formData, default_lining: e.target.value })} className="w-full border border-neutral-300 p-2 rounded">
-                <option value="navy">Navy</option>
-                <option value="black">Black</option>
-                <option value="burgundy">Burgundy</option>
-                <option value="grey">Grey</option>
-                <option value="cream">Cream</option>
-                <option value="royal-blue">Royal Blue</option>
-              </select>
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Price (USD)
+          </label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+            placeholder="350"
+            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+            >
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+              Product Type
+            </label>
+            <select
+              value={productType}
+              onChange={(e) => setProductType(e.target.value)}
+              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+            >
+              {PRODUCT_TYPES.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Description
+          </label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            rows={5}
+            placeholder="Premium navy wool-blend blazer with subtle windowpane check..."
+            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none resize-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            Model Image
+          </label>
+
+          <div className="flex gap-3 items-start">
+            {imageUrl && (
+              <div className="w-24 h-32 bg-neutral-100 overflow-hidden flex-shrink-0">
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            <div className="flex-1">
+              <label className="cursor-pointer block border border-neutral-300 p-3 text-center text-xs uppercase tracking-widest hover:border-neutral-900 transition">
+                {uploading ? "Uploading..." : imageUrl ? "Change Image" : "Upload Image"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              </label>
+              <p className="text-xs text-neutral-400 mt-2">
+                PNG or JPG. Recommended: transparent or white background, portrait orientation.
+              </p>
             </div>
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-neutral-900 text-white py-4 rounded-lg font-semibold hover:bg-amber-600 transition disabled:opacity-50"
-        >
-          {loading ? "Saving..." : "Save Model"}
-        </button>
+        <div className="pt-6 border-t border-neutral-200">
+          <button
+            type="submit"
+            disabled={loading || uploading}
+            className="w-full bg-neutral-900 text-white py-4 font-medium hover:bg-neutral-700 transition disabled:opacity-50 uppercase tracking-widest text-xs"
+          >
+            {loading ? "Saving..." : uploading ? "Uploading..." : "Save Model"}
+          </button>
+        </div>
+
       </form>
     </div>
   );
