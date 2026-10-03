@@ -1,80 +1,27 @@
-// @ts-nocheck
-'use client'
+// ============================================
+// MEASUREMENT FIELDS
+// ============================================
 
-import { measurementFields, type Gender } from '@/lib/data'
-
-export type Unit = 'in' | 'cm'
-export type Measurements = Record<string, string>
-
-type Props = {
-  gender: Gender
-  unit: Unit
-  onUnitChange: (u: Unit) => void
-  values: Measurements
-  onChange: (id: string, value: string) => void
+export interface MeasurementField {
+  id: string;
+  label: string;
+  placeholder?: string;
+  unit?: string;
+  required?: boolean;
+  hint?: string;
 }
 
-export function MeasurementForm({ gender, unit, onUnitChange, values, onChange }: Props) {
-  const fields = measurementFields[gender]
-  const completed = fields.filter((f) => values[f.id]?.trim()).length
-  const progress = Math.round((completed / fields.length) * 100)
-
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] tracking-wide-sm text-muted-foreground uppercase">Units</span>
-          <div className="flex border border-border">
-            {(['in', 'cm'] as Unit[]).map((u) => (
-              <button
-                key={u}
-                type="button"
-                onClick={() => onUnitChange(u)}
-                className={`px-4 py-1.5 text-[11px] tracking-wide-sm uppercase transition-colors ${
-                  unit === u ? 'bg-charcoal text-offwhite' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {u}
-              </button>
-            ))}
-          </div>
-        </div>
-        <span className="text-[11px] tracking-wide-sm text-muted-foreground uppercase">
-          {completed} / {fields.length}
-        </span>
-      </div>
-
-      <div className="mt-4 h-px w-full bg-border">
-        <div
-          className="h-px bg-champagne transition-all duration-700 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      <div className="mt-8 grid gap-6 sm:grid-cols-2">
-        {fields.map((field) => (
-          <div key={field.id}>
-            <label
-              htmlFor={`m-${field.id}`}
-              className="flex items-baseline justify-between text-[12px] tracking-wide-sm uppercase"
-            >
-              {field.label}
-              <span className="text-[10px] normal-case tracking-normal text-muted-foreground">
-                {unit}
-              </span>
-            </label>
-            <input
-              id={`m-${field.id}`}
-              inputMode="decimal"
-              value={values[field.id] ?? ''}
-              onChange={(e) => onChange(field.id, e.target.value.replace(/[^0-9.]/g, ''))}
-              placeholder="0.0"
-              className="mt-2 w-full border-b border-border bg-transparent pb-2 font-serif text-2xl text-foreground outline-none transition-colors placeholder:text-border focus:border-champagne"
-            />
-            <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{field.hint}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+export const measurementFields: MeasurementField[] = [
+  { id: "neck", label: "Neck", placeholder: "e.g. 15.5", unit: "in", required: true, hint: "Around the base of your neck, one finger loose." },
+  { id: "chest", label: "Chest", placeholder: "e.g. 40", unit: "in", required: true, hint: "Around the fullest part of your chest." },
+  { id: "waist", label: "Waist", placeholder: "e.g. 34", unit: "in", required: true, hint: "Around your natural waistline." },
+  { id: "hip", label: "Hip", placeholder: "e.g. 40", unit: "in", required: true, hint: "Around the fullest part of your hips." },
+  { id: "shoulder", label: "Shoulder Width", placeholder: "e.g. 18", unit: "in", required: true, hint: "Shoulder point to shoulder point across your back." },
+  { id: "sleeve", label: "Sleeve Length", placeholder: "e.g. 25", unit: "in", required: true, hint: "From shoulder point to wrist bone." },
+  { id: "jacketLength", label: "Jacket Length", placeholder: "e.g. 30", unit: "in", required: false, hint: "From base of neck to jacket hem." },
+  { id: "trouserWaist", label: "Trouser Waist", placeholder: "e.g. 34", unit: "in", required: false, hint: "Where you wear your trousers." },
+  { id: "inseam", label: "Inseam", placeholder: "e.g. 32", unit: "in", required: false, hint: "From crotch to ankle bone." },
+  { id: "thigh", label: "Thigh", placeholder: "e.g. 24", unit: "in", required: false, hint: "Around the fullest part of your thigh." },
+  { id: "height", label: "Height", placeholder: "e.g. 70", unit: "in", required: true, hint: "Without shoes." },
+  { id: "weight", label: "Weight", placeholder: "e.g. 170", unit: "lbs", required: false, hint: "Optional, helps us gauge fit." },
+];
