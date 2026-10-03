@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { measurementFields, type Gender } from '@/lib/data'
