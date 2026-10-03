@@ -1,66 +1,66 @@
-import Image from 'next/image'
-import { fabrics } from '@/lib/data'
-import { formatSigned } from '@/lib/format'
-import { SectionHeading } from '@/components/site/section-heading'
-import { Reveal } from '@/components/site/reveal'
+// components/home/fabric-atelier.tsx
+
+import Image from "next/image";
+import Link from "next/link";
+import { fabrics } from "@/lib/data";
+
+interface Fabric {
+  id: string;
+  name: string;
+  color: string;
+  price: number;
+  description?: string;
+}
 
 export function FabricAtelier() {
+  const list = (fabrics as Fabric[]) || [];
+
+  if (list.length === 0) return null;
+
   return (
-    <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-      <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20">
-        <div>
-          <SectionHeading eyebrow="The Fabric Atelier" title="The art of fabric." />
-          <Reveal as="p" delay={140} className="mt-6 max-w-md leading-relaxed text-muted-foreground">
-            A suit is only as considered as the cloth it begins with. We source and finish a curated
-            edit of the world&apos;s finest suiting — each with its own weight, hand and character.
-          </Reveal>
+    <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-8">
+      <div className="text-center mb-14">
+        <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
+          Fabric Atelier
+        </p>
+        <h2 className="text-3xl md:text-4xl font-serif text-neutral-900 mb-4">
+          The Finest Cloth
+        </h2>
+        <p className="text-neutral-500 max-w-md mx-auto text-sm">
+          Sourced from the finest mills in Italy and England.
+        </p>
+      </div>
 
-          <div className="mt-10 divide-y divide-border border-y border-border">
-            {fabrics.map((fabric) => (
-              <Reveal
-                key={fabric.id}
-                className="flex items-center justify-between gap-4 py-4"
-              >
-                <div className="flex items-center gap-4">
-                  <span
-                    className="h-9 w-9 rounded-full border border-border"
-                    style={{ backgroundColor: fabric.hex }}
-                  />
-                  <div>
-                    <p className="font-serif text-xl leading-none">{fabric.name}</p>
-                    <p className="mt-1 text-[12px] text-muted-foreground">{fabric.detail}</p>
-                  </div>
-                </div>
-                <span className="text-[11px] tracking-wide-sm text-muted-foreground uppercase">
-                  {formatSigned(fabric.price)}
-                </span>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-
-        <Reveal delay={120} className="grid grid-cols-2 gap-3">
-          {fabrics.map((fabric, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {list.slice(0, 8).map((fabric: Fabric, i: number) => (
+          <div key={fabric.id} className="group">
             <div
-              key={fabric.id}
-              className={`group relative overflow-hidden bg-muted ${
-                i % 2 === 0 ? 'aspect-[4/5]' : 'aspect-[4/5] md:mt-10'
-              }`}
-            >
-              <Image
-                src={fabric.swatch || '/placeholder.svg'}
-                alt={`${fabric.name} fabric texture`}
-                fill
-                sizes="(max-width: 1024px) 45vw, 25vw"
-                className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-charcoal/70 to-transparent p-4">
-                <p className="text-[10px] tracking-wide-sm text-offwhite uppercase">{fabric.name}</p>
-              </div>
-            </div>
-          ))}
-        </Reveal>
+              className="aspect-square w-full border border-neutral-200 mb-3 transition-transform duration-700 group-hover:scale-[1.02]"
+              style={{ backgroundColor: fabric.color }}
+            />
+            <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-1">
+              {fabric.price > 0 ? `+ $${fabric.price}` : "Included"}
+            </p>
+            <h3 className="text-sm font-medium text-neutral-900 mb-1">
+              {fabric.name}
+            </h3>
+            {fabric.description && (
+              <p className="text-xs text-neutral-500 leading-relaxed">
+                {fabric.description}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-14">
+        <Link
+          href="/custom/men"
+          className="inline-block text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 hover:opacity-60 transition"
+        >
+          Explore Custom Made →
+        </Link>
       </div>
     </section>
-  )
+  );
 }
