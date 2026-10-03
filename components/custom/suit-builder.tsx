@@ -1,6 +1,4 @@
 // @ts-nocheck
-
-// ... baaki tumhara existing code same rahega
   'use client'
 
 import { useMemo, useState } from 'react'
