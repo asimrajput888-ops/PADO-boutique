@@ -74,23 +74,34 @@ export default function MenBespokePage() {
 
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
+  // Product type helpers
+  const pt = model?.product_type || "suit";
+  const showLapel = ["suit", "blazer", "coat", "tuxedo"].includes(pt);
+  const showCollar = ["suit", "shirt", "tuxedo"].includes(pt);
+  const showButtons = ["suit", "blazer", "coat", "tuxedo", "vest"].includes(pt);
+  const showSleeve = ["suit", "blazer", "coat", "tuxedo", "shirt"].includes(pt);
+  const showTrouser = ["suit", "trouser", "tuxedo"].includes(pt);
+  const showVent = ["suit", "blazer", "coat", "tuxedo"].includes(pt);
+  const showVest = ["suit", "tuxedo"].includes(pt);
+  const showLining = ["suit", "blazer", "coat", "tuxedo", "vest", "trouser"].includes(pt);
+
   const totalPrice = useMemo(() => {
     if (!model) return 0;
     let price = model.price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
-    add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
-    add(BUTTON_OPTIONS.find((b) => b.id === selection.buttons));
-    add(SLEEVE_OPTIONS.find((s) => s.id === selection.sleeve));
-    add(SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar));
+    if (showLapel) add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
+    if (showButtons) add(BUTTON_OPTIONS.find((b) => b.id === selection.buttons));
+    if (showSleeve) add(SLEEVE_OPTIONS.find((s) => s.id === selection.sleeve));
+    if (showCollar) add(SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar));
     add(POCKET_OPTIONS.find((p) => p.id === selection.pocket));
     add(FIT_OPTIONS.find((f) => f.id === selection.fit));
-    add(TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
-    add(VENT_OPTIONS.find((v) => v.id === selection.vent));
-    add(VEST_OPTIONS.find((v) => v.id === selection.vest));
-    add(LINING_OPTIONS.find((l) => l.id === selection.lining));
+    if (showTrouser) add(TROUSER_OPTIONS.find((t) => t.id === selection.trouser));
+    if (showVent) add(VENT_OPTIONS.find((v) => v.id === selection.vent));
+    if (showVest) add(VEST_OPTIONS.find((v) => v.id === selection.vest));
+    if (showLining) add(LINING_OPTIONS.find((l) => l.id === selection.lining));
     return price;
-  }, [selection, currentFabric, model]);
+  }, [selection, currentFabric, model, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
@@ -151,7 +162,6 @@ export default function MenBespokePage() {
           </p>
         </div>
 
-        {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-12">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex items-center">
@@ -174,7 +184,7 @@ export default function MenBespokePage() {
             exit="exit"
             className="bg-white border border-neutral-200 p-6 md:p-10"
           >
-            {/* ============ STEP 1 ============ */}
+            {/* STEP 1 */}
             {step === 1 && (
               <div className="space-y-12">
                 <div>
@@ -199,45 +209,53 @@ export default function MenBespokePage() {
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lapel Style</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {LAPEL_OPTIONS.map((l) => (
-                      <ThumbnailOption key={l.id} id={l.id} name={l.name} price={l.price} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
-                    ))}
+                {showLapel && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lapel Style</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {LAPEL_OPTIONS.map((l) => (
+                        <ThumbnailOption key={l.id} id={l.id} name={l.name} price={l.price} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Buttons</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {BUTTON_OPTIONS.map((b) => (
-                      <ThumbnailOption key={b.id} id={b.id} name={b.name} price={b.price} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
-                    ))}
+                {showButtons && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Buttons</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {BUTTON_OPTIONS.map((b) => (
+                        <ThumbnailOption key={b.id} id={b.id} name={b.name} price={b.price} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Sleeve Buttons</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {SLEEVE_OPTIONS.map((s) => (
-                      <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
-                    ))}
+                {showSleeve && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Sleeve Buttons</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {SLEEVE_OPTIONS.map((s) => (
+                        <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Shirt Collar</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {SHIRT_COLLAR_OPTIONS.map((c) => (
-                      <ThumbnailOption key={c.id} id={c.id} name={c.name} price={c.price} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
-                    ))}
+                {showCollar && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Shirt Collar</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {SHIRT_COLLAR_OPTIONS.map((c) => (
+                        <ThumbnailOption key={c.id} id={c.id} name={c.name} price={c.price} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
-            {/* ============ STEP 2 ============ */}
+            {/* STEP 2 */}
             {step === 2 && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 02 — Customize Details</h2>
@@ -260,54 +278,62 @@ export default function MenBespokePage() {
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Trouser Style</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {TROUSER_OPTIONS.map((t) => (
-                      <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id })} />
-                    ))}
+                {showTrouser && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Trouser Style</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {TROUSER_OPTIONS.map((t) => (
+                        <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Jacket Vents</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {VENT_OPTIONS.map((v) => (
-                      <ThumbnailOption key={v.id} id={v.id} name={v.name} price={v.price} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
-                    ))}
+                {showVent && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Jacket Vents</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {VENT_OPTIONS.map((v) => (
+                        <ThumbnailOption key={v.id} id={v.id} name={v.name} price={v.price} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Vest</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {VEST_OPTIONS.map((v) => (
-                      <SimpleOption key={v.id} id={v.id} name={v.name} price={v.price} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
-                    ))}
+                {showVest && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Vest</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {VEST_OPTIONS.map((v) => (
+                        <SimpleOption key={v.id} id={v.id} name={v.name} price={v.price} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div>
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lining Color</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {LINING_OPTIONS.map((l) => (
-                      <button
-                        key={l.id}
-                        onClick={() => setSelection({ ...selection, lining: l.id })}
-                        className={`p-4 border flex flex-col items-center gap-3 transition-all ${
-                          selection.lining === l.id ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
-                        }`}
-                      >
-                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-neutral-300" style={{ backgroundColor: l.color }} />
-                        <span className="text-xs font-medium text-center text-neutral-900">{l.name}</span>
-                      </button>
-                    ))}
+                {showLining && (
+                  <div>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lining Color</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {LINING_OPTIONS.map((l) => (
+                        <button
+                          key={l.id}
+                          onClick={() => setSelection({ ...selection, lining: l.id })}
+                          className={`p-4 border flex flex-col items-center gap-3 transition-all ${
+                            selection.lining === l.id ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
+                          }`}
+                        >
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-neutral-300" style={{ backgroundColor: l.color }} />
+                          <span className="text-xs font-medium text-center text-neutral-900">{l.name}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
-            {/* ============ STEP 3 ============ */}
+            {/* STEP 3 */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 03 — Your Measurements</h2>
@@ -325,7 +351,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* ============ STEP 4 ============ */}
+            {/* STEP 4 */}
             {step === 4 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 04 — Final Review</h2>
@@ -338,12 +364,14 @@ export default function MenBespokePage() {
                     <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fabric</p>
                     <p className="font-medium text-neutral-900">{currentFabric?.name || "Not selected"}</p>
                   </div>
-                  {selection.lapel && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p><p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
-                  {selection.buttons && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Buttons</p><p className="font-medium text-neutral-900">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
-                  {selection.collar && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Collar</p><p className="font-medium text-neutral-900">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
+                  {showLapel && selection.lapel && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p><p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
+                  {showButtons && selection.buttons && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Buttons</p><p className="font-medium text-neutral-900">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
+                  {showCollar && selection.collar && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Collar</p><p className="font-medium text-neutral-900">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
                   {selection.fit && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fit</p><p className="font-medium text-neutral-900">{FIT_OPTIONS.find((f) => f.id === selection.fit)?.name}</p></div>}
-                  {selection.vent && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Vent</p><p className="font-medium text-neutral-900">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
-                  {selection.lining && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p><p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
+                  {showTrouser && selection.trouser && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Trouser</p><p className="font-medium text-neutral-900">{TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
+                  {showVent && selection.vent && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Vent</p><p className="font-medium text-neutral-900">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
+                  {showVest && selection.vest && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Vest</p><p className="font-medium text-neutral-900">{VEST_OPTIONS.find((v) => v.id === selection.vest)?.name}</p></div>}
+                  {showLining && selection.lining && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p><p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
                 </div>
 
                 <div className="bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
@@ -353,7 +381,6 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* Price + Nav */}
             <div className="mt-12 pt-6 border-t border-neutral-200">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-[10px] uppercase tracking-widest text-neutral-500">Total Price</span>
