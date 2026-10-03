@@ -19,7 +19,6 @@ export default function SignatureWomenPage() {
         .from("products")
         .select("*")
         .eq("category", "signature")
-        .eq("gender", "women")
         .order("created_at", { ascending: false });
       setProducts(data || []);
       setLoading(false);
@@ -68,6 +67,7 @@ export default function SignatureWomenPage() {
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-neutral-300 text-[10px] uppercase tracking-widest">
