@@ -1,68 +1,71 @@
-'use client'
+// components/home/signature-collection.tsx
 
-import Link from 'next/link'
-import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
-import { products, type Gender } from '@/lib/data'
-import { ProductCard } from '@/components/shop/product-card'
-import { Reveal } from '@/components/site/reveal'
+import Link from "next/link";
+import Image from "next/image";
+import { products } from "@/lib/data";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  gender?: string;
+  image: string;
+  description: string;
+}
 
 export function SignatureCollection() {
-  const [gender, setGender] = useState<Gender>('men')
-  const shown = products.filter((p) => p.gender === gender)
+  const list = (products as Product[]) || [];
+  const filtered = list.filter((p: Product) => p.category === "signature").slice(0, 4);
+
+  if (filtered.length === 0) {
+    return null;
+  }
 
   return (
-    <section className="bg-offwhite py-20 md:py-28">
-      <div className="mx-auto max-w-[1400px] px-5 md:px-8">
-        <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
-          <div>
-            <Reveal as="p" className="text-[11px] tracking-luxe text-muted-foreground uppercase">
-              Our Signature Collection
-            </Reveal>
-            <Reveal
-              as="h2"
-              delay={80}
-              className="mt-4 max-w-xl font-serif text-4xl leading-[1.0] text-balance md:text-6xl"
-            >
-              Designed to be remembered.
-            </Reveal>
-          </div>
-
-          <Reveal delay={120} className="flex items-center gap-1 border border-border p-1">
-            {(['men', 'women'] as Gender[]).map((g) => (
-              <button
-                key={g}
-                onClick={() => setGender(g)}
-                className={`px-6 py-2.5 text-[11px] tracking-wide-sm uppercase transition-colors ${
-                  gender === g
-                    ? 'bg-charcoal text-offwhite'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {g}
-              </button>
-            ))}
-          </Reveal>
+    <section className="mx-auto max-w-[1400px] px-5 py-20 md:px-8">
+      <div className="flex items-end justify-between mb-12">
+        <div>
+          <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-3">
+            Signature Collection
+          </p>
+          <h2 className="text-3xl md:text-4xl font-serif text-neutral-900">
+            Ready to Wear
+          </h2>
         </div>
+        <Link
+          href="/signature-suit"
+          className="hidden md:block text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1"
+        >
+          View All →
+        </Link>
+      </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 lg:grid-cols-4">
-          {shown.map((product, i) => (
-            <Reveal key={product.slug} delay={i * 70}>
-              <ProductCard product={product} />
-            </Reveal>
-          ))}
-        </div>
-
-        <div className="mt-14 flex justify-center">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-10 md:gap-x-4">
+        {filtered.map((product: Product, i: number) => (
           <Link
-            href="/shop"
-            className="group flex items-center gap-3 border border-charcoal px-9 py-4 text-[11px] tracking-wide-sm uppercase transition-colors hover:bg-charcoal hover:text-offwhite"
+            key={product.id}
+            href={`/shop/${product.id}`}
+            className="group block"
           >
-            View All Designs
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 50vw, 25vw"
+                className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+              />
+            </div>
+            <h3 className="text-[13px] md:text-sm text-neutral-900 leading-snug mb-1">
+              {product.name}
+            </h3>
+            <p className="text-[13px] md:text-sm text-neutral-500">
+              ${product.price.toLocaleString()}
+            </p>
           </Link>
-        </div>
+        ))}
       </div>
     </section>
-  )
+  );
 }
