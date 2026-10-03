@@ -33,8 +33,17 @@ export interface Benefit {
   icon: string;
 }
 
+export interface JournalPost {
+  slug: string;
+  title: string;
+  excerpt: string;
+  image?: string;
+  category: string;
+  readTime: string;
+}
+
 // ============================================
-// DATA (khaali — ab Supabase se aayega)
+// DATA — khaali (Supabase se aayega)
 // ============================================
 
 export const products: Product[] = [];
@@ -42,7 +51,38 @@ export const reviews: Review[] = [];
 export const benefits: Benefit[] = [];
 
 // ============================================
-// STATIC DATA
+// JOURNAL POSTS (static)
+// ============================================
+
+export const journalPosts: JournalPost[] = [
+  {
+    slug: "art-of-bespoke",
+    title: "The Art of Bespoke Tailoring",
+    excerpt: "Why a made-to-measure suit changes how you carry yourself.",
+    image: "/images/journal-1.png",
+    category: "Craft",
+    readTime: "5 min read",
+  },
+  {
+    slug: "fabric-guide",
+    title: "A Gentleman's Guide to Fabric",
+    excerpt: "Wool, cashmere, linen — what to pick and when.",
+    image: "/images/journal-2.png",
+    category: "Style",
+    readTime: "4 min read",
+  },
+  {
+    slug: "perfect-fit",
+    title: "The Perfect Fit",
+    excerpt: "How to measure yourself for a bespoke suit.",
+    image: "/images/journal-3.png",
+    category: "Guide",
+    readTime: "6 min read",
+  },
+];
+
+// ============================================
+// STATIC LISTS
 // ============================================
 
 export const CATEGORIES = [
