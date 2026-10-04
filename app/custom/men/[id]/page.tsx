@@ -44,7 +44,6 @@ export default function MenBespokePage() {
     pocket: "", fit: "", trouser: "", vent: "", vest: "", lining: "",
   });
 
-  // Total steps: Standard = 2 (Fit + Contact), Custom = 5
   const totalSteps = fitType === "custom" ? 5 : 2;
 
   useEffect(() => {
@@ -98,7 +97,6 @@ export default function MenBespokePage() {
   const totalPrice = useMemo(() => {
     if (!model) return 0;
     let price = model.price;
-    // Standard size = base price only, no customizations
     if (fitType === "standard") return price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
@@ -350,9 +348,6 @@ export default function MenBespokePage() {
                       >
                         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-neutral-300" style={{ backgroundColor: f.color }} />
                         <span className="text-sm font-medium text-neutral-900 text-center">{f.name}</span>
-                        <span className="text-xs text-neutral-500">
-                          {f.price > 0 ? `+ ${formatPrice(f.price)}` : "Included"}
-                        </span>
                       </button>
                     ))}
                   </div>
@@ -363,7 +358,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lapel Style</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {LAPEL_OPTIONS.map((l) => (
-                        <ThumbnailOption key={l.id} id={l.id} name={l.name} price={l.price} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
+                        <ThumbnailOption key={l.id} id={l.id} name={l.name} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
                       ))}
                     </div>
                   </div>
@@ -374,7 +369,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Buttons</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {BUTTON_OPTIONS.map((b) => (
-                        <ThumbnailOption key={b.id} id={b.id} name={b.name} price={b.price} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
+                        <ThumbnailOption key={b.id} id={b.id} name={b.name} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
                       ))}
                     </div>
                   </div>
@@ -385,7 +380,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Sleeve Buttons</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {SLEEVE_OPTIONS.map((s) => (
-                        <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
+                        <ThumbnailOption key={s.id} id={s.id} name={s.name} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
                       ))}
                     </div>
                   </div>
@@ -396,7 +391,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Shirt Collar</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {SHIRT_COLLAR_OPTIONS.map((c) => (
-                        <ThumbnailOption key={c.id} id={c.id} name={c.name} price={c.price} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
+                        <ThumbnailOption key={c.id} id={c.id} name={c.name} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
                       ))}
                     </div>
                   </div>
@@ -413,7 +408,7 @@ export default function MenBespokePage() {
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Pockets</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {POCKET_OPTIONS.map((p) => (
-                      <ThumbnailOption key={p.id} id={p.id} name={p.name} price={p.price} thumbnail={p.thumbnail} selected={selection.pocket === p.id} onSelect={() => setSelection({ ...selection, pocket: p.id })} />
+                      <ThumbnailOption key={p.id} id={p.id} name={p.name} thumbnail={p.thumbnail} selected={selection.pocket === p.id} onSelect={() => setSelection({ ...selection, pocket: p.id })} />
                     ))}
                   </div>
                 </div>
@@ -422,7 +417,7 @@ export default function MenBespokePage() {
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Fit</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {FIT_OPTIONS.map((f) => (
-                      <ThumbnailOption key={f.id} id={f.id} name={f.name} price={f.price} thumbnail={f.thumbnail} selected={selection.fit === f.id} onSelect={() => setSelection({ ...selection, fit: f.id })} />
+                      <ThumbnailOption key={f.id} id={f.id} name={f.name} thumbnail={f.thumbnail} selected={selection.fit === f.id} onSelect={() => setSelection({ ...selection, fit: f.id })} />
                     ))}
                   </div>
                 </div>
@@ -432,7 +427,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Trouser Style</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {TROUSER_OPTIONS.map((t) => (
-                        <ThumbnailOption key={t.id} id={t.id} name={t.name} price={t.price} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id })} />
+                        <ThumbnailOption key={t.id} id={t.id} name={t.name} thumbnail={t.thumbnail} selected={selection.trouser === t.id} onSelect={() => setSelection({ ...selection, trouser: t.id })} />
                       ))}
                     </div>
                   </div>
@@ -443,7 +438,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Jacket Vents</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {VENT_OPTIONS.map((v) => (
-                        <ThumbnailOption key={v.id} id={v.id} name={v.name} price={v.price} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
+                        <ThumbnailOption key={v.id} id={v.id} name={v.name} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
                       ))}
                     </div>
                   </div>
@@ -454,7 +449,7 @@ export default function MenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Vest</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {VEST_OPTIONS.map((v) => (
-                        <SimpleOption key={v.id} id={v.id} name={v.name} price={v.price} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
+                        <SimpleOption key={v.id} id={v.id} name={v.name} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
                       ))}
                     </div>
                   </div>
@@ -538,14 +533,13 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* FINAL STEP — Review + Contact (both flows) */}
+            {/* FINAL STEP — Review + Contact */}
             {step === totalSteps - 1 && (
               <div className="space-y-8">
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">
                   {fitType === "standard" ? "Confirm Order" : "Review & Submit"}
                 </h2>
 
-                {/* Order summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div className="bg-neutral-50 p-4 border border-neutral-200">
                     <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Model</p>
@@ -577,7 +571,6 @@ export default function MenBespokePage() {
                   )}
                 </div>
 
-                {/* Contact Information */}
                 <div className="border-t border-neutral-200 pt-8">
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Contact Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
