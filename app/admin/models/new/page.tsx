@@ -4,8 +4,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 const PRODUCT_TYPES = [
   { id: "suit", name: "Suit" },
@@ -60,52 +60,58 @@ export default function NewModelPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || uploading) return;
     setLoading(true);
 
-    if (!imageUrl) {
-      alert("Please upload a model image");
+    try {
+      if (!imageUrl) {
+        throw new Error("Please upload a model image");
+      }
+
+      const { error } = await supabase.from("models").insert({
+        name,
+        price: Number(price),
+        description,
+        category,
+        product_type: productType,
+        image_url: imageUrl,
+      });
+
+      if (error) throw new Error(error.message);
+
+      router.push("/admin/models");
+    } catch (err: any) {
+      alert("Error: " + err.message);
       setLoading(false);
-      return;
     }
-
-    const { error } = await supabase.from("models").insert({
-      name,
-      price: Number(price),
-      description,
-      category,
-      product_type: productType,
-      image_url: imageUrl,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert("Error: " + error.message);
-      return;
-    }
-
-    router.push("/admin/models");
   };
 
   return (
-    <div className="p-10 max-w-3xl mx-auto">
-      <div className="mb-8">
+    <div className="p-6 md:p-10 max-w-3xl">
+      {/* Header */}
+      <div className="mb-10">
         <Link
           href="/admin/models"
-          className="text-sm text-neutral-500 hover:text-neutral-900"
+          className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 inline-block mb-4 transition"
         >
           ← Back to Models
         </Link>
-        <h1 className="text-3xl font-serif mt-4 mb-1">Add New Model</h1>
+        <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-2">
+          Create New
+        </p>
+        <h1 className="text-3xl font-serif text-neutral-900 mb-2">
+          Add Model
+        </h1>
         <p className="text-neutral-500 text-sm">
-          Create a new customizer model.
+          Create a new customizer model for your collection.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
 
+        {/* Name */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+          <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
             Model Name
           </label>
           <input
@@ -113,34 +119,39 @@ export default function NewModelPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="e.g. The Navy Windowpane Blazer"
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+            placeholder="e.g. The Onyx — Black Tailored Suit"
+            className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
           />
         </div>
 
+        {/* Price */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Price (USD)
+          <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
+            Base Price (USD)
           </label>
           <input
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            placeholder="350"
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+            placeholder="450"
+            className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
           />
+          <p className="text-[11px] text-neutral-400 mt-2 leading-relaxed">
+            Base price before customizations. Custom options will add to this.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Category + Product Type */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
               Category
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+              className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm bg-white"
             >
               <option value="men">Men</option>
               <option value="women">Women</option>
@@ -148,13 +159,13 @@ export default function NewModelPage() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+            <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
               Product Type
             </label>
             <select
               value={productType}
               onChange={(e) => setProductType(e.target.value)}
-              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
+              className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm bg-white"
             >
               {PRODUCT_TYPES.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -165,8 +176,9 @@ export default function NewModelPage() {
           </div>
         </div>
 
+        {/* Description */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+          <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
             Description
           </label>
           <textarea
@@ -174,30 +186,43 @@ export default function NewModelPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
             rows={5}
-            placeholder="Premium navy wool-blend blazer with subtle windowpane check..."
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none resize-none"
+            placeholder="Premium black wool-blend suit, single-breasted two-button jacket, notch lapel, tapered trouser. Custom made to your measurements."
+            className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm"
           />
         </div>
 
+        {/* Image Upload */}
         <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
+          <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
             Model Image
           </label>
 
-          <div className="flex gap-3 items-start">
-            {imageUrl && (
-              <div className="w-24 h-32 bg-neutral-100 overflow-hidden flex-shrink-0">
+          <div className="flex gap-5 items-start">
+            {/* Preview */}
+            {imageUrl ? (
+              <div className="w-32 h-40 bg-neutral-100 overflow-hidden border border-neutral-200 flex-shrink-0">
                 <img
                   src={imageUrl}
                   alt="Preview"
                   className="w-full h-full object-cover"
                 />
               </div>
+            ) : (
+              <div className="w-32 h-40 bg-neutral-50 border border-dashed border-neutral-200 flex items-center justify-center flex-shrink-0">
+                <span className="text-[9px] uppercase tracking-widest text-neutral-400 text-center px-2">
+                  No Image
+                </span>
+              </div>
             )}
 
+            {/* Upload button */}
             <div className="flex-1">
-              <label className="cursor-pointer block border border-neutral-300 p-3 text-center text-xs uppercase tracking-widest hover:border-neutral-900 transition">
-                {uploading ? "Uploading..." : imageUrl ? "Change Image" : "Upload Image"}
+              <label className="cursor-pointer block border border-neutral-300 px-6 py-4 text-center text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition">
+                {uploading
+                  ? "Uploading..."
+                  : imageUrl
+                  ? "Change Image"
+                  : "Upload Image"}
                 <input
                   type="file"
                   accept="image/*"
@@ -205,20 +230,25 @@ export default function NewModelPage() {
                   onChange={handleFileUpload}
                 />
               </label>
-              <p className="text-xs text-neutral-400 mt-2">
-                PNG or JPG. Recommended: transparent or white background, portrait orientation.
+              <p className="text-[11px] text-neutral-400 mt-3 leading-relaxed">
+                PNG or JPG · Recommended 1200×1600px · Portrait orientation · Clean background
               </p>
             </div>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-neutral-200">
+        {/* Submit */}
+        <div className="pt-8 border-t border-neutral-200">
           <button
             type="submit"
             disabled={loading || uploading}
-            className="w-full bg-neutral-900 text-white py-4 font-medium hover:bg-neutral-700 transition disabled:opacity-50 uppercase tracking-widest text-xs"
+            className="w-full bg-neutral-900 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
           >
-            {loading ? "Saving..." : uploading ? "Uploading..." : "Save Model"}
+            {loading
+              ? "Saving..."
+              : uploading
+              ? "Uploading..."
+              : "Save Model"}
           </button>
         </div>
 
