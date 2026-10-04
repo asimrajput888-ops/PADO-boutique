@@ -17,6 +17,30 @@ export default function SiteFooter() {
           </p>
         </div>
 
+        {/* Custom Made */}
+        <div>
+          <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
+            Custom Made
+          </h4>
+          <ul className="space-y-3 text-sm">
+            <li>
+              <Link href="/custom/men" className="hover:text-neutral-900 transition-colors duration-300">
+                Men&apos;s Bespoke
+              </Link>
+            </li>
+            <li>
+              <Link href="/custom/women" className="hover:text-neutral-900 transition-colors duration-300">
+                Women&apos;s Bespoke
+              </Link>
+            </li>
+            <li>
+              <Link href="/seasonal" className="hover:text-neutral-900 transition-colors duration-300">
+                Seasonal &amp; Novelty
+              </Link>
+            </li>
+          </ul>
+        </div>
+
         {/* Customer Care */}
         <div>
           <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
@@ -63,24 +87,10 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/about" className="hover:text-neutral-900 transition-colors duration-300">
-                Our Story
-              </Link>
-            </li>
-            <li>
               <Link href="/journal" className="hover:text-neutral-900 transition-colors duration-300">
                 Journal
               </Link>
             </li>
-          </ul>
-        </div>
-
-        {/* Policies */}
-        <div>
-          <h4 className="text-neutral-900 text-[10px] tracking-[0.3em] uppercase mb-6">
-            Policies
-          </h4>
-          <ul className="space-y-3 text-sm">
             <li>
               <Link href="/privacy" className="hover:text-neutral-900 transition-colors duration-300">
                 Privacy
@@ -89,16 +99,6 @@ export default function SiteFooter() {
             <li>
               <Link href="/terms" className="hover:text-neutral-900 transition-colors duration-300">
                 Terms
-              </Link>
-            </li>
-            <li>
-              <Link href="/shipping" className="hover:text-neutral-900 transition-colors duration-300">
-                Shipping Policy
-              </Link>
-            </li>
-            <li>
-              <Link href="/return" className="hover:text-neutral-900 transition-colors duration-300">
-                Returns
               </Link>
             </li>
           </ul>
