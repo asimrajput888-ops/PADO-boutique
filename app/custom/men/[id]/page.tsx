@@ -25,10 +25,11 @@ export default function MenBespokePage() {
 
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1); // -1 = product showcase
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [standardSize, setStandardSize] = useState("40R");
@@ -82,6 +83,14 @@ export default function MenBespokePage() {
     fetchModel();
   }, [id]);
 
+  // Gallery images
+  const galleryImages: string[] =
+    model?.images && Array.isArray(model.images) && model.images.length > 0
+      ? model.images
+      : model?.image_url
+      ? [model.image_url]
+      : [];
+
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
   const pt = model?.product_type || "suit";
@@ -114,7 +123,7 @@ export default function MenBespokePage() {
   }, [selection, currentFabric, model, fitType, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps - 1));
-  const prevStep = () => setStep((p) => Math.max(p - 1, 0));
+  const prevStep = () => setStep((p) => Math.max(p - 1, -1));
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email) {
@@ -214,6 +223,130 @@ export default function MenBespokePage() {
     );
   }
 
+  // ============================================
+  // STEP -1: PRODUCT SHOWCASE
+  // ============================================
+  if (step === -1) {
+    return (
+      <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
+        <div className="max-w-[1400px] mx-auto">
+
+          <Link
+            href="/custom/men"
+            className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
+          >
+            ← Back to Models
+          </Link>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+            {/* LEFT: Gallery */}
+            <div>
+              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
+                {galleryImages[activeImage] && (
+                  <img
+                    src={galleryImages[activeImage]}
+                    alt={model.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+              </div>
+
+              {galleryImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {galleryImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(i)}
+                      className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-all ${
+                        activeImage === i ? "ring-1 ring-neutral-900" : "opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${model.name} ${i + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT: Info */}
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
+                {model.product_type || "Suit"}
+                {model.subcategory && ` · ${model.subcategory}`}
+              </p>
+
+              <h1 className="text-3xl md:text-4xl font-serif mb-6 text-neutral-900 leading-tight">
+                {model.name}
+              </h1>
+
+              <p className="text-2xl text-neutral-900 mb-8">
+                {formatPrice(model.price)}
+              </p>
+
+              <div className="border-t border-neutral-200 pt-8 mb-8">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                  Description
+                </h2>
+                <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-line">
+                  {model.description}
+                </p>
+              </div>
+
+              <div className="border-t border-neutral-200 pt-8 mb-8">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                  Details
+                </h2>
+                <ul className="space-y-3 text-sm text-neutral-600">
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Custom made to your exact measurements</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Standard Size (7–10 days) or Custom Measurements (3 weeks)</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Handcrafted in limited quantities</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Free worldwide shipping</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="border-t border-neutral-200 pt-8">
+                <button
+                  onClick={() => setStep(0)}
+                  className="w-full bg-neutral-900 text-white py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
+                >
+                  Start Customization →
+                </button>
+                <a
+                  href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full border border-neutral-300 text-neutral-900 text-center py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition mt-3"
+                >
+                  Chat with a Tailor
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // STEPS 0-4: CUSTOMIZER
+  // ============================================
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
     animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
@@ -223,9 +356,12 @@ export default function MenBespokePage() {
   return (
     <div className="min-h-screen bg-white py-16 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <Link href="/custom/men" className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block">
-          ← Back to Models
-        </Link>
+        <button
+          onClick={() => setStep(-1)}
+          className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
+        >
+          ← Back to Product
+        </button>
 
         <div className="text-center mb-12">
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
@@ -270,9 +406,7 @@ export default function MenBespokePage() {
                       fitType === "standard" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                      Fastest
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Fastest</p>
                     <h3 className="text-xl font-serif mb-2 text-neutral-900">Standard Size</h3>
                     <p className="text-sm text-neutral-500 leading-relaxed mb-4">
                       Choose from our standard sizes. Dispatch within 7–10 days.
@@ -286,9 +420,7 @@ export default function MenBespokePage() {
                       fitType === "custom" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                      Made to Measure
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Made to Measure</p>
                     <h3 className="text-xl font-serif mb-2 text-neutral-900">Custom Measurements</h3>
                     <p className="text-sm text-neutral-500 leading-relaxed mb-4">
                       Made to your exact measurements. Delivered within 3 weeks.
@@ -315,23 +447,12 @@ export default function MenBespokePage() {
                         </button>
                       ))}
                     </div>
-                    <div className="mt-6 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
-                      <p className="font-medium mb-1 text-neutral-900">Standard Size Order</p>
-                      <p>Your suit will be made in our standard size {standardSize} pattern. Dispatch within 7–10 days. No measurements required.</p>
-                    </div>
-                  </div>
-                )}
-
-                {fitType === "custom" && (
-                  <div className="mt-8 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
-                    <p className="font-medium mb-1 text-neutral-900">Custom Measurements</p>
-                    <p>You&apos;ll customize fabric, lapel, buttons, and provide your measurements. Delivered within 3 weeks.</p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* STEP 1 — Custom only: Fabric & Style */}
+            {/* STEP 1 — Custom only */}
             {step === 1 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
@@ -399,7 +520,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 — Custom only: Details */}
+            {/* STEP 2 — Custom only */}
             {step === 2 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
@@ -477,7 +598,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 — Custom only: Measurements */}
+            {/* STEP 3 — Measurements */}
             {step === 3 && fitType === "custom" && (
               <div>
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
@@ -563,12 +684,6 @@ export default function MenBespokePage() {
                       <p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p>
                     </div>
                   )}
-                  {fitType === "custom" && selection.lining && showLining && (
-                    <div className="bg-neutral-50 p-4 border border-neutral-200">
-                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p>
-                      <p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p>
-                    </div>
-                  )}
                 </div>
 
                 <div className="border-t border-neutral-200 pt-8">
@@ -630,7 +745,11 @@ export default function MenBespokePage() {
                   <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
                     ← Back
                   </button>
-                ) : <div />}
+                ) : (
+                  <button onClick={() => setStep(-1)} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
+                    ← Product
+                  </button>
+                )}
                 {step < totalSteps - 1 ? (
                   <button
                     onClick={nextStep}
