@@ -6,7 +6,6 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
-import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import {
@@ -17,22 +16,40 @@ import {
 import ThumbnailOption from "@/components/customizer/ThumbnailOption";
 import SimpleOption from "@/components/customizer/SimpleOption";
 
+const STANDARD_SIZES = ["36R", "38R", "40R", "42R", "44R", "46R"];
+
 export default function MenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
-  const { addToCart } = useCart();
   const { formatPrice } = useCurrency();
 
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
+
+  const [fitType, setFitType] = useState<"standard" | "custom">("standard");
+  const [standardSize, setStandardSize] = useState("40R");
+
+  const [contact, setContact] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    country: "",
+    notes: "",
+  });
+
+  const [measurements, setMeasurements] = useState<Record<string, string>>({});
+
   const [selection, setSelection] = useState<any>({
     fabric: "", lapel: "", buttons: "", sleeve: "", collar: "",
     pocket: "", fit: "", trouser: "", vent: "", vest: "", lining: "",
-    measurements: { name: "", email: "", chest: "", waist: "", shoulder: "", height: "", notes: "" },
   });
-  const [added, setAdded] = useState(false);
-  const totalSteps = 4;
+
+  // Total steps depend on fit type
+  const totalSteps = fitType === "custom" ? 5 : 4;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -50,9 +67,7 @@ export default function MenBespokePage() {
         setLoading(false);
         return;
       }
-
       setModel(data);
-
       setSelection((prev: any) => ({
         ...prev,
         fabric: data.default_fabric || FABRICS[0]?.id || "",
@@ -74,7 +89,6 @@ export default function MenBespokePage() {
 
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
-  // Product type helpers
   const pt = model?.product_type || "suit";
   const showLapel = ["suit", "blazer", "coat", "tuxedo"].includes(pt);
   const showCollar = ["suit", "shirt", "tuxedo"].includes(pt);
@@ -103,19 +117,62 @@ export default function MenBespokePage() {
     return price;
   }, [selection, currentFabric, model, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
 
-  const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps));
-  const prevStep = () => setStep((p) => Math.max(p - 1, 1));
+  const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps - 1));
+  const prevStep = () => setStep((p) => Math.max(p - 1, 0));
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: `${model.id}-custom-${Date.now()}`,
-      name: `${model.name} (Custom)`,
-      price: totalPrice,
-      image: model.image_url,
-      quantity: 1,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 3000);
+  const handleSubmit = async () => {
+    if (!contact.name || !contact.email) {
+      alert("Please fill in your name and email");
+      return;
+    }
+    setSubmitting(true);
+
+    try {
+      const payload = {
+        customer_name: contact.name,
+        customer_email: contact.email,
+        customer_phone: contact.phone,
+        customer_country: contact.country,
+        fit_type: fitType,
+        standard_size: fitType === "standard" ? standardSize : null,
+        model_id: String(model.id),
+        model_name: model.name,
+        category: "men",
+        product_type: pt,
+        fabric: selection.fabric,
+        fabric_name: currentFabric?.name || "",
+        lapel: selection.lapel,
+        buttons: selection.buttons,
+        sleeve: selection.sleeve,
+        collar: selection.collar,
+        pocket: selection.pocket,
+        fit: selection.fit,
+        trouser: selection.trouser,
+        vent: selection.vent,
+        vest: selection.vest,
+        lining: selection.lining,
+        measurements: fitType === "custom" ? measurements : null,
+        total_price: totalPrice,
+        currency: "USD",
+        notes: contact.notes,
+      };
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to submit");
+
+      setOrderNumber(data.order?.order_number || "");
+      setSubmitted(true);
+    } catch (err: any) {
+      alert("Error: " + err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -134,6 +191,39 @@ export default function MenBespokePage() {
           <Link href="/custom/men" className="text-neutral-500 hover:text-neutral-900 underline">
             ← Back to Men&apos;s Signature
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Success screen
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-5 py-20">
+        <div className="max-w-lg text-center">
+          <div className="w-16 h-16 rounded-full bg-neutral-900 text-white flex items-center justify-center mx-auto mb-8 text-2xl">✓</div>
+          <h1 className="text-3xl font-serif text-neutral-900 mb-4">Order Received</h1>
+          <p className="text-neutral-500 mb-2">Your order number is:</p>
+          <p className="text-lg font-mono text-neutral-900 mb-8">{orderNumber}</p>
+          <p className="text-neutral-500 text-sm mb-10 leading-relaxed">
+            We&apos;ve sent a confirmation to <strong>{contact.email}</strong>. Our team will review your order within 24 hours and send you payment instructions.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/custom/men"
+              className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
+            >
+              Back to Collection
+            </Link>
+            <a
+              href={`https://wa.me/16393840265?text=Hi%2C%20I%20just%20placed%20order%20${orderNumber}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-neutral-300 text-neutral-900 px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition"
+            >
+              WhatsApp Us
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -158,7 +248,7 @@ export default function MenBespokePage() {
           </p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4 text-neutral-900">{model.name}</h1>
           <p className="text-neutral-500 text-sm">
-            Step {step} of {totalSteps} — {step === 1 ? "Fabric & Style" : step === 2 ? "Details" : step === 3 ? "Measurements" : "Final Review"}
+            Step {step + 1} of {totalSteps}
           </p>
         </div>
 
@@ -166,11 +256,11 @@ export default function MenBespokePage() {
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                step > i + 1 ? "bg-neutral-900 text-white" : step === i + 1 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-500"
+                step > i ? "bg-neutral-900 text-white" : step === i ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-500"
               }`}>
-                {step > i + 1 ? "✓" : i + 1}
+                {step > i ? "✓" : i + 1}
               </div>
-              {i < totalSteps - 1 && <div className={`w-8 h-[1px] ${step > i + 1 ? "bg-neutral-900" : "bg-neutral-200"}`} />}
+              {i < totalSteps - 1 && <div className={`w-8 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
             </div>
           ))}
         </div>
@@ -184,11 +274,72 @@ export default function MenBespokePage() {
             exit="exit"
             className="bg-white border border-neutral-200 p-6 md:p-10"
           >
-            {/* STEP 1 */}
+            {/* STEP 0 — Fit Type */}
+            {step === 0 && (
+              <div>
+                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Choose Your Fit</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setFitType("standard")}
+                    className={`text-left p-6 border transition-all ${
+                      fitType === "standard" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
+                    }`}
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
+                      Fastest
+                    </p>
+                    <h3 className="text-xl font-serif mb-2 text-neutral-900">Standard Size</h3>
+                    <p className="text-sm text-neutral-500 leading-relaxed mb-4">
+                      Choose from our standard sizes. Dispatch within 7–10 days.
+                    </p>
+                    <p className="text-xs text-neutral-400">Fixed price · no measurements</p>
+                  </button>
+
+                  <button
+                    onClick={() => setFitType("custom")}
+                    className={`text-left p-6 border transition-all ${
+                      fitType === "custom" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
+                    }`}
+                  >
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
+                      Made to Measure
+                    </p>
+                    <h3 className="text-xl font-serif mb-2 text-neutral-900">Custom Measurements</h3>
+                    <p className="text-sm text-neutral-500 leading-relaxed mb-4">
+                      Made to your exact measurements. Delivered within 3 weeks.
+                    </p>
+                    <p className="text-xs text-neutral-400">Premium fit · 15+ measurements</p>
+                  </button>
+                </div>
+
+                {fitType === "standard" && (
+                  <div className="mt-8">
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">
+                      Select Your Size
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {STANDARD_SIZES.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setStandardSize(size)}
+                          className={`px-5 py-3 text-sm border transition-all ${
+                            standardSize === size ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 hover:border-neutral-900"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* STEP 1 — Fabric */}
             {step === 1 && (
               <div className="space-y-12">
+                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
                 <div>
-                  <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 01 — Fabric &amp; Style</h2>
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Fabric</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {FABRICS.map((f) => (
@@ -255,10 +406,10 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 */}
+            {/* STEP 2 — Details */}
             {step === 2 && (
               <div className="space-y-12">
-                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 02 — Customize Details</h2>
+                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
 
                 <div>
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Pockets</h3>
@@ -333,72 +484,157 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 */}
-            {step === 3 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 03 — Your Measurements</h2>
-                <div className="space-y-4">
-                  <input type="text" placeholder="Full Name" value={selection.measurements.name} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, name: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                  <input type="email" placeholder="Email Address" value={selection.measurements.email} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, email: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input type="text" placeholder="Chest (in)" value={selection.measurements.chest} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, chest: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                    <input type="text" placeholder="Waist (in)" value={selection.measurements.waist} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, waist: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                    <input type="text" placeholder="Shoulder (in)" value={selection.measurements.shoulder} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, shoulder: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                    <input type="text" placeholder="Height (in)" value={selection.measurements.height} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, height: e.target.value } })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
-                  </div>
-                  <textarea placeholder="Additional notes (optional)" value={selection.measurements.notes} onChange={(e) => setSelection({ ...selection, measurements: { ...selection.measurements, notes: e.target.value } })} rows={4} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm" />
+            {/* STEP 3 — Measurements (custom only) */}
+            {step === 3 && fitType === "custom" && (
+              <div>
+                <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
+                <p className="text-sm text-neutral-500 mb-8 leading-relaxed">
+                  All measurements in inches. Measure over a well-fitted shirt, keeping the tape snug but not tight.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { id: "neck", label: "Neck", required: true },
+                    { id: "chest", label: "Chest", required: true },
+                    { id: "waist", label: "Waist", required: true },
+                    { id: "hip", label: "Hip", required: true },
+                    { id: "shoulder", label: "Shoulder Width", required: true },
+                    { id: "sleeve", label: "Sleeve Length", required: true },
+                    { id: "jacketLength", label: "Jacket Length", required: false },
+                    { id: "trouserWaist", label: "Trouser Waist", required: false },
+                    { id: "inseam", label: "Inseam", required: false },
+                    { id: "thigh", label: "Thigh", required: false },
+                    { id: "height", label: "Height", required: true },
+                    { id: "weight", label: "Weight (lbs)", required: false },
+                  ].map((f) => (
+                    <div key={f.id}>
+                      <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
+                        {f.label} {f.required && <span className="text-red-500">*</span>}
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={measurements[f.id] || ""}
+                        onChange={(e) => setMeasurements({ ...measurements, [f.id]: e.target.value })}
+                        className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                        placeholder="e.g. 40"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8 border border-neutral-200 p-5 bg-neutral-50">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">
+                    Need help measuring?
+                  </p>
+                  <p className="text-sm text-neutral-600 mb-3">
+                    Send us a photo of your best-fitting suit — we&apos;ll match the measurements for you.
+                  </p>
+                  <a
+                    href={`https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 inline-block hover:opacity-60 transition"
+                  >
+                    Message on WhatsApp →
+                  </a>
                 </div>
               </div>
             )}
 
-            {/* STEP 4 */}
-            {step === 4 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-serif mb-8 text-neutral-900">Step 04 — Final Review</h2>
+            {/* STEP 4 — Review + Contact */}
+            {step === totalSteps - 1 && (
+              <div className="space-y-8">
+                <h2 className="text-2xl font-serif mb-4 text-neutral-900">Review &amp; Submit</h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div className="bg-neutral-50 p-4 border border-neutral-200">
                     <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Model</p>
                     <p className="font-medium text-neutral-900">{model.name}</p>
                   </div>
                   <div className="bg-neutral-50 p-4 border border-neutral-200">
-                    <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fabric</p>
-                    <p className="font-medium text-neutral-900">{currentFabric?.name || "Not selected"}</p>
+                    <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fit</p>
+                    <p className="font-medium text-neutral-900">
+                      {fitType === "custom" ? "Custom Measurements" : `Standard Size ${standardSize}`}
+                    </p>
                   </div>
-                  {showLapel && selection.lapel && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p><p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
-                  {showButtons && selection.buttons && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Buttons</p><p className="font-medium text-neutral-900">{BUTTON_OPTIONS.find((b) => b.id === selection.buttons)?.name}</p></div>}
-                  {showCollar && selection.collar && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Collar</p><p className="font-medium text-neutral-900">{SHIRT_COLLAR_OPTIONS.find((c) => c.id === selection.collar)?.name}</p></div>}
-                  {selection.fit && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fit</p><p className="font-medium text-neutral-900">{FIT_OPTIONS.find((f) => f.id === selection.fit)?.name}</p></div>}
-                  {showTrouser && selection.trouser && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Trouser</p><p className="font-medium text-neutral-900">{TROUSER_OPTIONS.find((t) => t.id === selection.trouser)?.name}</p></div>}
-                  {showVent && selection.vent && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Vent</p><p className="font-medium text-neutral-900">{VENT_OPTIONS.find((v) => v.id === selection.vent)?.name}</p></div>}
-                  {showVest && selection.vest && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Vest</p><p className="font-medium text-neutral-900">{VEST_OPTIONS.find((v) => v.id === selection.vest)?.name}</p></div>}
-                  {showLining && selection.lining && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p><p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
+                  <div className="bg-neutral-50 p-4 border border-neutral-200">
+                    <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fabric</p>
+                    <p className="font-medium text-neutral-900">{currentFabric?.name}</p>
+                  </div>
+                  {selection.lapel && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p><p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
+                  {selection.lining && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p><p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
+                </div>
+
+                <div className="border-t border-neutral-200 pt-8">
+                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Full Name *"
+                      value={contact.name}
+                      onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email Address *"
+                      value={contact.email}
+                      onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Phone / WhatsApp"
+                      value={contact.phone}
+                      onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Country"
+                      value={contact.country}
+                      onChange={(e) => setContact({ ...contact, country: e.target.value })}
+                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                    />
+                    <textarea
+                      placeholder="Additional notes (optional)"
+                      value={contact.notes}
+                      onChange={(e) => setContact({ ...contact, notes: e.target.value })}
+                      rows={3}
+                      className="md:col-span-2 w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm"
+                    />
+                  </div>
                 </div>
 
                 <div className="bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
-                  <p className="font-medium mb-1 text-neutral-900">📦 Order Summary</p>
-                  <p>Your bespoke piece will be handcrafted and delivered within 3 weeks.</p>
+                  <p className="font-medium mb-1 text-neutral-900">What happens next?</p>
+                  <p>We&apos;ll review your order within 24 hours and send payment instructions by email. Production starts after deposit.</p>
                 </div>
               </div>
             )}
 
+            {/* Price + Nav */}
             <div className="mt-12 pt-6 border-t border-neutral-200">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-[10px] uppercase tracking-widest text-neutral-500">Total Price</span>
                 <span className="text-2xl font-serif text-neutral-900">{formatPrice(totalPrice)}</span>
               </div>
               <div className="flex justify-between items-center">
-                {step > 1 ? (
+                {step > 0 ? (
                   <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
                     ← Back
                   </button>
                 ) : <div />}
-                {step < totalSteps ? (
+                {step < totalSteps - 1 ? (
                   <button onClick={nextStep} className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
-                    Next Step
+                    Next
                   </button>
                 ) : (
-                  <button onClick={handleAddToCart} className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
-                    {added ? "✓ Added" : "Add to Cart"}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={submitting}
+                    className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
+                  >
+                    {submitting ? "Submitting..." : "Submit Order"}
                   </button>
                 )}
               </div>
