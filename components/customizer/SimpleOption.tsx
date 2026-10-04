@@ -13,7 +13,6 @@ interface SimpleOptionProps {
 export default function SimpleOption({
   id,
   name,
-  price,
   selected,
   onSelect,
 }: SimpleOptionProps) {
@@ -27,20 +26,13 @@ export default function SimpleOption({
           : "border-neutral-200 hover:border-neutral-400 bg-white"
       }`}
     >
-      <div>
-        <p
-          className={`text-sm font-medium ${
-            selected ? "text-neutral-900" : "text-neutral-700"
-          }`}
-        >
-          {name}
-        </p>
-        {price !== undefined && (
-          <p className="text-xs text-neutral-500 mt-0.5">
-            {price > 0 ? `+ $${price.toLocaleString()}` : "Included"}
-          </p>
-        )}
-      </div>
+      <p
+        className={`text-sm font-medium ${
+          selected ? "text-neutral-900" : "text-neutral-700"
+        }`}
+      >
+        {name}
+      </p>
 
       <div
         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
