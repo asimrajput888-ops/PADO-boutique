@@ -3,7 +3,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCurrency } from "@/context/currency-context";
@@ -38,7 +37,6 @@ export default function CustomWomenGallery() {
           ← Back to Collections
         </Link>
 
-        {/* Header */}
         <div className="text-center mb-14 md:mb-20">
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
             PADO Signature Designs
@@ -51,7 +49,6 @@ export default function CustomWomenGallery() {
           </p>
         </div>
 
-        {/* Grid */}
         {loading ? (
           <p className="text-center text-neutral-400 py-20">Loading models...</p>
         ) : models.length === 0 ? (
@@ -71,12 +68,12 @@ export default function CustomWomenGallery() {
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3 md:mb-4">
                   {m.image_url ? (
-                    <Image
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
                       src={m.image_url}
                       alt={m.name}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-neutral-300 text-[10px] uppercase tracking-widest">
