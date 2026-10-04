@@ -1,235 +1,156 @@
-// app/admin/models/new/page.tsx
+// app/admin/models/page.tsx
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-const PRODUCT_TYPES = [
-  { id: "suit", name: "Suit" },
-  { id: "blazer", name: "Blazer" },
-  { id: "coat", name: "Coat" },
-  { id: "tuxedo", name: "Tuxedo" },
-  { id: "shirt", name: "Shirt" },
-  { id: "vest", name: "Vest" },
-  { id: "trouser", name: "Trouser" },
-];
+export default function AdminModelsPage() {
+  const [models, setModels] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function NewModelPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-
-  // Form fields
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("men");
-  const [productType, setProductType] = useState("suit");
-  const [imageUrl, setImageUrl] = useState("");
-
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-
-    const fileExt = file.name.split(".").pop();
-    const fileName = `model-${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, file);
-
-    if (uploadError) {
-      alert("Upload failed: " + uploadError.message);
-      setUploading(false);
-      return;
-    }
-
-    const { data } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(fileName);
-
-    setImageUrl(data.publicUrl);
-    setUploading(false);
+  const fetchModels = async () => {
+    const { data } = await supabase
+      .from("models")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setModels(data || []);
+    setLoading(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    fetchModels();
+  }, []);
 
-    if (!imageUrl) {
-      alert("Please upload a model image");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.from("models").insert({
-      name,
-      price: Number(price),
-      description,
-      category,
-      product_type: productType,
-      image_url: imageUrl,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert("Error: " + error.message);
-      return;
-    }
-
-    router.push("/admin/models");
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this model?")) return;
+    await supabase.from("models").delete().eq("id", id);
+    fetchModels();
   };
 
   return (
-    <div className="p-10 max-w-3xl mx-auto">
-      <div className="mb-8">
+    <div className="p-6 md:p-10">
+      {/* Header */}
+      <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-2">
+            Manage
+          </p>
+          <h1 className="text-3xl font-serif text-neutral-900 mb-1">Models</h1>
+          <p className="text-neutral-500 text-sm">
+            {models.length} {models.length === 1 ? "model" : "models"} total
+          </p>
+        </div>
         <Link
-          href="/admin/models"
-          className="text-sm text-neutral-500 hover:text-neutral-900"
+          href="/admin/models/new"
+          className="bg-neutral-900 text-white px-6 py-3 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
         >
-          ← Back to Models
+          + Add Model
         </Link>
-        <h1 className="text-3xl font-serif mt-4 mb-1">Add New Model</h1>
-        <p className="text-neutral-500 text-sm">
-          Create a new customizer model.
-        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-
-        {/* Name */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Model Name
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            placeholder="e.g. Classic Navy Blazer"
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
-          />
-        </div>
-
-        {/* Price */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Price (USD)
-          </label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-            placeholder="350"
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
-          />
-        </div>
-
-        {/* Category + Product Type */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
-            >
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-              Product Type
-            </label>
-            <select
-              value={productType}
-              onChange={(e) => setProductType(e.target.value)}
-              className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none"
-            >
-              {PRODUCT_TYPES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            rows={5}
-            placeholder="Single-breasted navy blazer. Notch lapel, two-button closure, flap pockets."
-            className="w-full border border-neutral-300 p-3 focus:border-neutral-900 outline-none resize-none"
-          />
-        </div>
-
-        {/* Image Upload */}
-        <div>
-          <label className="block text-xs uppercase tracking-widest text-neutral-500 mb-2">
-            Model Image
-          </label>
-
-          <div className="flex gap-3 items-start">
-            {imageUrl && (
-              <div className="w-24 h-32 bg-neutral-100 overflow-hidden flex-shrink-0">
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
-            <div className="flex-1">
-              <label className="cursor-pointer block border border-neutral-300 p-3 text-center text-xs uppercase tracking-widest hover:border-neutral-900 transition">
-                {uploading ? "Uploading..." : imageUrl ? "Change Image" : "Upload Image"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
-              </label>
-              <p className="text-xs text-neutral-400 mt-2">
-                PNG or JPG. Recommended: transparent or white background, portrait orientation.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <div className="pt-6 border-t border-neutral-200">
-          <button
-            type="submit"
-            disabled={loading || uploading}
-            className="w-full bg-neutral-900 text-white py-4 font-medium hover:bg-neutral-700 transition disabled:opacity-50 uppercase tracking-widest text-xs"
+      {/* Table */}
+      {loading ? (
+        <p className="text-neutral-400 text-sm">Loading...</p>
+      ) : models.length === 0 ? (
+        <div className="border border-neutral-200 p-16 text-center">
+          <p className="text-neutral-400 text-sm mb-4">
+            No models yet. Add your first customizer model.
+          </p>
+          <Link
+            href="/admin/models/new"
+            className="inline-block bg-neutral-900 text-white px-6 py-3 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
           >
-            {loading ? "Saving..." : uploading ? "Uploading..." : "Save Model"}
-          </button>
+            + Add Model
+          </Link>
         </div>
-
-      </form>
+      ) : (
+        <div className="border border-neutral-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-neutral-50 border-b border-neutral-200">
+                <tr>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Image
+                  </th>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Name
+                  </th>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Category
+                  </th>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Type
+                  </th>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Price
+                  </th>
+                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {models.map((model) => (
+                  <tr
+                    key={model.id}
+                    className="border-t border-neutral-100 hover:bg-neutral-50"
+                  >
+                    <td className="p-4">
+                      <div className="w-14 h-16 bg-neutral-100 overflow-hidden">
+                        {model.image_url ? (
+                          <img
+                            src={model.image_url}
+                            alt={model.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-neutral-300 text-[9px] uppercase">
+                            No img
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-4 font-medium text-neutral-900">
+                      {model.name}
+                    </td>
+                    <td className="p-4 text-neutral-600 capitalize text-sm">
+                      {model.category || "—"}
+                    </td>
+                    <td className="p-4 text-neutral-600 capitalize text-sm">
+                      {model.product_type || "—"}
+                    </td>
+                    <td className="p-4 text-sm font-medium">
+                      ${Number(model.price || 0).toLocaleString()}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-3">
+                        <Link
+                          href={`/custom/${
+                            model.category === "women" ? "women" : "men"
+                          }/${model.id}`}
+                          target="_blank"
+                          className="text-amber-600 hover:underline text-xs"
+                        >
+                          View
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(model.id)}
+                          className="text-red-500 hover:underline text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
