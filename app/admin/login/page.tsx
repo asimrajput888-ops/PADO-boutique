@@ -32,38 +32,67 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center px-6">
-      <div className="max-w-md w-full bg-white border border-neutral-200 p-10 rounded-2xl shadow-xl">
-        <p className="text-amber-600 tracking-[0.3em] text-xs font-semibold mb-3 uppercase text-center">
-          PADO Admin
+    <div className="min-h-screen bg-white flex items-center justify-center px-5">
+      <div className="max-w-md w-full">
+        {/* Brand */}
+        <div className="text-center mb-12">
+          <h1 className="text-lg font-serif tracking-[0.5em] text-neutral-900 mb-3">
+            PADO
+          </h1>
+          <p className="text-[10px] uppercase tracking-[0.4em] text-neutral-400">
+            Admin Access
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div className="border border-neutral-200 p-8 md:p-10">
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                placeholder="admin@padoboutique.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-500 text-xs leading-relaxed">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-neutral-900 text-white py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-[10px] uppercase tracking-[0.3em] text-neutral-400 mt-8">
+          © {new Date().getFullYear()} PADO Boutique
         </p>
-        <h1 className="text-3xl font-serif text-center mb-8">Admin Login</h1>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-neutral-300 p-3 rounded-lg focus:border-amber-500 outline-none"
-            required
-          />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-neutral-900 text-white py-3 rounded-lg font-semibold hover:bg-amber-600 transition disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
       </div>
     </div>
   );
