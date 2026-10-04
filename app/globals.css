@@ -1,112 +1,33 @@
 /* app/globals.css */
 
 @import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-
-  /* PADO Custom */
-  --color-ivory: var(--ivory);
-  --color-offwhite: var(--offwhite);
-  --color-charcoal: var(--charcoal);
-  --color-taupe: var(--taupe);
-  --color-champagne: var(--champagne);
+  --color-background: #ffffff;
+  --color-foreground: #171717;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif-var), ui-serif, Georgia, serif;
-
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-}
-
-:root {
-  color-scheme: light;
-
-  /* ============ SUITSUPPLY PALETTE ============ */
-  /* Pure white background, neutral grays, no warmth overload */
-  
-  --ivory: oklch(0.985 0.002 90);
-  --offwhite: oklch(0.995 0.001 90);
-  --charcoal: oklch(0.22 0.004 60);
-  --taupe: oklch(0.82 0.006 74);
-  --champagne: oklch(0.72 0.055 78);
-
-  /* Backgrounds — clean, minimal */
-  --background: oklch(1 0 0);                    /* pure white */
-  --foreground: oklch(0.18 0.004 60);            /* near black text */
-
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.004 60);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.004 60);
-
-  /* Primary — deep black for CTA buttons */
-  --primary: oklch(0.18 0.004 60);
-  --primary-foreground: oklch(0.99 0 0);
-
-  /* Secondary — soft neutral */
-  --secondary: oklch(0.96 0.002 84);
-  --secondary-foreground: oklch(0.22 0.004 60);
-
-  /* Muted — subtle grays */
-  --muted: oklch(0.965 0.002 84);
-  --muted-foreground: oklch(0.48 0.006 66);
-
-  /* Accent — soft champagne (PADO signature) */
-  --accent: oklch(0.72 0.055 78);
-  --accent-foreground: oklch(0.18 0.004 60);
-
-  --destructive: oklch(0.55 0.19 27);
-
-  /* Borders — very subtle */
-  --border: oklch(0.91 0.003 78);
-  --input: oklch(0.91 0.003 78);
-  --ring: oklch(0.72 0.055 78);
-
-  --radius: 0.125rem;   /* Suitsupply = minimal radius */
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/40;
+    border-color: #e5e5e5;
   }
 
   html {
-    @apply bg-background;
+    background-color: #ffffff;
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: 'liga' 1, 'kern' 1, 'ss01' 1;
-    letter-spacing: -0.005em;
+    background-color: #ffffff;
+    color: #171717;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'liga' 1, 'kern' 1;
   }
 
-  /* Serif for all headings — Suitsupply style */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
     font-weight: 500;
@@ -115,112 +36,35 @@
   }
 
   ::selection {
-    background: var(--charcoal);
-    color: var(--offwhite);
+    background: #171717;
+    color: #ffffff;
   }
 }
 
 @layer utilities {
-  /* Fonts */
   .font-serif {
     font-family: var(--font-serif);
     font-weight: 500;
   }
 
-  /* Tracking — for eyebrow labels */
   .tracking-luxe {
     letter-spacing: 0.32em;
   }
+
   .tracking-wide-sm {
     letter-spacing: 0.18em;
   }
 
-  /* ============ SUITSUPPLY-STYLE PRODUCT CARD ============ */
-  /* Minimal image container */
-  .product-card-image {
-    background-color: oklch(0.975 0.003 84);
-    aspect-ratio: 3 / 4;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* Slow, subtle zoom on hover */
-  .product-card-image img {
-    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .group:hover .product-card-image img {
-    transform: scale(1.03);
-  }
-
-  /* Scroll reveal */
   .reveal {
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
   }
+
   .reveal.is-visible {
     opacity: 1;
     transform: none;
-  }
-
-  /* ============ Animations ============ */
-  @keyframes bespoke-fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  .animate-fade-up {
-    animation: bespoke-fade-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  @keyframes bespoke-slow-zoom {
-    from {
-      transform: scale(1.06);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
-  .animate-slow-zoom {
-    animation: bespoke-slow-zoom 10s ease-out both;
-  }
-
-  @keyframes bespoke-shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  /* ============ UNDERLINE LINK (Suitsupply style) ============ */
-  .link-underline {
-    position: relative;
-    display: inline-block;
-  }
-  .link-underline::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 1px;
-    background-color: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .link-underline:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
   }
 }
 
@@ -228,7 +72,6 @@
   * {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
   }
   .reveal {
     opacity: 1;
