@@ -29,15 +29,6 @@ export default function SiteHeader() {
 
   const menuSections = [
     {
-      id: "new",
-      title: "New & Featured",
-      links: [
-        { name: "New Arrivals", href: "/shop" },
-        { name: "Bestsellers", href: "/shop" },
-        { name: "Limited Editions", href: "/signature-suit" },
-      ],
-    },
-    {
       id: "for-him",
       title: "For Him",
       links: [
@@ -48,8 +39,6 @@ export default function SiteHeader() {
         { name: "Custom Shirts", href: "/custom/men" },
         { name: "Custom Coats", href: "/custom/men" },
         { name: "Tuxedos", href: "/custom/men" },
-        { name: "Ready to Wear — Suits", href: "/signature-suit/men" },
-        { name: "Ready to Wear — Blazers", href: "/signature-suit/men" },
       ],
     },
     {
@@ -60,29 +49,17 @@ export default function SiteHeader() {
         { name: "Custom Jackets", href: "/custom/women" },
         { name: "Custom Coats", href: "/custom/women" },
         { name: "Custom Shirts", href: "/custom/women" },
-        { name: "Ready to Wear", href: "/signature-suit/women" },
       ],
     },
     {
       id: "seasonal",
       title: "Seasonal & Novelty",
       links: [
-       { name: "Halloween Collection", href: "/seasonal?type=halloween" },
-{ name: "Superhero Suits", href: "/seasonal?type=superhero" },
-{ name: "Gothic & Dark", href: "/seasonal?type=gothic" },
-{ name: "Movie-Inspired", href: "/seasonal?type=movie" },
-{ name: "Party & Events", href: "/seasonal?type=party" },
-      ],
-    },
-    {
-      id: "occasions",
-      title: "Occasions",
-      links: [
-        { name: "Weddings", href: "/shop" },
-        { name: "Halloween", href: "/seasonal?type=halloween" },
-{ name: "Cosplay & Events", href: "/seasonal" },
-        { name: "Black Tie", href: "/custom/men" },
-        { name: "Business & Formal", href: "/custom/men" },
+        { name: "Halloween Collection", href: "/seasonal?type=halloween" },
+        { name: "Superhero Suits", href: "/seasonal?type=superhero" },
+        { name: "Gothic & Dark", href: "/seasonal?type=gothic" },
+        { name: "Movie-Inspired", href: "/seasonal?type=movie" },
+        { name: "Party & Events", href: "/seasonal?type=party" },
       ],
     },
     {
@@ -123,7 +100,7 @@ export default function SiteHeader() {
             </button>
 
             <Link
-              href="/shop"
+              href="/custom"
               aria-label="Search"
               className={`transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}
             >
@@ -217,7 +194,6 @@ export default function SiteHeader() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
             >
-              {/* Drawer header */}
               <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
                 <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
                   Menu
@@ -231,7 +207,6 @@ export default function SiteHeader() {
                 </button>
               </div>
 
-              {/* Menu content */}
               <div className="px-8 py-10">
                 {menuSections.map((section) => (
                   <div key={section.id} className="mb-8">
@@ -278,7 +253,6 @@ export default function SiteHeader() {
                 ))}
               </div>
 
-              {/* Drawer footer */}
               <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
                 <Link
                   href="/track-order"
