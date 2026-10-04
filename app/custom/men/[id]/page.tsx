@@ -30,15 +30,11 @@ export default function MenBespokePage() {
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
-  const [fitType, setFitType] = useState<"standard" | "custom">("standard");
+  const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [standardSize, setStandardSize] = useState("40R");
 
   const [contact, setContact] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    country: "",
-    notes: "",
+    name: "", email: "", phone: "", country: "", notes: "",
   });
 
   const [measurements, setMeasurements] = useState<Record<string, string>>({});
@@ -48,8 +44,8 @@ export default function MenBespokePage() {
     pocket: "", fit: "", trouser: "", vent: "", vest: "", lining: "",
   });
 
-  // Total steps depend on fit type
-  const totalSteps = fitType === "custom" ? 5 : 4;
+  // Total steps: Standard = 2 (Fit + Contact), Custom = 5
+  const totalSteps = fitType === "custom" ? 5 : 2;
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -102,6 +98,8 @@ export default function MenBespokePage() {
   const totalPrice = useMemo(() => {
     if (!model) return 0;
     let price = model.price;
+    // Standard size = base price only, no customizations
+    if (fitType === "standard") return price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
     if (showLapel) add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
@@ -115,7 +113,7 @@ export default function MenBespokePage() {
     if (showVest) add(VEST_OPTIONS.find((v) => v.id === selection.vest));
     if (showLining) add(LINING_OPTIONS.find((l) => l.id === selection.lining));
     return price;
-  }, [selection, currentFabric, model, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
+  }, [selection, currentFabric, model, fitType, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps - 1));
   const prevStep = () => setStep((p) => Math.max(p - 1, 0));
@@ -139,18 +137,18 @@ export default function MenBespokePage() {
         model_name: model.name,
         category: "men",
         product_type: pt,
-        fabric: selection.fabric,
-        fabric_name: currentFabric?.name || "",
-        lapel: selection.lapel,
-        buttons: selection.buttons,
-        sleeve: selection.sleeve,
-        collar: selection.collar,
-        pocket: selection.pocket,
-        fit: selection.fit,
-        trouser: selection.trouser,
-        vent: selection.vent,
-        vest: selection.vest,
-        lining: selection.lining,
+        fabric: fitType === "custom" ? selection.fabric : null,
+        fabric_name: fitType === "custom" ? currentFabric?.name || "" : null,
+        lapel: fitType === "custom" ? selection.lapel : null,
+        buttons: fitType === "custom" ? selection.buttons : null,
+        sleeve: fitType === "custom" ? selection.sleeve : null,
+        collar: fitType === "custom" ? selection.collar : null,
+        pocket: fitType === "custom" ? selection.pocket : null,
+        fit: fitType === "custom" ? selection.fit : null,
+        trouser: fitType === "custom" ? selection.trouser : null,
+        vent: fitType === "custom" ? selection.vent : null,
+        vest: fitType === "custom" ? selection.vest : null,
+        lining: fitType === "custom" ? selection.lining : null,
         measurements: fitType === "custom" ? measurements : null,
         total_price: totalPrice,
         currency: "USD",
@@ -196,7 +194,6 @@ export default function MenBespokePage() {
     );
   }
 
-  // Success screen
   if (submitted) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-5 py-20">
@@ -208,22 +205,12 @@ export default function MenBespokePage() {
           <p className="text-neutral-500 text-sm mb-10 leading-relaxed">
             We&apos;ve sent a confirmation to <strong>{contact.email}</strong>. Our team will review your order within 24 hours and send you payment instructions.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/custom/men"
-              className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
-            >
-              Back to Collection
-            </Link>
-            <a
-              href={`https://wa.me/16393840265?text=Hi%2C%20I%20just%20placed%20order%20${orderNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-neutral-300 text-neutral-900 px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition"
-            >
-              WhatsApp Us
-            </a>
-          </div>
+          <Link
+            href="/custom/men"
+            className="inline-block bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
+          >
+            Back to Collection
+          </Link>
         </div>
       </div>
     );
@@ -244,7 +231,7 @@ export default function MenBespokePage() {
 
         <div className="text-center mb-12">
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-            Customize Your Model
+            {fitType === "standard" ? "Standard Size Order" : "Custom Made"}
           </p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4 text-neutral-900">{model.name}</h1>
           <p className="text-neutral-500 text-sm">
@@ -330,13 +317,24 @@ export default function MenBespokePage() {
                         </button>
                       ))}
                     </div>
+                    <div className="mt-6 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
+                      <p className="font-medium mb-1 text-neutral-900">Standard Size Order</p>
+                      <p>Your suit will be made in our standard size {standardSize} pattern. Dispatch within 7–10 days. No measurements required.</p>
+                    </div>
+                  </div>
+                )}
+
+                {fitType === "custom" && (
+                  <div className="mt-8 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
+                    <p className="font-medium mb-1 text-neutral-900">Custom Measurements</p>
+                    <p>You&apos;ll customize fabric, lapel, buttons, and provide your measurements. Delivered within 3 weeks.</p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* STEP 1 — Fabric */}
-            {step === 1 && (
+            {/* STEP 1 — Custom only: Fabric & Style */}
+            {step === 1 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
                 <div>
@@ -406,8 +404,8 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 — Details */}
-            {step === 2 && (
+            {/* STEP 2 — Custom only: Details */}
+            {step === 2 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
 
@@ -484,7 +482,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 — Measurements (custom only) */}
+            {/* STEP 3 — Custom only: Measurements */}
             {step === 3 && fitType === "custom" && (
               <div>
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
@@ -529,7 +527,7 @@ export default function MenBespokePage() {
                     Send us a photo of your best-fitting suit — we&apos;ll match the measurements for you.
                   </p>
                   <a
-                    href={`https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements`}
+                    href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 inline-block hover:opacity-60 transition"
@@ -540,11 +538,14 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 4 — Review + Contact */}
+            {/* FINAL STEP — Review + Contact (both flows) */}
             {step === totalSteps - 1 && (
               <div className="space-y-8">
-                <h2 className="text-2xl font-serif mb-4 text-neutral-900">Review &amp; Submit</h2>
+                <h2 className="text-2xl font-serif mb-4 text-neutral-900">
+                  {fitType === "standard" ? "Confirm Order" : "Review & Submit"}
+                </h2>
 
+                {/* Order summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   <div className="bg-neutral-50 p-4 border border-neutral-200">
                     <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Model</p>
@@ -556,14 +557,27 @@ export default function MenBespokePage() {
                       {fitType === "custom" ? "Custom Measurements" : `Standard Size ${standardSize}`}
                     </p>
                   </div>
-                  <div className="bg-neutral-50 p-4 border border-neutral-200">
-                    <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fabric</p>
-                    <p className="font-medium text-neutral-900">{currentFabric?.name}</p>
-                  </div>
-                  {selection.lapel && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p><p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p></div>}
-                  {selection.lining && <div className="bg-neutral-50 p-4 border border-neutral-200"><p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p><p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p></div>}
+                  {fitType === "custom" && currentFabric && (
+                    <div className="bg-neutral-50 p-4 border border-neutral-200">
+                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Fabric</p>
+                      <p className="font-medium text-neutral-900">{currentFabric.name}</p>
+                    </div>
+                  )}
+                  {fitType === "custom" && selection.lapel && showLapel && (
+                    <div className="bg-neutral-50 p-4 border border-neutral-200">
+                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lapel</p>
+                      <p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p>
+                    </div>
+                  )}
+                  {fitType === "custom" && selection.lining && showLining && (
+                    <div className="bg-neutral-50 p-4 border border-neutral-200">
+                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p>
+                      <p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p>
+                    </div>
+                  )}
                 </div>
 
+                {/* Contact Information */}
                 <div className="border-t border-neutral-200 pt-8">
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Contact Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -625,7 +639,11 @@ export default function MenBespokePage() {
                   </button>
                 ) : <div />}
                 {step < totalSteps - 1 ? (
-                  <button onClick={nextStep} className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
+                  <button
+                    onClick={nextStep}
+                    disabled={step === 0 && !fitType}
+                    className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
+                  >
                     Next
                   </button>
                 ) : (
