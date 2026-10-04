@@ -16,7 +16,6 @@ interface ThumbnailOptionProps {
 export default function ThumbnailOption({
   id,
   name,
-  price,
   thumbnail,
   selected,
   onSelect,
@@ -31,7 +30,7 @@ export default function ThumbnailOption({
           : "border-neutral-200 hover:border-neutral-400 bg-white"
       }`}
     >
-      {/* Image Container — bigger */}
+      {/* Image Container */}
       <div className="relative aspect-[4/3] w-full bg-neutral-100 overflow-hidden">
         {thumbnail ? (
           <Image
@@ -40,6 +39,7 @@ export default function ThumbnailOption({
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-300 text-[10px] uppercase tracking-widest">
@@ -55,7 +55,7 @@ export default function ThumbnailOption({
         )}
       </div>
 
-      {/* Text below image */}
+      {/* Text below image — name only, no price */}
       <div className="px-4 py-3 border-t border-neutral-100">
         <p
           className={`text-sm font-medium leading-snug ${
@@ -64,11 +64,6 @@ export default function ThumbnailOption({
         >
           {name}
         </p>
-        {price !== undefined && (
-          <p className="text-xs text-neutral-500 mt-0.5">
-            {price > 0 ? `+ $${price.toLocaleString()}` : "Included"}
-          </p>
-        )}
       </div>
     </button>
   );
