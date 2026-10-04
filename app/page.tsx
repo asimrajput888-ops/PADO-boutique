@@ -16,7 +16,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchFeatured = async () => {
       const { data } = await supabase
-        .from("products")
+        .from("models")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(4);
@@ -68,10 +68,10 @@ export default function HomePage() {
                 Design Your Suit
               </Link>
               <Link
-                href="/shop"
+                href="/custom/men"
                 className="border border-white/60 text-white px-6 py-3 font-semibold hover:border-amber-500 hover:text-amber-500 transition-all duration-300 tracking-widest text-[11px] uppercase"
               >
-                Explore Catalogue
+                Explore Collection
               </Link>
             </div>
           </motion.div>
@@ -91,11 +91,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {/* Custom Made */}
-            <Link href="/custom" className="group relative aspect-[4/5] overflow-hidden bg-neutral-100">
+            {/* For Him */}
+            <Link href="/custom/men" className="group relative aspect-[4/5] overflow-hidden bg-neutral-100">
               <Image
                 src="/images/editorial-custom.png"
-                alt="Custom Made"
+                alt="Custom Made for Him"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.04]"
@@ -106,10 +106,10 @@ export default function HomePage() {
                   Bespoke
                 </p>
                 <h3 className="text-2xl md:text-3xl font-serif mb-3">
-                  Custom Made
+                  For Him
                 </h3>
                 <p className="text-xs md:text-sm opacity-90 mb-4 max-w-xs">
-                  Made to your exact measurements. Choose fabric, lapel, buttons, lining.
+                  Custom suits, jackets, coats. Made to your exact measurements.
                 </p>
                 <span className="text-[10px] tracking-[0.3em] uppercase border-b border-white pb-1">
                   Start Now →
@@ -117,11 +117,11 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* Ready to Wear */}
-            <Link href="/signature-suit" className="group relative aspect-[4/5] overflow-hidden bg-neutral-100">
+            {/* For Her */}
+            <Link href="/custom/women" className="group relative aspect-[4/5] overflow-hidden bg-neutral-100">
               <Image
-                src="/images/editorial-men.png"
-                alt="Ready to Wear"
+                src="/images/editorial-women.png"
+                alt="Custom Made for Her"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.04]"
@@ -129,16 +129,16 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
                 <p className="text-[10px] tracking-[0.4em] uppercase opacity-80 mb-2">
-                  Ready to Ship
+                  Bespoke
                 </p>
                 <h3 className="text-2xl md:text-3xl font-serif mb-3">
-                  Signature Suits
+                  For Her
                 </h3>
                 <p className="text-xs md:text-sm opacity-90 mb-4 max-w-xs">
-                  Limited ready-to-wear pieces. Available for immediate delivery.
+                  Tailored suits, blazers, and coats designed to your silhouette.
                 </p>
                 <span className="text-[10px] tracking-[0.3em] uppercase border-b border-white pb-1">
-                  Shop Now →
+                  Discover →
                 </span>
               </div>
             </Link>
@@ -164,7 +164,7 @@ export default function HomePage() {
                   Halloween, cosplay, gothic, movie-inspired. Custom made to order.
                 </p>
                 <span className="text-[10px] tracking-[0.3em] uppercase border-b border-white pb-1">
-                  Discover →
+                  Explore →
                 </span>
               </div>
             </Link>
@@ -172,7 +172,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ============ 3. FEATURED COLLECTION ============ */}
+      {/* ============ 3. FEATURED MODELS ============ */}
       {featured.length > 0 && (
         <section className="py-20 md:py-28 px-5 md:px-10 bg-neutral-50">
           <div className="max-w-[1400px] mx-auto">
@@ -182,11 +182,11 @@ export default function HomePage() {
                   New Arrivals
                 </p>
                 <h2 className="text-3xl md:text-4xl font-serif text-neutral-900">
-                  The Latest Pieces
+                  Signature Models
                 </h2>
               </div>
               <Link
-                href="/shop"
+                href="/custom"
                 className="hidden md:block text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 hover:opacity-60 transition"
               >
                 View All →
@@ -194,28 +194,27 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-10 md:gap-x-4">
-              {featured.map((product: any) => (
+              {featured.map((model: any) => (
                 <Link
-                  key={product.id}
-                  href={`/shop/${product.id}`}
+                  key={model.id}
+                  href={`/custom/${model.category === "women" ? "women" : "men"}/${model.id}`}
                   className="group block"
                 >
                   <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
-                    {product.image_url && (
-                      <Image
-                        src={product.image_url}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 640px) 50vw, 25vw"
-                        className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                    {model.image_url && (
+                      <img
+                        src={model.image_url}
+                        alt={model.name}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                        loading="lazy"
                       />
                     )}
                   </div>
                   <h3 className="text-[13px] md:text-sm text-neutral-900 leading-snug mb-1 group-hover:text-neutral-500 transition-colors">
-                    {product.name}
+                    {model.name}
                   </h3>
                   <p className="text-[13px] md:text-sm text-neutral-500">
-                    {formatPrice(product.price)}
+                    {formatPrice(model.price)}
                   </p>
                 </Link>
               ))}
