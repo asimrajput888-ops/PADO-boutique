@@ -38,7 +38,7 @@ export default function ContactPage() {
           </a>
 
           <a
-            href="mailto:info@padoshop.com"
+            href="mailto:padoboutique@gmail.com"
             className="border border-neutral-200 p-8 hover:border-neutral-900 transition group"
           >
             <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">
@@ -47,7 +47,7 @@ export default function ContactPage() {
             <p className="font-serif text-xl text-neutral-900 mb-2 group-hover:text-neutral-500">
               Write to Us
             </p>
-            <p className="text-sm text-neutral-500">info@padoshop.com</p>
+            <p className="text-sm text-neutral-500">padoboutique@gmail.com</p>
           </a>
         </div>
 
@@ -81,3 +81,4 @@ export default function ContactPage() {
     </div>
   );
 }
+
