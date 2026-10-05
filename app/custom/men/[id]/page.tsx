@@ -29,6 +29,7 @@ export default function MenBespokePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [includeShirt, setIncludeShirt] = useState(false);
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [standardSize, setStandardSize] = useState("40R");
@@ -82,7 +83,6 @@ export default function MenBespokePage() {
     fetchModel();
   }, [id]);
 
-  // Gallery images — 8 images stacked
   const galleryImages: string[] =
     model?.images && Array.isArray(model.images) && model.images.length > 0
       ? model.images
@@ -94,7 +94,7 @@ export default function MenBespokePage() {
 
   const pt = model?.product_type || "suit";
   const showLapel = ["suit", "blazer", "coat", "tuxedo"].includes(pt);
-  const showCollar = ["suit", "shirt", "tuxedo"].includes(pt);
+  const showCollar = pt === "shirt" || (["suit", "tuxedo"].includes(pt) && includeShirt);
   const showButtons = ["suit", "blazer", "coat", "tuxedo", "vest"].includes(pt);
   const showSleeve = ["suit", "blazer", "coat", "tuxedo", "shirt"].includes(pt);
   const showTrouser = ["suit", "trouser", "tuxedo"].includes(pt);
@@ -108,6 +108,7 @@ export default function MenBespokePage() {
     if (fitType === "standard") return price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
+    if (includeShirt && pt !== "shirt") price += 8000;
     if (showLapel) add(LAPEL_OPTIONS.find((l) => l.id === selection.lapel));
     if (showButtons) add(BUTTON_OPTIONS.find((b) => b.id === selection.buttons));
     if (showSleeve) add(SLEEVE_OPTIONS.find((s) => s.id === selection.sleeve));
@@ -119,7 +120,7 @@ export default function MenBespokePage() {
     if (showVest) add(VEST_OPTIONS.find((v) => v.id === selection.vest));
     if (showLining) add(LINING_OPTIONS.find((l) => l.id === selection.lining));
     return price;
-  }, [selection, currentFabric, model, fitType, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
+  }, [selection, currentFabric, model, fitType, includeShirt, showLapel, showButtons, showSleeve, showCollar, showTrouser, showVent, showVest, showLining]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps - 1));
   const prevStep = () => setStep((p) => Math.max(p - 1, -1));
@@ -222,14 +223,11 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================
-  // STEP -1: PRODUCT SHOWCASE (Suitsupply Stacked Gallery)
-  // ============================================
+  // STEP -1: Product Showcase
   if (step === -1) {
     return (
       <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
         <div className="max-w-[1400px] mx-auto">
-
           <Link
             href="/custom/men"
             className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
@@ -238,14 +236,10 @@ export default function MenBespokePage() {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* LEFT: Gallery — all 8 images stacked vertically (Suitsupply style) */}
             <div className="space-y-3">
               {galleryImages.length > 0 ? (
                 galleryImages.map((img, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-[3/4] overflow-hidden bg-neutral-100"
-                  >
+                  <div key={i} className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
                     <img
                       src={img}
                       alt={`${model.name} ${i + 1}`}
@@ -261,7 +255,6 @@ export default function MenBespokePage() {
               )}
             </div>
 
-            {/* RIGHT: Info — sticky */}
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
                 {model.product_type || "Suit"}
@@ -332,9 +325,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================
-  // STEPS 0-4: CUSTOMIZER
-  // ============================================
+  // STEPS 0-4
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
     animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
@@ -383,7 +374,7 @@ export default function MenBespokePage() {
             exit="exit"
             className="bg-white border border-neutral-200 p-6 md:p-10"
           >
-            {/* STEP 0 */}
+            {/* STEP 0 — Fit Type */}
             {step === 0 && (
               <div>
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Choose Your Fit</h2>
@@ -440,27 +431,63 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 1 */}
+            {/* STEP 1 — Fabric & Style */}
             {step === 1 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
+
                 <div>
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Fabric</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
                     {FABRICS.map((f) => (
                       <button
                         key={f.id}
                         onClick={() => setSelection({ ...selection, fabric: f.id })}
-                        className={`p-5 border flex flex-col items-center gap-3 transition-all ${
+                        className={`p-2 border flex flex-col items-center gap-2 transition-all ${
                           selection.fabric === f.id ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
                         }`}
                       >
-                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-neutral-300" style={{ backgroundColor: f.color }} />
-                        <span className="text-sm font-medium text-neutral-900 text-center">{f.name}</span>
+                        <div className="relative w-full aspect-square overflow-hidden bg-neutral-100">
+                          <img
+                            src={f.image}
+                            alt={f.name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <span className="text-[11px] md:text-xs font-medium text-neutral-900 text-center leading-tight px-1">
+                          {f.name}
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
+
+                {["suit", "tuxedo"].includes(pt) && (
+                  <div className="border border-neutral-200 p-6">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-neutral-900 mb-1">Include Shirt</p>
+                        <p className="text-xs text-neutral-500 leading-relaxed">
+                          Add a matching shirt with custom collar.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newValue = !includeShirt;
+                          setIncludeShirt(newValue);
+                          if (!newValue) setSelection({ ...selection, collar: "" });
+                        }}
+                        className={`px-5 py-3 text-[10px] uppercase tracking-[0.25em] border transition-all whitespace-nowrap ${
+                          includeShirt ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-900 border-neutral-300 hover:border-neutral-900"
+                        }`}
+                      >
+                        {includeShirt ? "✓ Added" : "+ Add Shirt"}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {showLapel && (
                   <div>
@@ -497,7 +524,12 @@ export default function MenBespokePage() {
 
                 {showCollar && (
                   <div>
-                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Shirt Collar</h3>
+                    <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
+                      Shirt Collar
+                      {includeShirt && pt !== "shirt" && (
+                        <span className="text-neutral-400 ml-2 normal-case tracking-normal">(shirt included)</span>
+                      )}
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {SHIRT_COLLAR_OPTIONS.map((c) => (
                         <ThumbnailOption key={c.id} id={c.id} name={c.name} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
@@ -508,7 +540,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 */}
+            {/* STEP 2 — Details */}
             {step === 2 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
@@ -586,7 +618,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 */}
+            {/* STEP 3 — Measurements */}
             {step === 3 && fitType === "custom" && (
               <div>
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
@@ -677,41 +709,11 @@ export default function MenBespokePage() {
                 <div className="border-t border-neutral-200 pt-8">
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Contact Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Full Name *"
-                      value={contact.name}
-                      onChange={(e) => setContact({ ...contact, name: e.target.value })}
-                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email Address *"
-                      value={contact.email}
-                      onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Phone / WhatsApp"
-                      value={contact.phone}
-                      onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Country"
-                      value={contact.country}
-                      onChange={(e) => setContact({ ...contact, country: e.target.value })}
-                      className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
-                    />
-                    <textarea
-                      placeholder="Additional notes (optional)"
-                      value={contact.notes}
-                      onChange={(e) => setContact({ ...contact, notes: e.target.value })}
-                      rows={3}
-                      className="md:col-span-2 w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm"
-                    />
+                    <input type="text" placeholder="Full Name *" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
+                    <input type="email" placeholder="Email Address *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
+                    <input type="text" placeholder="Phone / WhatsApp" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
+                    <input type="text" placeholder="Country" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm" />
+                    <textarea placeholder="Additional notes (optional)" value={contact.notes} onChange={(e) => setContact({ ...contact, notes: e.target.value })} rows={3} className="md:col-span-2 w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm" />
                   </div>
                 </div>
 
@@ -730,28 +732,14 @@ export default function MenBespokePage() {
               </div>
               <div className="flex justify-between items-center">
                 {step > 0 ? (
-                  <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
-                    ← Back
-                  </button>
+                  <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Back</button>
                 ) : (
-                  <button onClick={() => setStep(-1)} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
-                    ← Product
-                  </button>
+                  <button onClick={() => setStep(-1)} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Product</button>
                 )}
                 {step < totalSteps - 1 ? (
-                  <button
-                    onClick={nextStep}
-                    disabled={step === 0 && !fitType}
-                    className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
-                  >
-                    Next
-                  </button>
+                  <button onClick={nextStep} disabled={step === 0 && !fitType} className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50">Next</button>
                 ) : (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
-                  >
+                  <button onClick={handleSubmit} disabled={submitting} className="bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50">
                     {submitting ? "Submitting..." : "Submit Order"}
                   </button>
                 )}
