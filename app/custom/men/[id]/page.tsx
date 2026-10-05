@@ -25,7 +25,7 @@ export default function MenBespokePage() {
 
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(-1); // -1 = product showcase
+  const [step, setStep] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
@@ -224,7 +224,7 @@ export default function MenBespokePage() {
   }
 
   // ============================================
-  // STEP -1: PRODUCT SHOWCASE
+  // STEP -1: PRODUCT SHOWCASE (Suitsupply Gallery)
   // ============================================
   if (step === -1) {
     return (
@@ -239,27 +239,37 @@ export default function MenBespokePage() {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* LEFT: Gallery */}
+            {/* LEFT: Gallery — 1 large + 8 thumbs (Suitsupply style) */}
             <div>
+              {/* Main image — large portrait */}
               <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
-                {galleryImages[activeImage] && (
+                {galleryImages[activeImage] ? (
                   <img
                     src={galleryImages[activeImage]}
                     alt={model.name}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-xs uppercase tracking-widest">
+                    No image
+                  </div>
                 )}
               </div>
 
-              {galleryImages.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
+              {/* Thumbnails — 8 in a single row on desktop, 4 per row on mobile */}
+              {galleryImages.length > 0 && (
+                <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
                   {galleryImages.map((img, i) => (
                     <button
                       key={i}
+                      type="button"
                       onClick={() => setActiveImage(i)}
-                      className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-all ${
-                        activeImage === i ? "ring-1 ring-neutral-900" : "opacity-60 hover:opacity-100"
+                      className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-all duration-300 ${
+                        activeImage === i
+                          ? "ring-1 ring-neutral-900"
+                          : "opacity-60 hover:opacity-100"
                       }`}
+                      aria-label={`View image ${i + 1}`}
                     >
                       <img
                         src={img}
@@ -273,7 +283,7 @@ export default function MenBespokePage() {
               )}
             </div>
 
-            {/* RIGHT: Info */}
+            {/* RIGHT: Info — sticky */}
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
                 {model.product_type || "Suit"}
