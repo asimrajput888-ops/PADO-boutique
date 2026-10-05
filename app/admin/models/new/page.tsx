@@ -17,6 +17,15 @@ const PRODUCT_TYPES = [
   { id: "trouser", name: "Trouser" },
 ];
 
+const SUBCATEGORIES = [
+  { id: "", name: "— None —" },
+  { id: "halloween", name: "Halloween" },
+  { id: "superhero", name: "Superhero" },
+  { id: "gothic", name: "Gothic" },
+  { id: "movie", name: "Movie-Inspired" },
+  { id: "party", name: "Party & Events" },
+];
+
 export default function NewModelPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -27,10 +36,22 @@ export default function NewModelPage() {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("men");
   const [productType, setProductType] = useState("suit");
-  const [imageUrl, setImageUrl] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+
+  // 8 image slots
+  const [imageUrls, setImageUrls] = useState<string[]>([
+    "", "", "", "", "", "", "", "",
+  ]);
+
+  const updateImage = (index: number, url: string) => {
+    const updated = [...imageUrls];
+    updated[index] = url;
+    setImageUrls(updated);
+  };
 
   const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -38,7 +59,7 @@ export default function NewModelPage() {
     setUploading(true);
 
     const fileExt = file.name.split(".").pop();
-    const fileName = `model-${Date.now()}.${fileExt}`;
+    const fileName = `model-${Date.now()}-${index}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from("product-images")
@@ -54,27 +75,33 @@ export default function NewModelPage() {
       .from("product-images")
       .getPublicUrl(fileName);
 
-    setImageUrl(data.publicUrl);
+    updateImage(index, data.publicUrl);
     setUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || uploading) return;
+
+    // Validate at least 1 image
+    const cleanImages = imageUrls.filter((url) => url.trim() !== "");
+    if (cleanImages.length === 0) {
+      alert("Please upload at least 1 image");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      if (!imageUrl) {
-        throw new Error("Please upload a model image");
-      }
-
       const { error } = await supabase.from("models").insert({
         name,
         price: Number(price),
         description,
         category,
         product_type: productType,
-        image_url: imageUrl,
+        subcategory: subcategory || null,
+        image_url: cleanImages[0], // main listing image
+        images: cleanImages, // all images array
       });
 
       if (error) throw new Error(error.message);
@@ -87,7 +114,7 @@ export default function NewModelPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-3xl">
+    <div className="p-6 md:p-10 max-w-4xl">
       {/* Header */}
       <div className="mb-10">
         <Link
@@ -103,7 +130,7 @@ export default function NewModelPage() {
           Add Model
         </h1>
         <p className="text-neutral-500 text-sm">
-          Create a new customizer model for your collection.
+          Create a new customizer model with up to 8 gallery images.
         </p>
       </div>
 
@@ -112,14 +139,14 @@ export default function NewModelPage() {
         {/* Name */}
         <div>
           <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-            Model Name
+            Model Name *
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="e.g. The Onyx — Black Tailored Suit"
+            placeholder="e.g. The Muerto — Day of the Dead Suit (Men)"
             className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
           />
         </div>
@@ -127,26 +154,26 @@ export default function NewModelPage() {
         {/* Price */}
         <div>
           <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-            Base Price (USD)
+            Base Price (USD) *
           </label>
           <input
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            placeholder="450"
+            placeholder="550"
             className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm"
           />
           <p className="text-[11px] text-neutral-400 mt-2 leading-relaxed">
-            Base price before customizations. Custom options will add to this.
+            Base price before customizations.
           </p>
         </div>
 
-        {/* Category + Product Type */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Category + Product Type + Subcategory */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-              Category
+              Category *
             </label>
             <select
               value={category}
@@ -160,7 +187,7 @@ export default function NewModelPage() {
 
           <div>
             <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-              Product Type
+              Product Type *
             </label>
             <select
               value={productType}
@@ -174,66 +201,116 @@ export default function NewModelPage() {
               ))}
             </select>
           </div>
+
+          <div>
+            <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
+              Subcategory
+            </label>
+            <select
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none text-sm bg-white"
+            >
+              {SUBCATEGORIES.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-neutral-400 mt-2 leading-relaxed">
+              For seasonal collection (Halloween, Superhero, etc.)
+            </p>
+          </div>
         </div>
 
         {/* Description */}
         <div>
           <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-            Description
+            Description *
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
-            rows={5}
-            placeholder="Premium black wool-blend suit, single-breasted two-button jacket, notch lapel, tapered trouser. Custom made to your measurements."
+            rows={6}
+            placeholder="Hand-embroidered Day of the Dead inspired tuxedo suit. Black wool-blend fabric with red rose, gold vine, and skull embroidery."
             className="w-full border border-neutral-200 p-4 focus:border-neutral-900 outline-none resize-none text-sm"
           />
         </div>
 
-        {/* Image Upload */}
+        {/* Images — 8 slots */}
         <div>
-          <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-medium">
-            Model Image
-          </label>
+          <div className="flex items-center justify-between mb-4">
+            <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-medium">
+              Gallery Images
+            </label>
+            <p className="text-[10px] tracking-widest uppercase text-neutral-400">
+              {imageUrls.filter((u) => u).length} / 8 added
+            </p>
+          </div>
+          <p className="text-[11px] text-neutral-400 mb-6 leading-relaxed">
+            First image = main listing thumbnail. Add up to 8 images for the gallery.
+          </p>
 
-          <div className="flex gap-5 items-start">
-            {/* Preview */}
-            {imageUrl ? (
-              <div className="w-32 h-40 bg-neutral-100 overflow-hidden border border-neutral-200 flex-shrink-0">
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-32 h-40 bg-neutral-50 border border-dashed border-neutral-200 flex items-center justify-center flex-shrink-0">
-                <span className="text-[9px] uppercase tracking-widest text-neutral-400 text-center px-2">
-                  No Image
-                </span>
-              </div>
-            )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {imageUrls.map((url, i) => (
+              <div key={i} className="border border-neutral-200 p-3">
+                {/* Image slot number */}
+                <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-2">
+                  Image {i + 1}
+                  {i === 0 && " · Main"}
+                </p>
 
-            {/* Upload button */}
-            <div className="flex-1">
-              <label className="cursor-pointer block border border-neutral-300 px-6 py-4 text-center text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition">
-                {uploading
-                  ? "Uploading..."
-                  : imageUrl
-                  ? "Change Image"
-                  : "Upload Image"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
-              </label>
-              <p className="text-[11px] text-neutral-400 mt-3 leading-relaxed">
-                PNG or JPG · Recommended 1200×1600px · Portrait orientation · Clean background
-              </p>
-            </div>
+                {/* Preview */}
+                <div className="relative aspect-[3/4] bg-neutral-100 mb-3 overflow-hidden">
+                  {url ? (
+                    <>
+                      <img
+                        src={url}
+                        alt={`Image ${i + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateImage(i, "")}
+                        className="absolute top-2 right-2 w-6 h-6 bg-white/90 text-neutral-900 text-xs hover:bg-red-500 hover:text-white transition"
+                      >
+                        ✕
+                      </button>
+                    </>
+                  ) : (
+                    <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-neutral-50 transition">
+                      <span className="text-[10px] uppercase tracking-widest text-neutral-400 text-center px-2">
+                        {uploading
+                          ? "Uploading..."
+                          : "+ Upload"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleFileUpload(e, i)}
+                        disabled={uploading}
+                      />
+                    </label>
+                  )}
+                </div>
+
+                {/* Replace button */}
+                {url && (
+                  <label className="block cursor-pointer border border-neutral-300 text-center py-2 text-[10px] uppercase tracking-widest hover:border-neutral-900 transition">
+                    Change
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, i)}
+                      disabled={uploading}
+                    />
+                  </label>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
