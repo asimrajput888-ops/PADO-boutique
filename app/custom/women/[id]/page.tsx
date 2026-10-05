@@ -26,10 +26,11 @@ export default function WomenBespokePage() {
 
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [standardSize, setStandardSize] = useState("M");
@@ -45,7 +46,6 @@ export default function WomenBespokePage() {
     pocket: "", fit: "", trouser: "", skirt: "", vent: "", vest: "", lining: "",
   });
 
-  // Total steps: Standard = 2 (Fit + Contact), Custom = 5
   const totalSteps = fitType === "custom" ? 5 : 2;
 
   useEffect(() => {
@@ -85,6 +85,16 @@ export default function WomenBespokePage() {
     fetchModel();
   }, [id]);
 
+  // ============================================
+  // GALLERY IMAGES — 8 images from array
+  // ============================================
+  const galleryImages: string[] =
+    model?.images && Array.isArray(model.images) && model.images.length > 0
+      ? model.images
+      : model?.image_url
+      ? [model.image_url]
+      : [];
+
   const currentFabric = FABRICS.find((f) => f.id === selection.fabric);
 
   const pt = model?.product_type || "suit";
@@ -101,7 +111,6 @@ export default function WomenBespokePage() {
   const totalPrice = useMemo(() => {
     if (!model) return 0;
     let price = model.price;
-    // Standard size = base price only, no customizations
     if (fitType === "standard") return price;
     const add = (opt: any) => { if (opt) price += opt.price; };
     add(currentFabric);
@@ -120,7 +129,7 @@ export default function WomenBespokePage() {
   }, [selection, currentFabric, model, fitType, showLapel, showButtons, showSleeve, showCollar, showTrouser, showSkirt, showVent, showVest, showLining]);
 
   const nextStep = () => setStep((p) => Math.min(p + 1, totalSteps - 1));
-  const prevStep = () => setStep((p) => Math.max(p - 1, 0));
+  const prevStep = () => setStep((p) => Math.max(p - 1, -1));
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email) {
@@ -220,6 +229,138 @@ export default function WomenBespokePage() {
     );
   }
 
+  // ============================================
+  // STEP -1: PRODUCT SHOWCASE (Gallery + Info)
+  // ============================================
+  if (step === -1) {
+    return (
+      <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
+        <div className="max-w-[1400px] mx-auto">
+
+          <Link
+            href="/custom/women"
+            className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
+          >
+            ← Back to Models
+          </Link>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+            {/* LEFT: Gallery — 8 images */}
+            <div>
+              {/* Main image */}
+              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
+                {galleryImages[activeImage] ? (
+                  <img
+                    src={galleryImages[activeImage]}
+                    alt={model.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-xs uppercase tracking-widest">
+                    No image
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnails — all 8 */}
+              {galleryImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {galleryImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(i)}
+                      className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-all ${
+                        activeImage === i
+                          ? "ring-1 ring-neutral-900"
+                          : "opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${model.name} ${i + 1}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT: Info */}
+            <div className="lg:sticky lg:top-28 lg:self-start">
+              <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
+                {model.product_type || "Suit"}
+                {model.subcategory && ` · ${model.subcategory}`}
+              </p>
+
+              <h1 className="text-3xl md:text-4xl font-serif mb-6 text-neutral-900 leading-tight">
+                {model.name}
+              </h1>
+
+              <p className="text-2xl text-neutral-900 mb-8">
+                {formatPrice(model.price)}
+              </p>
+
+              <div className="border-t border-neutral-200 pt-8 mb-8">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                  Description
+                </h2>
+                <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-line">
+                  {model.description}
+                </p>
+              </div>
+
+              <div className="border-t border-neutral-200 pt-8 mb-8">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                  Details
+                </h2>
+                <ul className="space-y-3 text-sm text-neutral-600">
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Custom made to your exact measurements</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Standard Size (7–10 days) or Custom Measurements (3 weeks)</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Handcrafted in limited quantities</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-neutral-400">—</span>
+                    <span>Free worldwide shipping</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="border-t border-neutral-200 pt-8">
+                <button
+                  onClick={() => setStep(0)}
+                  className="w-full bg-neutral-900 text-white py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
+                >
+                  Start Customization →
+                </button>
+                <a
+                  href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full border border-neutral-300 text-neutral-900 text-center py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition mt-3"
+                >
+                  Chat with a Tailor
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // STEPS 0-4: CUSTOMIZER
+  // ============================================
   const cardVariants = {
     initial: { opacity: 0, x: 50 },
     animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
@@ -229,9 +370,12 @@ export default function WomenBespokePage() {
   return (
     <div className="min-h-screen bg-white py-16 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <Link href="/custom/women" className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block">
-          ← Back to Models
-        </Link>
+        <button
+          onClick={() => setStep(-1)}
+          className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
+        >
+          ← Back to Product
+        </button>
 
         <div className="text-center mb-12">
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
@@ -276,9 +420,7 @@ export default function WomenBespokePage() {
                       fitType === "standard" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                      Fastest
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Fastest</p>
                     <h3 className="text-xl font-serif mb-2 text-neutral-900">Standard Size</h3>
                     <p className="text-sm text-neutral-500 leading-relaxed mb-4">
                       Choose from our standard sizes. Dispatch within 7–10 days.
@@ -292,9 +434,7 @@ export default function WomenBespokePage() {
                       fitType === "custom" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
                     }`}
                   >
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                      Made to Measure
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Made to Measure</p>
                     <h3 className="text-xl font-serif mb-2 text-neutral-900">Custom Measurements</h3>
                     <p className="text-sm text-neutral-500 leading-relaxed mb-4">
                       Made to your exact measurements. Delivered within 3 weeks.
@@ -321,23 +461,12 @@ export default function WomenBespokePage() {
                         </button>
                       ))}
                     </div>
-                    <div className="mt-6 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
-                      <p className="font-medium mb-1 text-neutral-900">Standard Size Order</p>
-                      <p>Your suit will be made in our standard size {standardSize} pattern. Dispatch within 7–10 days. No measurements required.</p>
-                    </div>
-                  </div>
-                )}
-
-                {fitType === "custom" && (
-                  <div className="mt-8 bg-neutral-100 border border-neutral-200 p-5 text-sm text-neutral-700">
-                    <p className="font-medium mb-1 text-neutral-900">Custom Measurements</p>
-                    <p>You&apos;ll customize fabric, silhouette, and provide your measurements. Delivered within 3 weeks.</p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* STEP 1 — Custom only: Fabric & Style */}
+            {/* STEP 1 — Custom only */}
             {step === 1 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
@@ -354,9 +483,6 @@ export default function WomenBespokePage() {
                       >
                         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-neutral-300" style={{ backgroundColor: f.color }} />
                         <span className="text-sm font-medium text-neutral-900 text-center">{f.name}</span>
-                        <span className="text-xs text-neutral-500">
-                          {f.price > 0 ? `+ ${formatPrice(f.price)}` : "Included"}
-                        </span>
                       </button>
                     ))}
                   </div>
@@ -367,7 +493,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Lapel Style</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {LAPEL_OPTIONS.map((l) => (
-                        <ThumbnailOption key={l.id} id={l.id} name={l.name} price={l.price} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
+                        <ThumbnailOption key={l.id} id={l.id} name={l.name} thumbnail={l.thumbnail} selected={selection.lapel === l.id} onSelect={() => setSelection({ ...selection, lapel: l.id })} />
                       ))}
                     </div>
                   </div>
@@ -378,7 +504,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Buttons</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {BUTTON_OPTIONS.map((b) => (
-                        <ThumbnailOption key={b.id} id={b.id} name={b.name} price={b.price} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
+                        <ThumbnailOption key={b.id} id={b.id} name={b.name} thumbnail={b.thumbnail} selected={selection.buttons === b.id} onSelect={() => setSelection({ ...selection, buttons: b.id })} />
                       ))}
                     </div>
                   </div>
@@ -389,7 +515,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Sleeve Buttons</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {SLEEVE_OPTIONS.map((s) => (
-                        <ThumbnailOption key={s.id} id={s.id} name={s.name} price={s.price} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
+                        <ThumbnailOption key={s.id} id={s.id} name={s.name} thumbnail={s.thumbnail} selected={selection.sleeve === s.id} onSelect={() => setSelection({ ...selection, sleeve: s.id })} />
                       ))}
                     </div>
                   </div>
@@ -400,7 +526,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Shirt Collar</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {SHIRT_COLLAR_OPTIONS.map((c) => (
-                        <ThumbnailOption key={c.id} id={c.id} name={c.name} price={c.price} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
+                        <ThumbnailOption key={c.id} id={c.id} name={c.name} thumbnail={c.thumbnail} selected={selection.collar === c.id} onSelect={() => setSelection({ ...selection, collar: c.id })} />
                       ))}
                     </div>
                   </div>
@@ -408,7 +534,7 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 — Custom only: Details */}
+            {/* STEP 2 — Custom only */}
             {step === 2 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
@@ -417,7 +543,7 @@ export default function WomenBespokePage() {
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Pockets</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {POCKET_OPTIONS.map((p) => (
-                      <ThumbnailOption key={p.id} id={p.id} name={p.name} price={p.price} thumbnail={p.thumbnail} selected={selection.pocket === p.id} onSelect={() => setSelection({ ...selection, pocket: p.id })} />
+                      <ThumbnailOption key={p.id} id={p.id} name={p.name} thumbnail={p.thumbnail} selected={selection.pocket === p.id} onSelect={() => setSelection({ ...selection, pocket: p.id })} />
                     ))}
                   </div>
                 </div>
@@ -426,7 +552,7 @@ export default function WomenBespokePage() {
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Fit</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {FIT_OPTIONS.map((f) => (
-                      <ThumbnailOption key={f.id} id={f.id} name={f.name} price={f.price} thumbnail={f.thumbnail} selected={selection.fit === f.id} onSelect={() => setSelection({ ...selection, fit: f.id })} />
+                      <ThumbnailOption key={f.id} id={f.id} name={f.name} thumbnail={f.thumbnail} selected={selection.fit === f.id} onSelect={() => setSelection({ ...selection, fit: f.id })} />
                     ))}
                   </div>
                 </div>
@@ -440,7 +566,6 @@ export default function WomenBespokePage() {
                           key={t.id}
                           id={t.id}
                           name={t.name}
-                          price={t.price}
                           thumbnail={t.thumbnail}
                           selected={selection.trouser === t.id}
                           onSelect={() => setSelection({ ...selection, trouser: t.id, skirt: "" })}
@@ -459,7 +584,6 @@ export default function WomenBespokePage() {
                           key={s.id}
                           id={s.id}
                           name={s.name}
-                          price={s.price}
                           thumbnail={s.thumbnail}
                           selected={selection.skirt === s.id}
                           onSelect={() => setSelection({ ...selection, skirt: s.id, trouser: "" })}
@@ -474,7 +598,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Jacket Vents</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {VENT_OPTIONS.map((v) => (
-                        <ThumbnailOption key={v.id} id={v.id} name={v.name} price={v.price} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
+                        <ThumbnailOption key={v.id} id={v.id} name={v.name} thumbnail={v.thumbnail} selected={selection.vent === v.id} onSelect={() => setSelection({ ...selection, vent: v.id })} />
                       ))}
                     </div>
                   </div>
@@ -485,7 +609,7 @@ export default function WomenBespokePage() {
                     <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Vest</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {VEST_OPTIONS.map((v) => (
-                        <SimpleOption key={v.id} id={v.id} name={v.name} price={v.price} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
+                        <SimpleOption key={v.id} id={v.id} name={v.name} selected={selection.vest === v.id} onSelect={() => setSelection({ ...selection, vest: v.id })} />
                       ))}
                     </div>
                   </div>
@@ -513,7 +637,7 @@ export default function WomenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 — Custom only: Measurements (Women-specific) */}
+            {/* STEP 3 — Measurements (Women-specific) */}
             {step === 3 && fitType === "custom" && (
               <div>
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
@@ -599,18 +723,6 @@ export default function WomenBespokePage() {
                       <p className="font-medium text-neutral-900">{LAPEL_OPTIONS.find((l) => l.id === selection.lapel)?.name}</p>
                     </div>
                   )}
-                  {fitType === "custom" && selection.skirt && showSkirt && (
-                    <div className="bg-neutral-50 p-4 border border-neutral-200">
-                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Skirt</p>
-                      <p className="font-medium text-neutral-900">{SKIRT_OPTIONS.find((s) => s.id === selection.skirt)?.name}</p>
-                    </div>
-                  )}
-                  {fitType === "custom" && selection.lining && showLining && (
-                    <div className="bg-neutral-50 p-4 border border-neutral-200">
-                      <p className="text-neutral-400 mb-1 text-[10px] uppercase tracking-widest">Lining</p>
-                      <p className="font-medium text-neutral-900">{LINING_OPTIONS.find((l) => l.id === selection.lining)?.name}</p>
-                    </div>
-                  )}
                 </div>
 
                 <div className="border-t border-neutral-200 pt-8">
@@ -672,7 +784,11 @@ export default function WomenBespokePage() {
                   <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
                     ← Back
                   </button>
-                ) : <div />}
+                ) : (
+                  <button onClick={() => setStep(-1)} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">
+                    ← Product
+                  </button>
+                )}
                 {step < totalSteps - 1 ? (
                   <button
                     onClick={nextStep}
