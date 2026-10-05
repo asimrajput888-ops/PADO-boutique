@@ -29,7 +29,6 @@ export default function MenBespokePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
-  const [activeImage, setActiveImage] = useState(0);
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [standardSize, setStandardSize] = useState("40R");
@@ -83,7 +82,7 @@ export default function MenBespokePage() {
     fetchModel();
   }, [id]);
 
-  // Gallery images
+  // Gallery images — 8 images stacked
   const galleryImages: string[] =
     model?.images && Array.isArray(model.images) && model.images.length > 0
       ? model.images
@@ -224,7 +223,7 @@ export default function MenBespokePage() {
   }
 
   // ============================================
-  // STEP -1: PRODUCT SHOWCASE (Suitsupply Gallery)
+  // STEP -1: PRODUCT SHOWCASE (Suitsupply Stacked Gallery)
   // ============================================
   if (step === -1) {
     return (
@@ -239,46 +238,25 @@ export default function MenBespokePage() {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-            {/* LEFT: Gallery — 1 large + 8 thumbs (Suitsupply style) */}
-            <div>
-              {/* Main image — large portrait */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3">
-                {galleryImages[activeImage] ? (
-                  <img
-                    src={galleryImages[activeImage]}
-                    alt={model.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-neutral-300 text-xs uppercase tracking-widest">
-                    No image
+            {/* LEFT: Gallery — all 8 images stacked vertically (Suitsupply style) */}
+            <div className="space-y-3">
+              {galleryImages.length > 0 ? (
+                galleryImages.map((img, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-[3/4] overflow-hidden bg-neutral-100"
+                  >
+                    <img
+                      src={img}
+                      alt={`${model.name} ${i + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading={i === 0 ? "eager" : "lazy"}
+                    />
                   </div>
-                )}
-              </div>
-
-              {/* Thumbnails — 8 in a single row on desktop, 4 per row on mobile */}
-              {galleryImages.length > 0 && (
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-                  {galleryImages.map((img, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setActiveImage(i)}
-                      className={`relative aspect-[3/4] overflow-hidden bg-neutral-100 transition-all duration-300 ${
-                        activeImage === i
-                          ? "ring-1 ring-neutral-900"
-                          : "opacity-60 hover:opacity-100"
-                      }`}
-                      aria-label={`View image ${i + 1}`}
-                    >
-                      <img
-                        src={img}
-                        alt={`${model.name} ${i + 1}`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </button>
-                  ))}
+                ))
+              ) : (
+                <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 flex items-center justify-center text-neutral-300 text-xs uppercase tracking-widest">
+                  No image
                 </div>
               )}
             </div>
@@ -405,7 +383,7 @@ export default function MenBespokePage() {
             exit="exit"
             className="bg-white border border-neutral-200 p-6 md:p-10"
           >
-            {/* STEP 0 — Fit Type */}
+            {/* STEP 0 */}
             {step === 0 && (
               <div>
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Choose Your Fit</h2>
@@ -462,7 +440,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 1 — Custom only */}
+            {/* STEP 1 */}
             {step === 1 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Fabric &amp; Style</h2>
@@ -530,7 +508,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 2 — Custom only */}
+            {/* STEP 2 */}
             {step === 2 && fitType === "custom" && (
               <div className="space-y-12">
                 <h2 className="text-2xl font-serif mb-8 text-neutral-900">Customize Details</h2>
@@ -608,7 +586,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* STEP 3 — Measurements */}
+            {/* STEP 3 */}
             {step === 3 && fitType === "custom" && (
               <div>
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">Your Measurements</h2>
@@ -664,7 +642,7 @@ export default function MenBespokePage() {
               </div>
             )}
 
-            {/* FINAL STEP — Review + Contact */}
+            {/* FINAL STEP */}
             {step === totalSteps - 1 && (
               <div className="space-y-8">
                 <h2 className="text-2xl font-serif mb-4 text-neutral-900">
