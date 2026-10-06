@@ -11,6 +11,152 @@ import { supabase } from "@/lib/supabase";
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
 
+// ============================================
+// MEASUREMENT FIELDS BY PRODUCT TYPE (WOMEN)
+// ============================================
+
+const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: boolean }[]> = {
+  blazer: [
+    { id: "bust", label: "Bust", required: true },
+    { id: "shoulder", label: "Shoulder Width", required: true },
+    { id: "sleeve", label: "Sleeve Length", required: true },
+    { id: "jacketLength", label: "Jacket Length", required: true },
+    { id: "bicep", label: "Bicep", required: false },
+    { id: "waist", label: "Waist", required: true },
+  ],
+  shirt: [
+    { id: "neck", label: "Neck", required: true },
+    { id: "bust", label: "Bust", required: true },
+    { id: "shoulder", label: "Shoulder Width", required: true },
+    { id: "sleeve", label: "Sleeve Length", required: true },
+    { id: "shirtLength", label: "Shirt Length", required: true },
+    { id: "cuff", label: "Cuff", required: false },
+    { id: "waist", label: "Waist", required: false },
+  ],
+  trouser: [
+    { id: "waist", label: "Waist", required: true },
+    { id: "hip", label: "Hip", required: true },
+    { id: "inseam", label: "Inseam", required: true },
+    { id: "thigh", label: "Thigh", required: false },
+    { id: "knee", label: "Knee", required: false },
+    { id: "legOpening", label: "Leg Opening", required: false },
+    { id: "frontRise", label: "Front Rise", required: false },
+    { id: "backRise", label: "Back Rise", required: false },
+  ],
+  suit: [
+    { id: "bust", label: "Bust", required: true },
+    { id: "underbust", label: "Underbust", required: true },
+    { id: "shoulder", label: "Shoulder Width", required: true },
+    { id: "sleeve", label: "Sleeve Length", required: true },
+    { id: "jacketLength", label: "Jacket Length", required: true },
+    { id: "bicep", label: "Bicep", required: false },
+    { id: "waist", label: "Jacket Waist", required: true },
+    { id: "trouserWaist", label: "Trouser Waist", required: true },
+    { id: "hip", label: "Hip", required: true },
+    { id: "inseam", label: "Inseam", required: true },
+    { id: "thigh", label: "Thigh", required: false },
+    { id: "knee", label: "Knee", required: false },
+    { id: "legOpening", label: "Leg Opening", required: false },
+    { id: "frontRise", label: "Front Rise", required: false },
+  ],
+  tuxedo: [
+    { id: "bust", label: "Bust", required: true },
+    { id: "underbust", label: "Underbust", required: true },
+    { id: "shoulder", label: "Shoulder Width", required: true },
+    { id: "sleeve", label: "Sleeve Length", required: true },
+    { id: "jacketLength", label: "Jacket Length", required: true },
+    { id: "bicep", label: "Bicep", required: false },
+    { id: "waist", label: "Jacket Waist", required: true },
+    { id: "trouserWaist", label: "Trouser Waist", required: true },
+    { id: "hip", label: "Hip", required: true },
+    { id: "inseam", label: "Inseam", required: true },
+    { id: "thigh", label: "Thigh", required: false },
+    { id: "knee", label: "Knee", required: false },
+    { id: "legOpening", label: "Leg Opening", required: false },
+    { id: "frontRise", label: "Front Rise", required: false },
+  ],
+  coat: [
+    { id: "bust", label: "Bust", required: true },
+    { id: "shoulder", label: "Shoulder Width", required: true },
+    { id: "sleeve", label: "Sleeve Length", required: true },
+    { id: "coatLength", label: "Coat Length", required: true },
+    { id: "bicep", label: "Bicep", required: false },
+    { id: "waist", label: "Waist", required: true },
+  ],
+  vest: [
+    { id: "bust", label: "Bust", required: true },
+    { id: "waist", label: "Waist", required: true },
+    { id: "vestLength", label: "Vest Length", required: true },
+  ],
+};
+
+const MEASUREMENT_GUIDE: Record<string, { label: string; hint: string }[]> = {
+  blazer: [
+    { label: "Bust", hint: "Around the fullest part of your bust, under the arms." },
+    { label: "Shoulder Width", hint: "From shoulder point to shoulder point across your back." },
+    { label: "Sleeve Length", hint: "From shoulder point to wrist bone, arm slightly bent." },
+    { label: "Jacket Length", hint: "From base of neck to where you want the jacket hem." },
+    { label: "Bicep", hint: "Around the fullest part of your upper arm." },
+    { label: "Waist", hint: "Around your natural waistline, narrowest point." },
+  ],
+  shirt: [
+    { label: "Neck", hint: "Around the base of your neck, one finger loose." },
+    { label: "Bust", hint: "Around the fullest part of your bust." },
+    { label: "Shoulder Width", hint: "From shoulder point to shoulder point across your back." },
+    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
+    { label: "Shirt Length", hint: "From base of neck to where you want the shirt hem." },
+    { label: "Cuff", hint: "Around your wrist where the cuff sits." },
+    { label: "Waist", hint: "Around your natural waistline." },
+  ],
+  trouser: [
+    { label: "Waist", hint: "Where you normally wear your trousers." },
+    { label: "Hip", hint: "Around the fullest part of your hips." },
+    { label: "Inseam", hint: "From crotch to ankle bone." },
+    { label: "Thigh", hint: "Around the fullest part of your thigh." },
+    { label: "Knee", hint: "Around your knee, slightly bent." },
+    { label: "Leg Opening", hint: "Around the bottom of the trouser leg." },
+    { label: "Front Rise", hint: "From crotch to top of waistband (front)." },
+    { label: "Back Rise", hint: "From crotch to top of waistband (back)." },
+  ],
+  suit: [
+    { label: "Bust", hint: "Around the fullest part of your bust." },
+    { label: "Underbust", hint: "Around your rib cage just under the bust." },
+    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
+    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
+    { label: "Jacket Length", hint: "From base of neck to jacket hem." },
+    { label: "Jacket Waist", hint: "Around your natural waistline." },
+    { label: "Trouser Waist", hint: "Where you normally wear trousers." },
+    { label: "Hip", hint: "Around the fullest part of your hips." },
+    { label: "Inseam", hint: "From crotch to ankle bone." },
+    { label: "Thigh", hint: "Around the fullest part of your thigh." },
+    { label: "Knee", hint: "Around your knee." },
+    { label: "Leg Opening", hint: "Around bottom of trouser leg." },
+    { label: "Front Rise", hint: "From crotch to top of waistband." },
+  ],
+  tuxedo: [
+    { label: "Bust", hint: "Around the fullest part of your bust." },
+    { label: "Underbust", hint: "Around your rib cage just under the bust." },
+    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
+    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
+    { label: "Jacket Length", hint: "From base of neck to jacket hem." },
+    { label: "Trouser Waist", hint: "Where you normally wear trousers." },
+    { label: "Hip", hint: "Around the fullest part of your hips." },
+    { label: "Inseam", hint: "From crotch to ankle bone." },
+  ],
+  coat: [
+    { label: "Bust", hint: "Around the fullest part of your bust." },
+    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
+    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
+    { label: "Coat Length", hint: "From base of neck to coat hem." },
+    { label: "Waist", hint: "Around your natural waistline." },
+  ],
+  vest: [
+    { label: "Bust", hint: "Around the fullest part of your bust." },
+    { label: "Waist", hint: "Around your natural waistline." },
+    { label: "Vest Length", hint: "From top of shoulder to desired vest hem." },
+  ],
+};
+
 export default function WomenBespokePage() {
   const params = useParams();
   const id = params?.id as string;
@@ -26,14 +172,7 @@ export default function WomenBespokePage() {
   const [profileName, setProfileName] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
-
-  const [m, setM] = useState<Record<string, string>>({
-    bust: "", sleeves: "", shoulder: "", jacketLength: "",
-    underbust: "", bicep: "", pantsLength: "", waist: "",
-    hip: "", frontRise: "", backRise: "", thighs: "",
-    knee: "", legOpening: "",
-  });
-
+  const [m, setM] = useState<Record<string, string>>({});
   const [jacketFit, setJacketFit] = useState(JACKET_FITS[0]);
   const [trouserFit, setTrouserFit] = useState(TROUSER_FITS[0]);
   const [additionalInfo, setAdditionalInfo] = useState("");
@@ -72,8 +211,18 @@ export default function WomenBespokePage() {
       ? [model.image_url]
       : [];
 
+  const pt = model?.product_type || "suit";
+  const fields = MEASUREMENT_FIELDS[pt] || MEASUREMENT_FIELDS.suit;
+  const guide = MEASUREMENT_GUIDE[pt] || MEASUREMENT_GUIDE.suit;
+  const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
+  const needsTrouserFit = ["suit", "tuxedo", "trouser"].includes(pt);
+
   const updateM = (key: string, value: string) =>
     setM({ ...m, [key]: value });
+
+  const requiredMissing = fields
+    .filter((f) => f.required && !m[f.id])
+    .map((f) => f.label);
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email) {
@@ -93,13 +242,13 @@ export default function WomenBespokePage() {
         model_id: String(model.id),
         model_name: model.name,
         category: "women",
-        product_type: model.product_type || "suit",
+        product_type: pt,
         measurements: {
           profileName,
           height: `${heightFt}' ${heightIn}"`,
           ...m,
-          jacketFit,
-          trouserFit,
+          ...(needsJacketFit ? { jacketFit } : {}),
+          ...(needsTrouserFit ? { trouserFit } : {}),
           additionalInfo,
         },
         total_price: model.price,
@@ -168,7 +317,7 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP -1
+  // STEP -1: Product Showcase
   if (step === -1) {
     return (
       <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
@@ -196,7 +345,7 @@ export default function WomenBespokePage() {
 
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-                {model.product_type || "Suit"}
+                {pt}
               </p>
               <h1 className="text-3xl md:text-4xl font-serif mb-6 text-neutral-900 leading-tight">
                 {model.name}
@@ -212,18 +361,6 @@ export default function WomenBespokePage() {
                 <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-line">
                   {model.description}
                 </p>
-              </div>
-
-              <div className="border-t border-neutral-200 pt-8 mb-8">
-                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
-                  Details
-                </h2>
-                <ul className="space-y-3 text-sm text-neutral-600">
-                  <li className="flex gap-3"><span className="text-neutral-400">—</span><span>Custom made to your exact measurements</span></li>
-                  <li className="flex gap-3"><span className="text-neutral-400">—</span><span>Handcrafted in limited quantities</span></li>
-                  <li className="flex gap-3"><span className="text-neutral-400">—</span><span>Dispatched within 3 weeks</span></li>
-                  <li className="flex gap-3"><span className="text-neutral-400">—</span><span>Free worldwide shipping</span></li>
-                </ul>
               </div>
 
               <div className="border-t border-neutral-200 pt-8">
@@ -249,7 +386,7 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 0 — Measurements
+  // STEP 0: Measurement Form
   if (step === 0) {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
@@ -263,13 +400,13 @@ export default function WomenBespokePage() {
 
           <div className="text-center mb-12">
             <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-              Custom Measurements
+              {pt.toUpperCase()} MEASUREMENTS
             </p>
             <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">
               Create Your Size Profile
             </h1>
             <p className="text-neutral-500 text-sm">
-              All measurements in inches. Measure over well-fitted clothing.
+              All measurements in inches. Fields marked * are required.
             </p>
           </div>
 
@@ -317,30 +454,15 @@ export default function WomenBespokePage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { id: "bust", label: "Bust *" },
-                    { id: "shoulder", label: "Shoulder *" },
-                    { id: "underbust", label: "Underbust *" },
-                    { id: "sleeves", label: "Sleeves *" },
-                    { id: "jacketLength", label: "Jacket Length *" },
-                    { id: "bicep", label: "Bicep" },
-                    { id: "waist", label: "Waist *" },
-                    { id: "hip", label: "Hip *" },
-                    { id: "pantsLength", label: "Pants Length *" },
-                    { id: "frontRise", label: "Front Rise" },
-                    { id: "backRise", label: "Back Rise" },
-                    { id: "thighs", label: "Thighs" },
-                    { id: "knee", label: "Knee" },
-                    { id: "legOpening", label: "Leg Opening" },
-                  ].map((f) => (
+                  {fields.map((f) => (
                     <div key={f.id}>
                       <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                        {f.label}
+                        {f.label} {f.required && <span className="text-red-500">*</span>}
                       </label>
                       <input
                         type="text"
                         inputMode="decimal"
-                        value={m[f.id]}
+                        value={m[f.id] || ""}
                         onChange={(e) => updateM(f.id, e.target.value)}
                         placeholder="in"
                         className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm"
@@ -349,35 +471,39 @@ export default function WomenBespokePage() {
                   ))}
                 </div>
 
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                    Jacket Fit
-                  </label>
-                  <select
-                    value={jacketFit}
-                    onChange={(e) => setJacketFit(e.target.value)}
-                    className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                  >
-                    {JACKET_FITS.map((f) => (
-                      <option key={f} value={f}>{f}</option>
-                    ))}
-                  </select>
-                </div>
+                {needsJacketFit && (
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
+                      Jacket Fit
+                    </label>
+                    <select
+                      value={jacketFit}
+                      onChange={(e) => setJacketFit(e.target.value)}
+                      className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
+                    >
+                      {JACKET_FITS.map((f) => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                    Trouser Fit
-                  </label>
-                  <select
-                    value={trouserFit}
-                    onChange={(e) => setTrouserFit(e.target.value)}
-                    className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                  >
-                    {TROUSER_FITS.map((f) => (
-                      <option key={f} value={f}>{f}</option>
-                    ))}
-                  </select>
-                </div>
+                {needsTrouserFit && (
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
+                      Trouser Fit
+                    </label>
+                    <select
+                      value={trouserFit}
+                      onChange={(e) => setTrouserFit(e.target.value)}
+                      className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
+                    >
+                      {TROUSER_FITS.map((f) => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
@@ -396,17 +522,21 @@ export default function WomenBespokePage() {
               <div className="lg:sticky lg:top-8 lg:self-start space-y-6">
                 <div className="border border-neutral-200 p-6">
                   <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
-                    How to Measure
+                    How to Measure {pt}
                   </h3>
+
                   <div className="space-y-4 text-sm text-neutral-600">
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">01</span><p><strong className="text-neutral-900">Bust:</strong> Around the fullest part of your chest.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">02</span><p><strong className="text-neutral-900">Shoulder:</strong> Across the back from shoulder point to shoulder point.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">03</span><p><strong className="text-neutral-900">Underbust:</strong> Around your rib cage just under the bust.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">04</span><p><strong className="text-neutral-900">Sleeves:</strong> From shoulder point to wrist bone.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">05</span><p><strong className="text-neutral-900">Jacket Length:</strong> From base of neck to desired hem.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">06</span><p><strong className="text-neutral-900">Waist:</strong> Around your natural waistline.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">07</span><p><strong className="text-neutral-900">Hip:</strong> Around the fullest part of your hips.</p></div>
-                    <div className="flex gap-3"><span className="text-neutral-400 font-mono">08</span><p><strong className="text-neutral-900">Pants Length:</strong> From waistband to ankle bone.</p></div>
+                    {guide.map((g, i) => (
+                      <div key={i} className="flex gap-3">
+                        <span className="text-neutral-400 font-mono text-xs pt-0.5">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <p>
+                          <strong className="text-neutral-900">{g.label}:</strong>{" "}
+                          {g.hint}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -415,7 +545,7 @@ export default function WomenBespokePage() {
                     Need help?
                   </p>
                   <p className="text-sm text-neutral-600 mb-4 leading-relaxed">
-                    Send us a photo of your best-fitting outfit — we&apos;ll match the measurements for you.
+                    Send us a photo of your best-fitting {pt} — we&apos;ll match the measurements for you.
                   </p>
                   <a
                     href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements"
@@ -430,10 +560,16 @@ export default function WomenBespokePage() {
             </div>
 
             <div className="mt-10 pt-6 border-t border-neutral-200 flex justify-between items-center">
-              <div />
+              <div>
+                {requiredMissing.length > 0 && (
+                  <p className="text-xs text-neutral-500">
+                    Missing: {requiredMissing.join(", ")}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={() => setStep(1)}
-                disabled={!m.bust || !m.shoulder || !m.waist || !m.sleeves || !m.jacketLength || !m.pantsLength}
+                disabled={requiredMissing.length > 0 || !heightFt || !heightIn}
                 className="bg-neutral-900 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
               >
                 Continue →
@@ -445,7 +581,7 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 1 — Contact
+  // STEP 1: Contact
   if (step === 1) {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
@@ -494,7 +630,7 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 2 — Review
+  // STEP 2: Review
   return (
     <div className="min-h-screen bg-white py-16 px-4 md:px-6">
       <div className="max-w-3xl mx-auto">
@@ -515,14 +651,19 @@ export default function WomenBespokePage() {
           </div>
 
           <div>
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Measurements (inches)</h3>
+            <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">{pt.toUpperCase()} Measurements (inches)</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-              {heightFt && <div><p className="text-neutral-500 text-xs mb-1">Height</p><p className="font-medium">{heightFt}&apos; {heightIn}&quot;</p></div>}
-              {Object.entries(m).map(([key, value]) => value ? (
-                <div key={key}><p className="text-neutral-500 text-xs mb-1 capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</p><p className="font-medium">{value}&quot;</p></div>
-              ) : null)}
-              <div><p className="text-neutral-500 text-xs mb-1">Jacket Fit</p><p className="font-medium">{jacketFit}</p></div>
-              <div><p className="text-neutral-500 text-xs mb-1">Trouser Fit</p><p className="font-medium">{trouserFit}</p></div>
+              <div><p className="text-neutral-500 text-xs mb-1">Height</p><p className="font-medium">{heightFt}&apos; {heightIn}&quot;</p></div>
+              {fields.map((f) =>
+                m[f.id] ? (
+                  <div key={f.id}>
+                    <p className="text-neutral-500 text-xs mb-1">{f.label}</p>
+                    <p className="font-medium">{m[f.id]}&quot;</p>
+                  </div>
+                ) : null
+              )}
+              {needsJacketFit && <div><p className="text-neutral-500 text-xs mb-1">Jacket Fit</p><p className="font-medium">{jacketFit}</p></div>}
+              {needsTrouserFit && <div><p className="text-neutral-500 text-xs mb-1">Trouser Fit</p><p className="font-medium">{trouserFit}</p></div>}
             </div>
           </div>
 
