@@ -2,7 +2,7 @@
 
 "use client";
 
-import Image from "next/image";
+import { ICON_MAP } from "./icons";
 
 interface ThumbnailOptionProps {
   id: string;
@@ -16,10 +16,11 @@ interface ThumbnailOptionProps {
 export default function ThumbnailOption({
   id,
   name,
-  thumbnail,
   selected,
   onSelect,
 }: ThumbnailOptionProps) {
+  const IconComponent = ICON_MAP[id];
+
   return (
     <button
       type="button"
@@ -30,20 +31,13 @@ export default function ThumbnailOption({
           : "border-neutral-200 hover:border-neutral-400 bg-white"
       }`}
     >
-      {/* Image Container */}
-      <div className="relative aspect-[4/3] w-full bg-neutral-100 overflow-hidden">
-        {thumbnail ? (
-          <Image
-            src={thumbnail}
-            alt={name}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            unoptimized
-          />
+      {/* Icon Container */}
+      <div className="relative aspect-square w-full bg-white flex items-center justify-center p-6">
+        {IconComponent ? (
+          <IconComponent className="w-full h-full text-neutral-900" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-300 text-[10px] uppercase tracking-widest">
-            No preview
+            {name}
           </div>
         )}
 
@@ -55,7 +49,7 @@ export default function ThumbnailOption({
         )}
       </div>
 
-      {/* Text below image — name only, no price */}
+      {/* Text below */}
       <div className="px-4 py-3 border-t border-neutral-100">
         <p
           className={`text-sm font-medium leading-snug ${
