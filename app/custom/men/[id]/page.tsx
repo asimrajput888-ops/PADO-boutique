@@ -10,7 +10,11 @@ import { supabase } from "@/lib/supabase";
 
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
-const STANDARD_SIZES = ["36R", "38R", "40R", "42R", "44R", "46R", "48R"];
+
+const STANDARD_JACKET_SIZES = ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"];
+const STANDARD_JACKET_LENGTHS = ["Short", "Regular", "Long"];
+const STANDARD_TROUSER_SIZES = ["28", "30", "32", "34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58"];
+const STANDARD_INSEAMS = ["Unhemmed", "28", "30", "32", "34", "36", "38", "40"];
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: string; required: boolean }[]> = {
   blazer: [
@@ -116,7 +120,11 @@ export default function MenBespokePage() {
   const [orderNumber, setOrderNumber] = useState("");
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
-  const [standardSize, setStandardSize] = useState("");
+  const [jacketSize, setJacketSize] = useState("");
+  const [jacketLength, setJacketLength] = useState("Regular");
+  const [trouserSize, setTrouserSize] = useState("");
+  const [inseam, setInseam] = useState("Unhemmed");
+
   const [profileName, setProfileName] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
@@ -165,7 +173,10 @@ export default function MenBespokePage() {
   const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
   const needsTrouserFit = ["suit", "tuxedo", "trouser"].includes(pt);
 
-  // Steps: -1 = showcase, 0 = fit type, 1 = measurements (custom only), 2 = contact, 3 = review
+  const showJacketSelector = ["suit", "tuxedo", "blazer", "coat", "vest"].includes(pt);
+  const showTrouserSelector = ["suit", "tuxedo", "trouser"].includes(pt);
+  const showShirtSelector = pt === "shirt";
+
   const totalSteps = fitType === "standard" ? 3 : 4;
 
   const updateM = (key: string, value: string) =>
@@ -176,9 +187,14 @@ export default function MenBespokePage() {
     .filter((f) => f.required && !m[f.id])
     .map((f) => f.label);
 
+  const standardSelectionComplete =
+    (showJacketSelector && !jacketSize) ||
+    (showTrouserSelector && !trouserSize) ||
+    (showShirtSelector && !jacketSize);
+
   const nextStep = () => {
     if (step === 0 && fitType === "standard") {
-      setStep(2); // Skip measurements
+      setStep(2);
     } else {
       setStep((p) => Math.min(p + 1, 3));
     }
@@ -190,6 +206,22 @@ export default function MenBespokePage() {
     } else {
       setStep((p) => Math.max(p - 1, -1));
     }
+  };
+
+  const getStandardSizeLabel = () => {
+    if (showJacketSelector && showTrouserSelector) {
+      return `Jacket ${jacketSize} ${jacketLength} / Trouser ${trouserSize} ${inseam}`;
+    }
+    if (showJacketSelector) {
+      return `Jacket ${jacketSize} ${jacketLength}`;
+    }
+    if (showTrouserSelector) {
+      return `Trouser ${trouserSize} ${inseam}`;
+    }
+    if (showShirtSelector) {
+      return `Shirt ${jacketSize}`;
+    }
+    return jacketSize || "Standard";
   };
 
   const handleSubmit = async () => {
@@ -206,7 +238,7 @@ export default function MenBespokePage() {
         customer_phone: contact.phone,
         customer_country: contact.country,
         fit_type: fitType,
-        standard_size: fitType === "standard" ? standardSize : null,
+        standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
         model_id: String(model.id),
         model_name: model.name,
         category: "men",
@@ -366,24 +398,16 @@ export default function MenBespokePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Standard Size */}
             <button
               onClick={() => setFitType("standard")}
               className={`text-left p-8 border-2 transition-all ${
-                fitType === "standard"
-                  ? "border-neutral-900 bg-neutral-50"
-                  : "border-neutral-200 hover:border-neutral-400"
+                fitType === "standard" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
               }`}
             >
-              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                Fastest Delivery
-              </p>
-              <h3 className="text-2xl font-serif mb-4 text-neutral-900">
-                Standard Size
-              </h3>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Fastest Delivery</p>
+              <h3 className="text-2xl font-serif mb-4 text-neutral-900">Standard Size</h3>
               <p className="text-sm text-neutral-500 leading-relaxed mb-6">
-                Choose from our standard sizes. Crafted on a ready pattern and
-                dispatched within 7–10 days.
+                Choose from our standard sizes. Crafted on a ready pattern and dispatched within 7–10 days.
               </p>
               <ul className="space-y-2 text-xs text-neutral-500">
                 <li className="flex gap-2"><span>—</span><span>Fixed price</span></li>
@@ -392,27 +416,19 @@ export default function MenBespokePage() {
               </ul>
             </button>
 
-            {/* Custom Measurements */}
             <button
               onClick={() => setFitType("custom")}
               className={`text-left p-8 border-2 transition-all relative ${
-                fitType === "custom"
-                  ? "border-neutral-900 bg-neutral-50"
-                  : "border-neutral-200 hover:border-neutral-400"
+                fitType === "custom" ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 hover:border-neutral-400"
               }`}
             >
               <span className="absolute top-4 right-4 bg-neutral-900 text-white text-[9px] uppercase tracking-widest px-3 py-1">
                 Recommended
               </span>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
-                Perfect Fit
-              </p>
-              <h3 className="text-2xl font-serif mb-4 text-neutral-900">
-                Custom Measurements
-              </h3>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">Perfect Fit</p>
+              <h3 className="text-2xl font-serif mb-4 text-neutral-900">Custom Measurements</h3>
               <p className="text-sm text-neutral-500 leading-relaxed mb-6">
-                Made to your exact measurements by our master tailors. Delivered
-                within 3 weeks.
+                Made to your exact measurements by our master tailors. Delivered within 3 weeks.
               </p>
               <ul className="space-y-2 text-xs text-neutral-500">
                 <li className="flex gap-2"><span>—</span><span>Made to your measurements</span></li>
@@ -422,31 +438,134 @@ export default function MenBespokePage() {
             </button>
           </div>
 
-          {/* Standard size selector */}
+          {/* STANDARD SIZE SELECTORS */}
           {fitType === "standard" && (
-            <div className="mt-10 border border-neutral-200 p-6 md:p-8">
-              <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
-                Select Your Size
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {STANDARD_SIZES.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setStandardSize(size)}
-                    className={`px-6 py-3 text-sm border transition-all ${
-                      standardSize === size
-                        ? "bg-neutral-900 text-white border-neutral-900"
-                        : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              {standardSize && (
-                <p className="text-xs text-neutral-500 mt-5">
-                  You&apos;ve selected size <strong className="text-neutral-900">{standardSize}</strong>. Continue to enter your contact details.
-                </p>
+            <div className="mt-10 space-y-8">
+
+              {/* JACKET SIZE */}
+              {showJacketSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-5">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                      Jacket Size
+                    </label>
+                    <span className="text-[10px] uppercase tracking-widest text-neutral-400">Inches</span>
+                  </div>
+                  <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-6">
+                    {STANDARD_JACKET_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setJacketSize(size)}
+                        className={`py-2.5 text-sm border transition-all ${
+                          jacketSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                      Length
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {STANDARD_JACKET_LENGTHS.map((len) => (
+                        <button
+                          key={len}
+                          onClick={() => setJacketLength(len)}
+                          className={`py-3 text-sm border transition-all ${
+                            jacketLength === len ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                          }`}
+                        >
+                          {len}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TROUSER SIZE */}
+              {showTrouserSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-5">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                      Trouser Size
+                    </label>
+                    <span className="text-[10px] uppercase tracking-widest text-neutral-400">Waist (Inches)</span>
+                  </div>
+                  <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-6">
+                    {STANDARD_TROUSER_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setTrouserSize(size)}
+                        className={`py-2.5 text-sm border transition-all ${
+                          trouserSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                      Inseam
+                    </label>
+                    <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                      {STANDARD_INSEAMS.map((ins) => (
+                        <button
+                          key={ins}
+                          onClick={() => setInseam(ins)}
+                          className={`py-3 text-xs border transition-all ${
+                            inseam === ins ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                          }`}
+                        >
+                          {ins}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SHIRT SIZE */}
+              {showShirtSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
+                    Shirt Size (Neck)
+                  </label>
+                  <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2">
+                    {["14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5", "18", "18.5"].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setJacketSize(size)}
+                        className={`py-2.5 text-sm border transition-all ${
+                          jacketSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Summary */}
+              {(jacketSize || trouserSize) && (
+                <div className="bg-neutral-50 border border-neutral-200 p-5 text-sm text-neutral-600">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">
+                    Your Selection
+                  </p>
+                  {jacketSize && showJacketSelector && (
+                    <p className="mb-1">Jacket: <strong className="text-neutral-900">{jacketSize} {jacketLength}</strong></p>
+                  )}
+                  {jacketSize && showShirtSelector && (
+                    <p className="mb-1">Shirt Neck: <strong className="text-neutral-900">{jacketSize}</strong></p>
+                  )}
+                  {trouserSize && (
+                    <p>Trouser: <strong className="text-neutral-900">{trouserSize} / {inseam}</strong></p>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -463,7 +582,7 @@ export default function MenBespokePage() {
           <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-end">
             <button
               onClick={nextStep}
-              disabled={!fitType || (fitType === "standard" && !standardSize)}
+              disabled={!fitType || (fitType === "standard" && standardSelectionComplete)}
               className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
             >
               Continue →
@@ -700,9 +819,7 @@ export default function MenBespokePage() {
           <div className="flex items-center justify-center gap-3 mb-6">
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border bg-neutral-900 text-white border-neutral-900">
-                  ✓
-                </div>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border bg-neutral-900 text-white border-neutral-900">✓</div>
                 {i < 3 && <div className="w-12 h-[1px] bg-neutral-900" />}
               </div>
             ))}
@@ -721,9 +838,20 @@ export default function MenBespokePage() {
           <div className="border border-neutral-200 p-6">
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Order Summary</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between items-start gap-4"><span className="text-neutral-500">Model</span><span className="font-medium text-neutral-900 text-right">{model.name}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Fit</span><span className="font-medium text-neutral-900">{fitType === "custom" ? "Custom Measurements" : `Standard Size ${standardSize}`}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Total</span><span className="font-serif text-xl text-neutral-900">{formatPrice(model.price)}</span></div>
+              <div className="flex justify-between items-start gap-4">
+                <span className="text-neutral-500">Model</span>
+                <span className="font-medium text-neutral-900 text-right">{model.name}</span>
+              </div>
+              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100">
+                <span className="text-neutral-500">Fit</span>
+                <span className="font-medium text-neutral-900 text-right">
+                  {fitType === "custom" ? "Custom Measurements" : getStandardSizeLabel()}
+                </span>
+              </div>
+              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100">
+                <span className="text-neutral-500">Total</span>
+                <span className="font-serif text-xl text-neutral-900">{formatPrice(model.price)}</span>
+              </div>
             </div>
           </div>
 
