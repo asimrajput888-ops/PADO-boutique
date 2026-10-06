@@ -1,80 +1,152 @@
 /* app/globals.css */
 
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@theme inline {
-  --color-background: #ffffff;
-  --color-foreground: #171717;
+@theme {
+  /* ===== BRAND COLORS (Luxury Palette) ===== */
+  --color-brand-cream: #FFF8F0;
+  --color-brand-ivory: #FDFBF7;
+  --color-brand-stone: #E8E2D9;
+  --color-brand-gold: #C5A059;
+  --color-brand-gold-light: #D4B87A;
+  --color-brand-gold-dark: #A88840;
+  --color-brand-charcoal: #1E1E2C;
+  --color-brand-slate: #4A4A5A;
+  --color-brand-maroon: #5D1A24;
+  --color-brand-maroon-light: #7A2530;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-serif-var), ui-serif, Georgia, serif;
+  /* ===== TYPOGRAPHY ===== */
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', 'Helvetica Neue', sans-serif;
+
+  /* ===== SPACING SYSTEM ===== */
+  --spacing-section: 8rem;
+  --spacing-section-sm: 5rem;
+
+  /* ===== ANIMATION ===== */
+  --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-@layer base {
-  * {
-    border-color: #e5e5e5;
-  }
-
-  html {
-    background-color: #ffffff;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    background-color: #ffffff;
-    color: #171717;
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    font-feature-settings: 'liga' 1, 'kern' 1;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-    font-weight: 500;
-    letter-spacing: -0.015em;
-    line-height: 1.1;
-  }
-
-  ::selection {
-    background: #171717;
-    color: #ffffff;
-  }
+/* ===== BASE STYLES ===== */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .font-serif {
-    font-family: var(--font-serif);
-    font-weight: 500;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  .tracking-luxe {
-    letter-spacing: 0.32em;
-  }
+body {
+  background-color: var(--color-brand-ivory);
+  color: var(--color-brand-charcoal);
+  font-family: var(--font-sans);
+  font-weight: 300;
+}
 
-  .tracking-wide-sm {
-    letter-spacing: 0.18em;
-  }
+/* ===== LUXURY TYPOGRAPHY ===== */
+.font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
 
-  .reveal {
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gold);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-gold-dark);
+}
+
+/* ===== SELECTION ===== */
+::selection {
+  background: var(--color-brand-gold);
+  color: white;
+}
+
+/* ===== IMAGE HOVER ZOOM (Suitsupply Style) ===== */
+.img-zoom-container {
+  overflow: hidden;
+}
+.img-zoom-container img {
+  transition: transform 0.8s var(--ease-luxury);
+}
+.img-zoom-container:hover img {
+  transform: scale(1.05);
+}
+
+/* ===== LINK UNDERLINE ANIMATION ===== */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.4s var(--ease-luxury);
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ===== REVEAL ANIMATION UTILITY ===== */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-luxury), transform 0.8s var(--ease-luxury);
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== GOLD ACCENT LINE ===== */
+.gold-line {
+  width: 40px;
+  height: 1px;
+  background: var(--color-brand-gold);
+}
+
+/* ===== CARD HOVER LIFT ===== */
+.card-lift {
+  transition: transform 0.4s var(--ease-luxury), box-shadow 0.4s var(--ease-luxury);
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== FADE IN ANIMATION ===== */
+@keyframes fadeInUp {
+  from {
     opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(20px);
   }
-
-  .reveal.is-visible {
+  to {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
   }
 }
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s var(--ease-luxury) forwards;
+}
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+/* ===== MARQUEE SCROLL ===== */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
 }
