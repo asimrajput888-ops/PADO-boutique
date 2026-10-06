@@ -11,10 +11,6 @@ import { supabase } from "@/lib/supabase";
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
 
-// ============================================
-// MEASUREMENT FIELDS BY PRODUCT TYPE
-// ============================================
-
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: boolean }[]> = {
   blazer: [
     { id: "chest", label: "Chest", required: true },
@@ -29,16 +25,15 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "chest", label: "Chest", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
-    { id: "shirtLength", label: "Shirt Length", required: true },
-    { id: "cuff", label: "Cuff", required: false },
+    { id: "jacketLength", label: "Shirt Length", required: true },
     { id: "waist", label: "Waist", required: false },
     { id: "bicep", label: "Bicep", required: false },
   ],
   trouser: [
     { id: "waist", label: "Waist", required: true },
-    { id: "hip", label: "Hip", required: true },
-    { id: "inseam", label: "Inseam", required: true },
-    { id: "thigh", label: "Thigh", required: false },
+    { id: "seat", label: "Seat / Hip", required: true },
+    { id: "pantsLength", label: "Inseam", required: true },
+    { id: "thighs", label: "Thigh", required: false },
     { id: "knee", label: "Knee", required: false },
     { id: "legOpening", label: "Leg Opening", required: false },
     { id: "frontRise", label: "Front Rise", required: false },
@@ -50,11 +45,11 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Jacket Length", required: true },
     { id: "bicep", label: "Bicep", required: false },
-    { id: "waist", label: "Jacket Waist", required: true },
-    { id: "trouserWaist", label: "Trouser Waist", required: true },
-    { id: "hip", label: "Hip", required: true },
-    { id: "inseam", label: "Inseam", required: true },
-    { id: "thigh", label: "Thigh", required: false },
+    { id: "stomach", label: "Jacket Waist", required: true },
+    { id: "waist", label: "Trouser Waist", required: true },
+    { id: "seat", label: "Seat / Hip", required: true },
+    { id: "pantsLength", label: "Inseam", required: true },
+    { id: "thighs", label: "Thigh", required: false },
     { id: "knee", label: "Knee", required: false },
     { id: "legOpening", label: "Leg Opening", required: false },
     { id: "frontRise", label: "Front Rise", required: false },
@@ -65,11 +60,11 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Jacket Length", required: true },
     { id: "bicep", label: "Bicep", required: false },
-    { id: "waist", label: "Jacket Waist", required: true },
-    { id: "trouserWaist", label: "Trouser Waist", required: true },
-    { id: "hip", label: "Hip", required: true },
-    { id: "inseam", label: "Inseam", required: true },
-    { id: "thigh", label: "Thigh", required: false },
+    { id: "stomach", label: "Jacket Waist", required: true },
+    { id: "waist", label: "Trouser Waist", required: true },
+    { id: "seat", label: "Seat / Hip", required: true },
+    { id: "pantsLength", label: "Inseam", required: true },
+    { id: "thighs", label: "Thigh", required: false },
     { id: "knee", label: "Knee", required: false },
     { id: "legOpening", label: "Leg Opening", required: false },
     { id: "frontRise", label: "Front Rise", required: false },
@@ -78,84 +73,33 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "chest", label: "Chest", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
-    { id: "coatLength", label: "Coat Length", required: true },
+    { id: "jacketLength", label: "Coat Length", required: true },
     { id: "bicep", label: "Bicep", required: false },
-    { id: "waist", label: "Waist", required: true },
+    { id: "stomach", label: "Waist", required: true },
   ],
   vest: [
     { id: "chest", label: "Chest", required: true },
-    { id: "waist", label: "Waist", required: true },
-    { id: "vestLength", label: "Vest Length", required: true },
-    { id: "shoulder", label: "Shoulder Width", required: false },
+    { id: "stomach", label: "Waist", required: true },
+    { id: "jacketLength", label: "Vest Length", required: true },
   ],
 };
 
-const MEASUREMENT_GUIDE: Record<string, { label: string; hint: string }[]> = {
-  blazer: [
-    { label: "Chest", hint: "Around the fullest part of your chest, under the arms." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point across your back." },
-    { label: "Sleeve Length", hint: "From shoulder point to wrist bone, arm slightly bent." },
-    { label: "Jacket Length", hint: "From base of neck to where you want the jacket hem." },
-    { label: "Bicep", hint: "Around the fullest part of your upper arm." },
-    { label: "Waist", hint: "Around your natural waistline." },
-  ],
-  shirt: [
-    { label: "Neck", hint: "Around the base of your neck, one finger loose." },
-    { label: "Chest", hint: "Around the fullest part of your chest." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point across your back." },
-    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
-    { label: "Shirt Length", hint: "From base of neck to where you want the shirt hem." },
-    { label: "Cuff", hint: "Around your wrist where the cuff sits." },
-    { label: "Waist", hint: "Around your natural waistline." },
-    { label: "Bicep", hint: "Around the fullest part of your upper arm." },
-  ],
-  trouser: [
-    { label: "Waist", hint: "Where you normally wear your trousers." },
-    { label: "Hip", hint: "Around the fullest part of your hips." },
-    { label: "Inseam", hint: "From crotch to ankle bone." },
-    { label: "Thigh", hint: "Around the fullest part of your thigh." },
-    { label: "Knee", hint: "Around your knee, slightly bent." },
-    { label: "Leg Opening", hint: "Around the bottom of the trouser leg." },
-    { label: "Front Rise", hint: "From crotch to top of waistband (front)." },
-    { label: "Back Rise", hint: "From crotch to top of waistband (back)." },
-  ],
-  suit: [
-    { label: "Chest", hint: "Around the fullest part of your chest." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
-    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
-    { label: "Jacket Length", hint: "From base of neck to jacket hem." },
-    { label: "Bicep", hint: "Around the fullest part of upper arm." },
-    { label: "Jacket Waist", hint: "Around your natural waistline." },
-    { label: "Trouser Waist", hint: "Where you normally wear trousers." },
-    { label: "Hip", hint: "Around the fullest part of your hips." },
-    { label: "Inseam", hint: "From crotch to ankle bone." },
-    { label: "Thigh", hint: "Around the fullest part of your thigh." },
-    { label: "Knee", hint: "Around your knee." },
-    { label: "Leg Opening", hint: "Around bottom of trouser leg." },
-    { label: "Front Rise", hint: "From crotch to top of waistband." },
-  ],
-  tuxedo: [
-    { label: "Chest", hint: "Around the fullest part of your chest." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
-    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
-    { label: "Jacket Length", hint: "From base of neck to jacket hem." },
-    { label: "Trouser Waist", hint: "Where you normally wear trousers." },
-    { label: "Hip", hint: "Around the fullest part of your hips." },
-    { label: "Inseam", hint: "From crotch to ankle bone." },
-  ],
-  coat: [
-    { label: "Chest", hint: "Around the fullest part of your chest." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
-    { label: "Sleeve Length", hint: "From shoulder point to wrist bone." },
-    { label: "Coat Length", hint: "From base of neck to coat hem." },
-    { label: "Waist", hint: "Around your natural waistline." },
-  ],
-  vest: [
-    { label: "Chest", hint: "Around the fullest part of your chest." },
-    { label: "Waist", hint: "Around your natural waistline." },
-    { label: "Vest Length", hint: "From top of shoulder to desired vest hem." },
-    { label: "Shoulder Width", hint: "From shoulder point to shoulder point." },
-  ],
+const MEASUREMENT_IMAGES: Record<string, string> = {
+  chest: "/images/measurements-men/body_chest_men.webp",
+  shoulder: "/images/measurements-men/body_shoulder_men.webp",
+  sleeve: "/images/measurements-men/body_sleeve_length_men.webp",
+  jacketLength: "/images/measurements-men/body_jacket_length_men.webp",
+  bicep: "/images/measurements-men/body_bicep_men.webp",
+  waist: "/images/measurements-men/body_waist_men.webp",
+  stomach: "/images/measurements-men/body_stomach_men.webp",
+  seat: "/images/measurements-men/body_seat_men.webp",
+  pantsLength: "/images/measurements-men/body_pants_length_men.webp",
+  knee: "/images/measurements-men/body_knee_men.webp",
+  thighs: "/images/measurements-men/body_thighs_men.webp",
+  legOpening: "/images/measurements-men/body_leg_opening (1) men.webp",
+  neck: "/images/measurements-men/body_chest_men.webp",
+  frontRise: "/images/measurements-men/garment_frontrise(1)men.avif",
+  backRise: "/images/measurements-men/garment_backrise(1)men.avif",
 };
 
 export default function MenBespokePage() {
@@ -177,6 +121,7 @@ export default function MenBespokePage() {
   const [jacketFit, setJacketFit] = useState(JACKET_FITS[0]);
   const [trouserFit, setTrouserFit] = useState(TROUSER_FITS[0]);
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const [activeField, setActiveField] = useState<string>("chest");
 
   const [contact, setContact] = useState({
     name: "", email: "", phone: "", country: "", notes: "",
@@ -214,7 +159,6 @@ export default function MenBespokePage() {
 
   const pt = model?.product_type || "suit";
   const fields = MEASUREMENT_FIELDS[pt] || MEASUREMENT_FIELDS.suit;
-  const guide = MEASUREMENT_GUIDE[pt] || MEASUREMENT_GUIDE.suit;
   const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
   const needsTrouserFit = ["suit", "tuxedo", "trouser"].includes(pt);
 
@@ -466,6 +410,7 @@ export default function MenBespokePage() {
                         inputMode="decimal"
                         value={m[f.id] || ""}
                         onChange={(e) => updateM(f.id, e.target.value)}
+                        onFocus={() => setActiveField(f.id)}
                         placeholder="in"
                         className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm"
                       />
@@ -521,33 +466,41 @@ export default function MenBespokePage() {
                 </div>
               </div>
 
-              {/* RIGHT: Guide */}
-              <div className="lg:sticky lg:top-8 lg:self-start space-y-6">
-                <div className="border border-neutral-200 p-6">
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
-                    How to Measure {pt}
-                  </h3>
+              {/* RIGHT: Image Guide */}
+              <div className="lg:sticky lg:top-8 lg:self-start">
+                <div className="border border-neutral-200">
+                  {/* Image preview */}
+                  <div className="bg-neutral-50 aspect-square flex items-center justify-center overflow-hidden">
+                    {activeField && MEASUREMENT_IMAGES[activeField] ? (
+                      <img
+                        src={MEASUREMENT_IMAGES[activeField]}
+                        alt={fields.find((f) => f.id === activeField)?.label || "Measurement"}
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <p className="text-neutral-400 text-xs uppercase tracking-widest">
+                        Click a field to see guide
+                      </p>
+                    )}
+                  </div>
 
-                  <div className="space-y-4 text-sm text-neutral-600">
-                    {guide.map((g, i) => (
-                      <div key={i} className="flex gap-3">
-                        <span className="text-neutral-400 font-mono text-xs pt-0.5">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <p>
-                          <strong className="text-neutral-900">{g.label}:</strong>{" "}
-                          {g.hint}
-                        </p>
-                      </div>
-                    ))}
+                  {/* Label bar */}
+                  <div className="p-4 border-t border-neutral-200 bg-white text-center">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-1">
+                      How to Measure
+                    </p>
+                    <p className="text-sm font-medium text-neutral-900">
+                      {fields.find((f) => f.id === activeField)?.label || "Select a Field"}
+                    </p>
                   </div>
                 </div>
 
-                <div className="border border-neutral-200 p-6 bg-neutral-50">
+                {/* Help box */}
+                <div className="mt-4 border border-neutral-200 p-5 bg-neutral-50">
                   <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">
                     Need help?
                   </p>
-                  <p className="text-sm text-neutral-600 mb-4 leading-relaxed">
+                  <p className="text-sm text-neutral-600 mb-3 leading-relaxed">
                     Send us a photo of your best-fitting {pt} — we&apos;ll match the measurements for you.
                   </p>
                   <a
