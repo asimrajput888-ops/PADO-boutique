@@ -21,6 +21,17 @@ export default function ShippingPage() {
           </p>
         </div>
 
+        {/* Free Shipping Banner */}
+        <div className="mb-12 p-6 bg-[#C5A059]/15 border border-[#C5A059]/40 rounded-lg text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#5D1A24] font-semibold mb-2">
+            Complimentary Shipping
+          </p>
+          <p className="text-[#1E1E2C] text-lg font-serif">
+            Free worldwide shipping on all orders above{" "}
+            <strong className="text-[#5D1A24]">$250 USD</strong>
+          </p>
+        </div>
+
         {/* Intro */}
         <div className="text-[#1E1E2C]/80 leading-relaxed font-light mb-12">
           <p>
@@ -58,13 +69,29 @@ export default function ShippingPage() {
 
           <div className="border-l-2 border-[#C5A059] pl-6">
             <h2 className="text-xl font-serif mb-3 text-[#1E1E2C]">
-              International Delivery
+              International Delivery &amp; Shipping Charges
             </h2>
-            <p>
+            <p className="mb-3">
               We ship worldwide. Delivery timelines above include international transit,
               though customs clearance may occasionally add 1–3 additional days depending on
-              your destination country. Shipping charges are calculated at checkout.
+              your destination country.
             </p>
+            <ul className="space-y-2 text-sm">
+              <li className="flex gap-3">
+                <span className="text-[#C5A059]">—</span>
+                <span>
+                  <strong className="text-[#1E1E2C]">Orders above $250 USD:</strong> free
+                  worldwide shipping
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-[#C5A059]">—</span>
+                <span>
+                  <strong className="text-[#1E1E2C]">Orders below $250 USD:</strong> shipping
+                  charges calculated at checkout based on destination
+                </span>
+              </li>
+            </ul>
           </div>
 
           <div className="border-l-2 border-[#C5A059] pl-6">
