@@ -32,23 +32,26 @@ export default function SiteHeader() {
       id: "for-him",
       title: "For Him",
       links: [
-        { name: "Custom Suits", href: "/custom/men" },
-        { name: "Custom Jackets", href: "/custom/men" },
-        { name: "Custom Vests", href: "/custom/men" },
-        { name: "Custom Pants", href: "/custom/men" },
-        { name: "Custom Shirts", href: "/custom/men" },
-        { name: "Custom Coats", href: "/custom/men" },
-        { name: "Tuxedos", href: "/custom/men" },
+        { name: "All Men's", href: "/custom/men" },
+        { name: "Custom Suits", href: "/custom/men?type=suit" },
+        { name: "Custom Blazers", href: "/custom/men?type=blazer" },
+        { name: "Custom Tuxedos", href: "/custom/men?type=tuxedo" },
+        { name: "Custom Coats", href: "/custom/men?type=coat" },
+        { name: "Custom Shirts", href: "/custom/men?type=shirt" },
+        { name: "Custom Trousers", href: "/custom/men?type=trouser" },
+        { name: "Custom Vests", href: "/custom/men?type=vest" },
       ],
     },
     {
       id: "for-her",
       title: "For Her",
       links: [
-        { name: "Custom Suits", href: "/custom/women" },
-        { name: "Custom Jackets", href: "/custom/women" },
-        { name: "Custom Coats", href: "/custom/women" },
-        { name: "Custom Shirts", href: "/custom/women" },
+        { name: "All Women's", href: "/custom/women" },
+        { name: "Custom Suits", href: "/custom/women?type=suit" },
+        { name: "Custom Blazers", href: "/custom/women?type=blazer" },
+        { name: "Custom Coats", href: "/custom/women?type=coat" },
+        { name: "Custom Shirts", href: "/custom/women?type=shirt" },
+        { name: "Custom Trousers", href: "/custom/women?type=trouser" },
       ],
     },
     {
@@ -84,7 +87,7 @@ export default function SiteHeader() {
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
-
+          
           {/* LEFT: Hamburger + Search */}
           <div className="flex items-center gap-5 z-10">
             <button
@@ -194,6 +197,7 @@ export default function SiteHeader() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
             >
+              {/* Drawer header */}
               <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
                 <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
                   Menu
@@ -207,6 +211,7 @@ export default function SiteHeader() {
                 </button>
               </div>
 
+              {/* Menu content */}
               <div className="px-8 py-10">
                 {menuSections.map((section) => (
                   <div key={section.id} className="mb-8">
@@ -253,6 +258,7 @@ export default function SiteHeader() {
                 ))}
               </div>
 
+              {/* Drawer footer */}
               <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
                 <Link
                   href="/track-order"
