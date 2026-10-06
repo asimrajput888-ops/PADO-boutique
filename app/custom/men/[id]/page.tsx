@@ -96,10 +96,10 @@ const MEASUREMENT_IMAGES: Record<string, string> = {
   pantsLength: "/images/measurements-men/body_pants_length_men.webp",
   knee: "/images/measurements-men/body_knee_men.webp",
   thighs: "/images/measurements-men/body_thighs_men.webp",
-  legOpening: "/images/measurements-men/body_leg_opening (1) men.webp",
+  legOpening: "/images/measurements-men/leg-opening-men.webp",
   neck: "/images/measurements-men/body_chest_men.webp",
-  frontRise: "/images/measurements-men/garment_frontrise(1)men.avif",
-  backRise: "/images/measurements-men/garment_backrise(1)men.avif",
+  frontRise: "/images/measurements-men/front-rise-men.webp",
+  backRise: "/images/measurements-men/back-rise-men.webp",
 };
 
 export default function MenBespokePage() {
@@ -267,10 +267,7 @@ export default function MenBespokePage() {
     return (
       <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
         <div className="max-w-[1400px] mx-auto">
-          <Link
-            href="/custom/men"
-            className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
-          >
+          <Link href="/custom/men" className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block">
             ← Back to Collection
           </Link>
 
@@ -278,49 +275,26 @@ export default function MenBespokePage() {
             <div className="space-y-3">
               {galleryImages.map((img, i) => (
                 <div key={i} className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
-                  <img
-                    src={img}
-                    alt={`${model.name} ${i + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading={i === 0 ? "eager" : "lazy"}
-                  />
+                  <img src={img} alt={`${model.name} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" loading={i === 0 ? "eager" : "lazy"} />
                 </div>
               ))}
             </div>
 
             <div className="lg:sticky lg:top-28 lg:self-start">
-              <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-                {pt}
-              </p>
-              <h1 className="text-3xl md:text-4xl font-serif mb-6 text-neutral-900 leading-tight">
-                {model.name}
-              </h1>
-              <p className="text-2xl text-neutral-900 mb-8">
-                {formatPrice(model.price)}
-              </p>
+              <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">{pt}</p>
+              <h1 className="text-3xl md:text-4xl font-serif mb-6 text-neutral-900 leading-tight">{model.name}</h1>
+              <p className="text-2xl text-neutral-900 mb-8">{formatPrice(model.price)}</p>
 
               <div className="border-t border-neutral-200 pt-8 mb-8">
-                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
-                  Description
-                </h2>
-                <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-line">
-                  {model.description}
-                </p>
+                <h2 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Description</h2>
+                <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-line">{model.description}</p>
               </div>
 
               <div className="border-t border-neutral-200 pt-8">
-                <button
-                  onClick={() => setStep(0)}
-                  className="w-full bg-neutral-900 text-white py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
-                >
+                <button onClick={() => setStep(0)} className="w-full bg-neutral-900 text-white py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
                   Order Now →
                 </button>
-                <a
-                  href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full border border-neutral-300 text-neutral-900 text-center py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition mt-3"
-                >
+                <a href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`} target="_blank" rel="noopener noreferrer" className="block w-full border border-neutral-300 text-neutral-900 text-center py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition mt-3">
                   Chat with a Tailor
                 </a>
               </div>
@@ -336,65 +310,34 @@ export default function MenBespokePage() {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
-          <button
-            onClick={() => setStep(-1)}
-            className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
-          >
+          <button onClick={() => setStep(-1)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block">
             ← Back to Product
           </button>
 
           <div className="text-center mb-12">
-            <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-              {pt.toUpperCase()} MEASUREMENTS
-            </p>
-            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">
-              Create Your Size Profile
-            </h1>
-            <p className="text-neutral-500 text-sm">
-              All measurements in inches. Fields marked * are required.
-            </p>
+            <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">{pt.toUpperCase()} MEASUREMENTS</p>
+            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">Create Your Size Profile</h1>
+            <p className="text-neutral-500 text-sm">All measurements in inches. Fields marked * are required.</p>
           </div>
 
           <div className="border border-neutral-200 p-6 md:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* LEFT: Form fields */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                    Measurement Profile Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={profileName}
-                    onChange={(e) => setProfileName(e.target.value)}
-                    className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm"
-                  />
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Measurement Profile Name *</label>
+                  <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm" />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                    Height *
-                  </label>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Height *</label>
                   <div className="flex gap-3">
-                    <select
-                      value={heightFt}
-                      onChange={(e) => setHeightFt(e.target.value)}
-                      className="flex-1 border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                    >
+                    <select value={heightFt} onChange={(e) => setHeightFt(e.target.value)} className="flex-1 border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white">
                       <option value="">Feet</option>
-                      {[4, 5, 6, 7].map((ft) => (
-                        <option key={ft} value={ft}>{ft} ft</option>
-                      ))}
+                      {[4, 5, 6, 7].map((ft) => (<option key={ft} value={ft}>{ft} ft</option>))}
                     </select>
-                    <select
-                      value={heightIn}
-                      onChange={(e) => setHeightIn(e.target.value)}
-                      className="flex-1 border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                    >
+                    <select value={heightIn} onChange={(e) => setHeightIn(e.target.value)} className="flex-1 border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white">
                       <option value="">Inches</option>
-                      {Array.from({ length: 12 }, (_, i) => i).map((inch) => (
-                        <option key={inch} value={inch}>{inch} in</option>
-                      ))}
+                      {Array.from({ length: 12 }, (_, i) => i).map((inch) => (<option key={inch} value={inch}>{inch} in</option>))}
                     </select>
                   </div>
                 </div>
@@ -420,56 +363,30 @@ export default function MenBespokePage() {
 
                 {needsJacketFit && (
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                      Jacket Fit
-                    </label>
-                    <select
-                      value={jacketFit}
-                      onChange={(e) => setJacketFit(e.target.value)}
-                      className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                    >
-                      {JACKET_FITS.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Jacket Fit</label>
+                    <select value={jacketFit} onChange={(e) => setJacketFit(e.target.value)} className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white">
+                      {JACKET_FITS.map((f) => (<option key={f} value={f}>{f}</option>))}
                     </select>
                   </div>
                 )}
 
                 {needsTrouserFit && (
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                      Trouser Fit
-                    </label>
-                    <select
-                      value={trouserFit}
-                      onChange={(e) => setTrouserFit(e.target.value)}
-                      className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white"
-                    >
-                      {TROUSER_FITS.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Trouser Fit</label>
+                    <select value={trouserFit} onChange={(e) => setTrouserFit(e.target.value)} className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none text-sm bg-white">
+                      {TROUSER_FITS.map((f) => (<option key={f} value={f}>{f}</option>))}
                     </select>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">
-                    Additional Information
-                  </label>
-                  <textarea
-                    value={additionalInfo}
-                    onChange={(e) => setAdditionalInfo(e.target.value)}
-                    rows={4}
-                    placeholder="Any changes, special requests, or notes about your order..."
-                    className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none resize-none text-sm"
-                  />
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Additional Information</label>
+                  <textarea value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)} rows={4} placeholder="Any changes, special requests, or notes..." className="w-full border border-neutral-200 p-3 focus:border-neutral-900 outline-none resize-none text-sm" />
                 </div>
               </div>
 
-              {/* RIGHT: Image Guide */}
               <div className="lg:sticky lg:top-8 lg:self-start">
                 <div className="border border-neutral-200">
-                  {/* Image preview */}
                   <div className="bg-neutral-50 aspect-square flex items-center justify-center overflow-hidden">
                     {activeField && MEASUREMENT_IMAGES[activeField] ? (
                       <img
@@ -478,37 +395,21 @@ export default function MenBespokePage() {
                         className="w-full h-full object-contain"
                       />
                     ) : (
-                      <p className="text-neutral-400 text-xs uppercase tracking-widest">
-                        Click a field to see guide
-                      </p>
+                      <p className="text-neutral-400 text-xs uppercase tracking-widest">Click a field to see guide</p>
                     )}
                   </div>
-
-                  {/* Label bar */}
                   <div className="p-4 border-t border-neutral-200 bg-white text-center">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-1">
-                      How to Measure
-                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-1">How to Measure</p>
                     <p className="text-sm font-medium text-neutral-900">
                       {fields.find((f) => f.id === activeField)?.label || "Select a Field"}
                     </p>
                   </div>
                 </div>
 
-                {/* Help box */}
                 <div className="mt-4 border border-neutral-200 p-5 bg-neutral-50">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">
-                    Need help?
-                  </p>
-                  <p className="text-sm text-neutral-600 mb-3 leading-relaxed">
-                    Send us a photo of your best-fitting {pt} — we&apos;ll match the measurements for you.
-                  </p>
-                  <a
-                    href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 inline-block hover:opacity-60 transition"
-                  >
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">Need help?</p>
+                  <p className="text-sm text-neutral-600 mb-3 leading-relaxed">Send us a photo of your best-fitting {pt} — we&apos;ll match the measurements for you.</p>
+                  <a href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements" target="_blank" rel="noopener noreferrer" className="text-[10px] tracking-[0.3em] uppercase border-b border-neutral-900 pb-1 inline-block hover:opacity-60 transition">
                     WhatsApp Us →
                   </a>
                 </div>
@@ -518,16 +419,10 @@ export default function MenBespokePage() {
             <div className="mt-10 pt-6 border-t border-neutral-200 flex justify-between items-center">
               <div>
                 {requiredMissing.length > 0 && (
-                  <p className="text-xs text-neutral-500">
-                    Missing: {requiredMissing.join(", ")}
-                  </p>
+                  <p className="text-xs text-neutral-500">Missing: {requiredMissing.join(", ")}</p>
                 )}
               </div>
-              <button
-                onClick={() => setStep(1)}
-                disabled={requiredMissing.length > 0 || !heightFt || !heightIn}
-                className="bg-neutral-900 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50"
-              >
+              <button onClick={() => setStep(1)} disabled={requiredMissing.length > 0 || !heightFt || !heightIn} className="bg-neutral-900 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50">
                 Continue →
               </button>
             </div>
@@ -542,20 +437,13 @@ export default function MenBespokePage() {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
         <div className="max-w-2xl mx-auto">
-          <button
-            onClick={() => setStep(0)}
-            className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
-          >
+          <button onClick={() => setStep(0)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block">
             ← Back to Measurements
           </button>
 
           <div className="text-center mb-12">
-            <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
-              Step 2 of 3
-            </p>
-            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">
-              Contact Information
-            </h1>
+            <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">Step 2 of 3</p>
+            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">Contact Information</h1>
           </div>
 
           <div className="border border-neutral-200 p-6 md:p-10 space-y-5">
@@ -610,14 +498,9 @@ export default function MenBespokePage() {
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">{pt.toUpperCase()} Measurements (inches)</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
               <div><p className="text-neutral-500 text-xs mb-1">Height</p><p className="font-medium">{heightFt}&apos; {heightIn}&quot;</p></div>
-              {fields.map((f) =>
-                m[f.id] ? (
-                  <div key={f.id}>
-                    <p className="text-neutral-500 text-xs mb-1">{f.label}</p>
-                    <p className="font-medium">{m[f.id]}&quot;</p>
-                  </div>
-                ) : null
-              )}
+              {fields.map((f) => m[f.id] ? (
+                <div key={f.id}><p className="text-neutral-500 text-xs mb-1">{f.label}</p><p className="font-medium">{m[f.id]}&quot;</p></div>
+              ) : null)}
               {needsJacketFit && <div><p className="text-neutral-500 text-xs mb-1">Jacket Fit</p><p className="font-medium">{jacketFit}</p></div>}
               {needsTrouserFit && <div><p className="text-neutral-500 text-xs mb-1">Trouser Fit</p><p className="font-medium">{trouserFit}</p></div>}
             </div>
