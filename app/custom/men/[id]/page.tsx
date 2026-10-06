@@ -135,7 +135,14 @@ export default function MenBespokePage() {
   const [activeField, setActiveField] = useState<string>("chest");
 
   const [contact, setContact] = useState({
-    name: "", email: "", phone: "", country: "", notes: "",
+    name: "",
+    email: "",
+    phone: "",
+    address1: "",
+    address2: "",
+    city: "",
+    postalCode: "",
+    country: "",
   });
 
   useEffect(() => {
@@ -225,8 +232,8 @@ export default function MenBespokePage() {
   };
 
   const handleSubmit = async () => {
-    if (!contact.name || !contact.email) {
-      alert("Please fill in your name and email");
+    if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) {
+      alert("Please fill in all required fields");
       return;
     }
     setSubmitting(true);
@@ -237,6 +244,13 @@ export default function MenBespokePage() {
         customer_email: contact.email,
         customer_phone: contact.phone,
         customer_country: contact.country,
+        shipping_address: {
+          address1: contact.address1,
+          address2: contact.address2,
+          city: contact.city,
+          postalCode: contact.postalCode,
+          country: contact.country,
+        },
         fit_type: fitType,
         standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
         model_id: String(model.id),
@@ -253,7 +267,7 @@ export default function MenBespokePage() {
         } : null,
         total_price: model.price,
         currency: "USD",
-        notes: additionalInfo || contact.notes,
+        notes: additionalInfo || "",
       };
 
       const res = await fetch("/api/orders", {
@@ -307,12 +321,13 @@ export default function MenBespokePage() {
           <p className="text-neutral-500 mb-3 text-sm">Order number</p>
           <p className="text-lg font-mono text-neutral-900 mb-10 tracking-wider">{orderNumber}</p>
           <div className="border border-neutral-200 p-6 text-left mb-10">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">What happens next</p>
-            <ol className="space-y-3 text-sm text-neutral-600">
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono">01</span><span>We review your order within 24 hours</span></li>
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono">02</span><span>Payment instructions sent to <strong className="text-neutral-900">{contact.email}</strong></span></li>
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono">03</span><span>Production starts — dispatch within 3 weeks</span></li>
-            </ol>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">Shipping to</p>
+            <p className="text-sm text-neutral-700 leading-relaxed">
+              {contact.address1}<br />
+              {contact.address2 && <>{contact.address2}<br /></>}
+              {contact.city} {contact.postalCode}<br />
+              {contact.country}
+            </p>
           </div>
           <Link href="/custom/men" className="inline-block bg-neutral-900 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
             Back to Collection
@@ -745,7 +760,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // STEP 2: Contact
+  // STEP 2: Contact + Shipping
   if (step === 2) {
     return (
       <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
@@ -768,37 +783,72 @@ export default function MenBespokePage() {
               ))}
             </div>
             <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
-              Step {fitType === "standard" ? "2" : "3"} of {totalSteps} — Contact
+              Step {fitType === "standard" ? "2" : "3"} of {totalSteps} — Contact & Shipping
             </p>
           </div>
 
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">Contact Information</h1>
-            <p className="text-neutral-500 text-sm">We&apos;ll use this to send order updates and payment instructions.</p>
+            <h1 className="text-3xl md:text-4xl font-serif mb-4 text-neutral-900">Contact & Shipping</h1>
+            <p className="text-neutral-500 text-sm">Where should we send your order?</p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-8">
+            {/* Contact Section */}
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Full Name *</label>
-              <input type="text" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Contact Details</p>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Full Name *</label>
+                  <input type="text" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Email Address *</label>
+                  <input type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Phone / WhatsApp</label>
+                  <input type="text" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+              </div>
             </div>
+
+            {/* Shipping Address */}
             <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Email Address *</label>
-              <input type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Phone / WhatsApp</label>
-              <input type="text" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
-            </div>
-            <div>
-              <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Country</label>
-              <input type="text" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Shipping Address</p>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Address Line 1 *</label>
+                  <input type="text" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} placeholder="House / Street" className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Address Line 2</label>
+                  <input type="text" value={contact.address2} onChange={(e) => setContact({ ...contact, address2: e.target.value })} placeholder="Apartment, suite, etc. (optional)" className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">City *</label>
+                    <input type="text" value={contact.city} onChange={(e) => setContact({ ...contact, city: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Postal Code</label>
+                    <input type="text" value={contact.postalCode} onChange={(e) => setContact({ ...contact, postalCode: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase tracking-[0.25em] text-neutral-500 mb-2 font-semibold">Country *</label>
+                  <input type="text" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-neutral-200 p-3.5 focus:border-neutral-900 outline-none text-sm" />
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-between items-center">
             <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Back</button>
-            <button onClick={nextStep} disabled={!contact.name || !contact.email} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
+            <button
+              onClick={nextStep}
+              disabled={!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country}
+              className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
+            >
               Review Order →
             </button>
           </div>
@@ -877,12 +927,17 @@ export default function MenBespokePage() {
           )}
 
           <div className="border border-neutral-200 p-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Contact</h3>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-neutral-500">Name:</span> <span className="text-neutral-900">{contact.name}</span></p>
-              <p><span className="text-neutral-500">Email:</span> <span className="text-neutral-900">{contact.email}</span></p>
-              {contact.phone && <p><span className="text-neutral-500">Phone:</span> <span className="text-neutral-900">{contact.phone}</span></p>}
-              {contact.country && <p><span className="text-neutral-500">Country:</span> <span className="text-neutral-900">{contact.country}</span></p>}
+            <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Shipping Address</h3>
+            <div className="text-sm text-neutral-700 leading-relaxed">
+              <p className="font-medium text-neutral-900 mb-1">{contact.name}</p>
+              <p>{contact.address1}</p>
+              {contact.address2 && <p>{contact.address2}</p>}
+              <p>{contact.city} {contact.postalCode}</p>
+              <p>{contact.country}</p>
+              <div className="mt-4 pt-4 border-t border-neutral-100 space-y-1">
+                <p className="text-neutral-500">{contact.email}</p>
+                {contact.phone && <p className="text-neutral-500">{contact.phone}</p>}
+              </div>
             </div>
           </div>
 
