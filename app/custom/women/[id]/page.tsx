@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
+const STANDARD_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: string; required: boolean }[]> = {
   blazer: [
@@ -105,6 +106,8 @@ export default function WomenBespokePage() {
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
+  const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
+  const [standardSize, setStandardSize] = useState("");
   const [profileName, setProfileName] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
@@ -153,6 +156,8 @@ export default function WomenBespokePage() {
   const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
   const needsTrouserFit = ["suit", "tuxedo", "trouser"].includes(pt);
 
+  const totalSteps = fitType === "standard" ? 3 : 4;
+
   const updateM = (key: string, value: string) =>
     setM({ ...m, [key]: value });
 
@@ -160,6 +165,22 @@ export default function WomenBespokePage() {
   const requiredMissing = fields
     .filter((f) => f.required && !m[f.id])
     .map((f) => f.label);
+
+  const nextStep = () => {
+    if (step === 0 && fitType === "standard") {
+      setStep(2);
+    } else {
+      setStep((p) => Math.min(p + 1, 3));
+    }
+  };
+
+  const prevStep = () => {
+    if (step === 2 && fitType === "standard") {
+      setStep(0);
+    } else {
+      setStep((p) => Math.max(p - 1, -1));
+    }
+  };
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email) {
@@ -174,20 +195,20 @@ export default function WomenBespokePage() {
         customer_email: contact.email,
         customer_phone: contact.phone,
         customer_country: contact.country,
-        fit_type: "custom",
-        standard_size: null,
+        fit_type: fitType,
+        standard_size: fitType === "standard" ? standardSize : null,
         model_id: String(model.id),
         model_name: model.name,
         category: "women",
         product_type: pt,
-        measurements: {
+        measurements: fitType === "custom" ? {
           profileName,
           height: `${heightFt}' ${heightIn}"`,
           ...m,
           ...(needsJacketFit ? { jacketFit } : {}),
           ...(needsTrouserFit ? { trouserFit } : {}),
           additionalInfo,
-        },
+        } : null,
         total_price: model.price,
         currency: "USD",
         notes: additionalInfo || contact.notes,
@@ -238,13 +259,15 @@ export default function WomenBespokePage() {
         <div className="max-w-lg text-center">
           <div className="w-20 h-20 rounded-full bg-neutral-900 text-white flex items-center justify-center mx-auto mb-10 text-3xl">✓</div>
           <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">Order Confirmed</p>
-          <h1 className="text-3xl font-serif text-neutral-900 mb-6">Thank you, {contact.name.split(" ")[0]}.</h1>
+          <h1 className="text-3xl font-serif text-neutral-900 mb-6">
+            Thank you, {contact.name.split(" ")[0]}.
+          </h1>
           <p className="text-neutral-500 mb-3 text-sm">Order number</p>
           <p className="text-lg font-mono text-neutral-900 mb-10 tracking-wider">{orderNumber}</p>
           <div className="border border-neutral-200 p-6 text-left mb-10">
             <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4">What happens next</p>
             <ol className="space-y-3 text-sm text-neutral-600">
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono">01</span><span>We review your measurements within 24 hours</span></li>
+              <li className="flex gap-3"><span className="text-neutral-400 font-mono">01</span><span>We review your order within 24 hours</span></li>
               <li className="flex gap-3"><span className="text-neutral-400 font-mono">02</span><span>Payment instructions sent to <strong className="text-neutral-900">{contact.email}</strong></span></li>
               <li className="flex gap-3"><span className="text-neutral-400 font-mono">03</span><span>Production starts — dispatch within 3 weeks</span></li>
             </ol>
@@ -257,6 +280,7 @@ export default function WomenBespokePage() {
     );
   }
 
+  // STEP -1: Product Showcase
   if (step === -1) {
     return (
       <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
@@ -309,26 +333,159 @@ export default function WomenBespokePage() {
     );
   }
 
+  // STEP 0: Choose Fit Type
   if (step === 0) {
     return (
-      <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-white py-12 md:py-20 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
           <button onClick={() => setStep(-1)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
             ← Back to Product
           </button>
 
+          <div className="text-center mb-14">
+            <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-4">
+              Step 1 of {totalSteps}
+            </p>
+            <h1 className="text-3xl md:text-5xl font-serif mb-4 text-neutral-900">
+              How Would You Like Your {pt}?
+            </h1>
+            <p className="text-neutral-500 text-sm max-w-xl mx-auto leading-relaxed">
+              Choose a standard size for faster delivery, or provide your measurements
+              for a perfect bespoke fit.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button
+              onClick={() => setFitType("standard")}
+              className={`text-left p-8 border-2 transition-all ${
+                fitType === "standard"
+                  ? "border-neutral-900 bg-neutral-50"
+                  : "border-neutral-200 hover:border-neutral-400"
+              }`}
+            >
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
+                Fastest Delivery
+              </p>
+              <h3 className="text-2xl font-serif mb-4 text-neutral-900">
+                Standard Size
+              </h3>
+              <p className="text-sm text-neutral-500 leading-relaxed mb-6">
+                Choose from our standard sizes. Crafted on a ready pattern and
+                dispatched within 7–10 days.
+              </p>
+              <ul className="space-y-2 text-xs text-neutral-500">
+                <li className="flex gap-2"><span>—</span><span>Fixed price</span></li>
+                <li className="flex gap-2"><span>—</span><span>No measurements required</span></li>
+                <li className="flex gap-2"><span>—</span><span>7–10 day dispatch</span></li>
+              </ul>
+            </button>
+
+            <button
+              onClick={() => setFitType("custom")}
+              className={`text-left p-8 border-2 transition-all relative ${
+                fitType === "custom"
+                  ? "border-neutral-900 bg-neutral-50"
+                  : "border-neutral-200 hover:border-neutral-400"
+              }`}
+            >
+              <span className="absolute top-4 right-4 bg-neutral-900 text-white text-[9px] uppercase tracking-widest px-3 py-1">
+                Recommended
+              </span>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
+                Perfect Fit
+              </p>
+              <h3 className="text-2xl font-serif mb-4 text-neutral-900">
+                Custom Measurements
+              </h3>
+              <p className="text-sm text-neutral-500 leading-relaxed mb-6">
+                Made to your exact measurements by our master tailors. Delivered
+                within 3 weeks.
+              </p>
+              <ul className="space-y-2 text-xs text-neutral-500">
+                <li className="flex gap-2"><span>—</span><span>Made to your measurements</span></li>
+                <li className="flex gap-2"><span>—</span><span>15+ measurement fields</span></li>
+                <li className="flex gap-2"><span>—</span><span>3 week delivery</span></li>
+              </ul>
+            </button>
+          </div>
+
+          {fitType === "standard" && (
+            <div className="mt-10 border border-neutral-200 p-6 md:p-8">
+              <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
+                Select Your Size
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {STANDARD_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setStandardSize(size)}
+                    className={`px-6 py-3 text-sm border transition-all ${
+                      standardSize === size
+                        ? "bg-neutral-900 text-white border-neutral-900"
+                        : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              {standardSize && (
+                <p className="text-xs text-neutral-500 mt-5">
+                  You&apos;ve selected size <strong className="text-neutral-900">{standardSize}</strong>. Continue to enter your contact details.
+                </p>
+              )}
+            </div>
+          )}
+
+          {fitType === "custom" && (
+            <div className="mt-10 bg-neutral-50 border border-neutral-200 p-6 md:p-8">
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                You&apos;ll be guided through our measurement form on the next step.
+                If you need assistance, our tailors are available on WhatsApp.
+              </p>
+            </div>
+          )}
+
+          <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-end">
+            <button
+              onClick={nextStep}
+              disabled={!fitType || (fitType === "standard" && !standardSize)}
+              className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
+            >
+              Continue →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP 1: Measurements (Custom only)
+  if (step === 1 && fitType === "custom") {
+    return (
+      <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto">
+          <button onClick={() => setStep(0)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
+            ← Back to Fit Selection
+          </button>
+
           <div className="mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-all ${step >= i ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-300"}`}>
-                    {i + 1}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-all ${
+                    step >= i ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-300"
+                  }`}>
+                    {step > i ? "✓" : i + 1}
                   </div>
-                  {i < 2 && <div className={`w-12 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
+                  {i < 3 && <div className={`w-12 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
                 </div>
               ))}
             </div>
-            <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">Step 1 of 3 — Measurements</p>
+            <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
+              Step 2 of {totalSteps} — Measurements
+            </p>
           </div>
 
           <div className="text-center mb-14">
@@ -435,12 +592,6 @@ export default function WomenBespokePage() {
                     WhatsApp Us →
                   </a>
                 </div>
-
-                <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                  <div className="border border-neutral-200 p-3"><p className="text-[9px] uppercase tracking-widest text-neutral-500 leading-tight">Secure Order</p></div>
-                  <div className="border border-neutral-200 p-3"><p className="text-[9px] uppercase tracking-widest text-neutral-500 leading-tight">Worldwide Shipping</p></div>
-                  <div className="border border-neutral-200 p-3"><p className="text-[9px] uppercase tracking-widest text-neutral-500 leading-tight">Master Tailors</p></div>
-                </div>
               </div>
             </div>
           </div>
@@ -453,7 +604,7 @@ export default function WomenBespokePage() {
                 <p className="text-xs text-neutral-500">All required fields completed ✓</p>
               )}
             </div>
-            <button onClick={() => setStep(1)} disabled={requiredMissing.length > 0 || !heightFt || !heightIn} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
+            <button onClick={nextStep} disabled={requiredMissing.length > 0 || !heightFt || !heightIn} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
               Continue to Contact →
             </button>
           </div>
@@ -462,26 +613,31 @@ export default function WomenBespokePage() {
     );
   }
 
-  if (step === 1) {
+  // STEP 2: Contact
+  if (step === 2) {
     return (
       <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-2xl mx-auto">
-          <button onClick={() => setStep(0)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
-            ← Back to Measurements
+          <button onClick={prevStep} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
+            ← Back
           </button>
 
           <div className="mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border ${step >= i ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-300"}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border ${
+                    step >= i ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-300"
+                  }`}>
                     {step > i ? "✓" : i + 1}
                   </div>
-                  {i < 2 && <div className={`w-12 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
+                  {i < 3 && <div className={`w-12 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
                 </div>
               ))}
             </div>
-            <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">Step 2 of 3 — Contact</p>
+            <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
+              Step {fitType === "standard" ? "2" : "3"} of {totalSteps} — Contact
+            </p>
           </div>
 
           <div className="text-center mb-12">
@@ -509,8 +665,8 @@ export default function WomenBespokePage() {
           </div>
 
           <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-between items-center">
-            <button onClick={() => setStep(0)} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Back</button>
-            <button onClick={() => setStep(2)} disabled={!contact.name || !contact.email} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
+            <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Back</button>
+            <button onClick={nextStep} disabled={!contact.name || !contact.email} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
               Review Order →
             </button>
           </div>
@@ -519,23 +675,28 @@ export default function WomenBespokePage() {
     );
   }
 
+  // STEP 3: Review
   return (
     <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
       <div className="max-w-3xl mx-auto">
-        <button onClick={() => setStep(1)} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
-          ← Back to Contact
+        <button onClick={prevStep} className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-10 inline-block">
+          ← Back
         </button>
 
         <div className="mb-12">
           <div className="flex items-center justify-center gap-3 mb-6">
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border bg-neutral-900 text-white border-neutral-900">✓</div>
-                {i < 2 && <div className="w-12 h-[1px] bg-neutral-900" />}
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border bg-neutral-900 text-white border-neutral-900">
+                  ✓
+                </div>
+                {i < 3 && <div className="w-12 h-[1px] bg-neutral-900" />}
               </div>
             ))}
           </div>
-          <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">Step 3 of 3 — Review</p>
+          <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
+            Step {totalSteps} of {totalSteps} — Review
+          </p>
         </div>
 
         <div className="text-center mb-12">
@@ -548,22 +709,24 @@ export default function WomenBespokePage() {
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Order Summary</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between items-start gap-4"><span className="text-neutral-500">Model</span><span className="font-medium text-neutral-900 text-right">{model.name}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Fit</span><span className="font-medium text-neutral-900">Custom Measurements</span></div>
+              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Fit</span><span className="font-medium text-neutral-900">{fitType === "custom" ? "Custom Measurements" : `Standard Size ${standardSize}`}</span></div>
               <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Total</span><span className="font-serif text-xl text-neutral-900">{formatPrice(model.price)}</span></div>
             </div>
           </div>
 
-          <div className="border border-neutral-200 p-6">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Measurements (inches)</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-              <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Height</p><p className="font-medium text-neutral-900">{heightFt}&apos; {heightIn}&quot;</p></div>
-              {fields.map((f) => m[f.id] ? (
-                <div key={f.id}><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">{f.label}</p><p className="font-medium text-neutral-900">{m[f.id]}&quot;</p></div>
-              ) : null)}
-              {needsJacketFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Jacket Fit</p><p className="font-medium text-neutral-900">{jacketFit}</p></div>}
-              {needsTrouserFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Trouser Fit</p><p className="font-medium text-neutral-900">{trouserFit}</p></div>}
+          {fitType === "custom" && (
+            <div className="border border-neutral-200 p-6">
+              <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">Measurements (inches)</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Height</p><p className="font-medium text-neutral-900">{heightFt}&apos; {heightIn}&quot;</p></div>
+                {fields.map((f) => m[f.id] ? (
+                  <div key={f.id}><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">{f.label}</p><p className="font-medium text-neutral-900">{m[f.id]}&quot;</p></div>
+                ) : null)}
+                {needsJacketFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Jacket Fit</p><p className="font-medium text-neutral-900">{jacketFit}</p></div>}
+                {needsTrouserFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Trouser Fit</p><p className="font-medium text-neutral-900">{trouserFit}</p></div>}
+              </div>
             </div>
-          </div>
+          )}
 
           {additionalInfo && (
             <div className="border border-neutral-200 p-6">
@@ -580,15 +743,6 @@ export default function WomenBespokePage() {
               {contact.phone && <p><span className="text-neutral-500">Phone:</span> <span className="text-neutral-900">{contact.phone}</span></p>}
               {contact.country && <p><span className="text-neutral-500">Country:</span> <span className="text-neutral-900">{contact.country}</span></p>}
             </div>
-          </div>
-
-          <div className="bg-neutral-50 border border-neutral-200 p-6">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">What happens after you submit</p>
-            <ol className="space-y-3 text-sm text-neutral-600">
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono text-xs pt-0.5">01</span><span>Our master tailors review your measurements within 24 hours</span></li>
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono text-xs pt-0.5">02</span><span>Payment instructions sent to your email</span></li>
-              <li className="flex gap-3"><span className="text-neutral-400 font-mono text-xs pt-0.5">03</span><span>Crafting begins — dispatched within 3 weeks</span></li>
-            </ol>
           </div>
 
           <button onClick={handleSubmit} disabled={submitting} className="w-full bg-neutral-900 text-white py-5 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-50">
