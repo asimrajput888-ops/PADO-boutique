@@ -74,6 +74,34 @@ export default function TermsPage() {
           </section>
 
           <section>
+            <h2 className="text-xl font-serif mb-3 text-neutral-900">Shipping Charges</h2>
+            <ul className="space-y-2 text-neutral-700">
+              <li className="flex gap-3">
+                <span className="text-amber-600">—</span>
+                <span>
+                  <strong className="text-neutral-900">Free Worldwide Shipping:</strong> on all
+                  orders above <strong>$250 USD</strong>.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-amber-600">—</span>
+                <span>
+                  <strong className="text-neutral-900">Orders below $250 USD:</strong> shipping
+                  charges are calculated at checkout based on delivery destination.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-amber-600">—</span>
+                <span>
+                  <strong className="text-neutral-900">Customs &amp; Duties:</strong> any import
+                  duties or taxes levied by the destination country are the responsibility of
+                  the customer.
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section>
             <h2 className="text-xl font-serif mb-3 text-neutral-900">Returns &amp; Exchanges</h2>
             <p className="mb-4">
               As every piece is handcrafted to order, our return policy reflects the bespoke
