@@ -13,7 +13,7 @@ const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: boolean }[]> = {
   blazer: [
-    { id: "chest", label: "Bust", required: true },
+    { id: "bust", label: "Bust", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Jacket Length", required: true },
@@ -21,7 +21,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "waist", label: "Waist", required: true },
   ],
   shirt: [
-    { id: "chest", label: "Bust", required: true },
+    { id: "bust", label: "Bust", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Shirt Length", required: true },
@@ -36,8 +36,8 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "legOpening", label: "Leg Opening", required: false },
   ],
   suit: [
-    { id: "chest", label: "Bust", required: true },
-    { id: "stomach", label: "Underbust", required: true },
+    { id: "bust", label: "Bust", required: true },
+    { id: "underbust", label: "Underbust", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Jacket Length", required: true },
@@ -50,8 +50,8 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "legOpening", label: "Leg Opening", required: false },
   ],
   tuxedo: [
-    { id: "chest", label: "Bust", required: true },
-    { id: "stomach", label: "Underbust", required: true },
+    { id: "bust", label: "Bust", required: true },
+    { id: "underbust", label: "Underbust", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Jacket Length", required: true },
@@ -63,34 +63,34 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; required: 
     { id: "legOpening", label: "Leg Opening", required: false },
   ],
   coat: [
-    { id: "chest", label: "Bust", required: true },
+    { id: "bust", label: "Bust", required: true },
     { id: "shoulder", label: "Shoulder Width", required: true },
     { id: "sleeve", label: "Sleeve Length", required: true },
     { id: "jacketLength", label: "Coat Length", required: true },
     { id: "waist", label: "Waist", required: true },
   ],
   vest: [
-    { id: "chest", label: "Bust", required: true },
+    { id: "bust", label: "Bust", required: true },
     { id: "waist", label: "Waist", required: true },
     { id: "jacketLength", label: "Vest Length", required: true },
   ],
 };
 
 const MEASUREMENT_IMAGES: Record<string, string> = {
-  chest: "/images/measurements-women/wom_chest.webp",
+  bust: "/images/measurements-women/wom_chest.webp",
+  underbust: "/images/measurements-women/wom_stomach.webp",
   shoulder: "/images/measurements-women/wom_shoulder.webp",
   sleeve: "/images/measurements-women/wom_sleeves.webp",
   jacketLength: "/images/measurements-women/wom_jacket_length.webp",
   bicep: "/images/measurements-women/wom_bicep.webp",
   waist: "/images/measurements-women/wom_waist.webp",
-  stomach: "/images/measurements-women/wom_stomach.webp",
   seat: "/images/measurements-women/wom_seat.webp",
   pantsLength: "/images/measurements-women/wom_pants_length.webp",
   knee: "/images/measurements-women/wom_knee.webp",
   thighs: "/images/measurements-women/wom_thighs.webp",
   legOpening: "/images/measurements-women/body_leg_opening.webp",
-  frontRise: "/images/measurements-women/garment_frontrise.avif",
-  backRise: "/images/measurements-women/garment_backrise.avif",
+  frontRise: "/images/measurements-women/front-rise-women.webp",
+  backRise: "/images/measurements-women/back-rise-women.webp",
 };
 
 export default function WomenBespokePage() {
@@ -112,7 +112,7 @@ export default function WomenBespokePage() {
   const [jacketFit, setJacketFit] = useState(JACKET_FITS[0]);
   const [trouserFit, setTrouserFit] = useState(TROUSER_FITS[0]);
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const [activeField, setActiveField] = useState<string>("chest");
+  const [activeField, setActiveField] = useState<string>("bust");
 
   const [contact, setContact] = useState({
     name: "", email: "", phone: "", country: "", notes: "",
@@ -242,10 +242,7 @@ export default function WomenBespokePage() {
           <p className="text-neutral-500 text-sm mb-10 leading-relaxed">
             We&apos;ve sent a confirmation to <strong>{contact.email}</strong>. Our team will review your order within 24 hours and send you payment instructions.
           </p>
-          <Link
-            href="/custom/women"
-            className="inline-block bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
-          >
+          <Link href="/custom/women" className="inline-block bg-neutral-900 text-white px-8 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition">
             Back to Collection
           </Link>
         </div>
@@ -253,7 +250,6 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP -1
   if (step === -1) {
     return (
       <div className="min-h-screen bg-white pt-24 pb-24 px-5 md:px-10">
@@ -296,7 +292,6 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 0 — Measurements
   if (step === 0) {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
@@ -380,7 +375,11 @@ export default function WomenBespokePage() {
                 <div className="border border-neutral-200">
                   <div className="bg-neutral-50 aspect-square flex items-center justify-center overflow-hidden">
                     {activeField && MEASUREMENT_IMAGES[activeField] ? (
-                      <img src={MEASUREMENT_IMAGES[activeField]} alt={fields.find((f) => f.id === activeField)?.label || "Measurement"} className="w-full h-full object-contain" />
+                      <img
+                        src={MEASUREMENT_IMAGES[activeField]}
+                        alt={fields.find((f) => f.id === activeField)?.label || "Measurement"}
+                        className="w-full h-full object-contain"
+                      />
                     ) : (
                       <p className="text-neutral-400 text-xs uppercase tracking-widest">Click a field to see guide</p>
                     )}
@@ -419,7 +418,6 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 1 — Contact
   if (step === 1) {
     return (
       <div className="min-h-screen bg-white py-16 px-4 md:px-6">
@@ -461,7 +459,6 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 2 — Review
   return (
     <div className="min-h-screen bg-white py-16 px-4 md:px-6">
       <div className="max-w-3xl mx-auto">
