@@ -3,33 +3,60 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useCurrency } from "@/context/currency-context";
 
-export default function CustomMenGallery() {
+const TYPE_LABELS: Record<string, string> = {
+  suit: "Custom Suits",
+  blazer: "Custom Blazers",
+  tuxedo: "Custom Tuxedos",
+  coat: "Custom Coats",
+  shirt: "Custom Shirts",
+  trouser: "Custom Trousers",
+  vest: "Custom Vests",
+};
+
+function MenGalleryContent() {
+  const searchParams = useSearchParams();
+  const typeFilter = searchParams.get("type") || "";
+
   const [models, setModels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const fetchModels = async () => {
-      const { data } = await supabase
+      setLoading(true);
+      let query = supabase
         .from("models")
         .select("*")
         .eq("category", "men")
         .order("created_at", { ascending: false });
 
+      if (typeFilter) {
+        query = query.eq("product_type", typeFilter);
+      }
+
+      const { data } = await query;
       setModels(data || []);
       setLoading(false);
     };
     fetchModels();
-  }, []);
+  }, [typeFilter]);
+
+  const heading = typeFilter
+    ? TYPE_LABELS[typeFilter] || "Men's Collection"
+    : "Men's Bespoke Collection";
+
+  const subheading = typeFilter
+    ? `Custom-made ${typeFilter}s tailored to your exact measurements.`
+    : "Choose a model, then customize fabric, lapel, buttons, and measurements.";
 
   return (
     <div className="min-h-screen bg-white pt-32 pb-24 px-5 md:px-10">
       <div className="max-w-[1400px] mx-auto">
-
         <Link
           href="/custom"
           className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-900 mb-8 inline-block"
@@ -42,20 +69,24 @@ export default function CustomMenGallery() {
             PADO Signature Designs
           </p>
           <h1 className="text-3xl md:text-5xl font-serif mb-4 text-neutral-900">
-            Men&apos;s Bespoke Models
+            {heading}
           </h1>
           <p className="text-neutral-500 max-w-md mx-auto text-sm">
-            Choose a model, then customize fabric, lapel, buttons, and measurements.
+            {subheading}
           </p>
         </div>
 
         {loading ? (
-          <p className="text-center text-neutral-400 py-20">Loading models...</p>
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin" />
+          </div>
         ) : models.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-neutral-400 text-base">No models available yet.</p>
-            <p className="text-neutral-400 text-sm mt-2">
-              Add models from the Admin Panel.
+          <div className="text-center py-24 border border-neutral-200">
+            <p className="text-neutral-400 text-base mb-2">
+              No {typeFilter ? `${typeFilter}s` : "models"} available yet.
+            </p>
+            <p className="text-neutral-400 text-sm">
+              New pieces are added regularly. Check back soon.
             </p>
           </div>
         ) : (
@@ -68,7 +99,6 @@ export default function CustomMenGallery() {
               >
                 <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-3 md:mb-4">
                   {m.image_url ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={m.image_url}
                       alt={m.name}
@@ -99,5 +129,17 @@ export default function CustomMenGallery() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function CustomMenGallery() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white pt-40 flex justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin" />
+      </div>
+    }>
+      <MenGalleryContent />
+    </Suspense>
   );
 }
