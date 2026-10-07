@@ -23,7 +23,6 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       options={{
         duration: 1.2,
         smoothWheel: true,
-        smoothTouch: false,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       }}
     >
