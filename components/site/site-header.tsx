@@ -4,26 +4,55 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/context/cart-context";
 import { useCurrency } from "@/context/currency-context";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const { cart } = useCart();
   const { currency, setCurrency } = useCurrency();
+  const pathname = usePathname();
 
+  // Hide on scroll down, show on scroll up
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      setScrolled(currentScrollY > 40);
+
+      if (currentScrollY > lastScrollY && currentScrollY > 200) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
+  // Lock body scroll when drawer/search open
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "unset";
-  }, [menuOpen]);
+    document.body.style.overflow = menuOpen || searchOpen ? "hidden" : "unset";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [menuOpen, searchOpen]);
+
+  // Close on route change
+  useEffect(() => {
+    setMenuOpen(false);
+    setSearchOpen(false);
+  }, [pathname]);
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -33,13 +62,13 @@ export default function SiteHeader() {
       title: "For Him",
       links: [
         { name: "All Men's", href: "/custom/men" },
-        { name: "Custom Suits", href: "/custom/men?type=suit" },
-        { name: "Custom Blazers", href: "/custom/men?type=blazer" },
-        { name: "Custom Tuxedos", href: "/custom/men?type=tuxedo" },
-        { name: "Custom Coats", href: "/custom/men?type=coat" },
-        { name: "Custom Shirts", href: "/custom/men?type=shirt" },
-        { name: "Custom Trousers", href: "/custom/men?type=trouser" },
-        { name: "Custom Vests", href: "/custom/men?type=vest" },
+        { name: "Suits", href: "/custom/men?type=suit" },
+        { name: "Blazers", href: "/custom/men?type=blazer" },
+        { name: "Tuxedos", href: "/custom/men?type=tuxedo" },
+        { name: "Coats", href: "/custom/men?type=coat" },
+        { name: "Shirts", href: "/custom/men?type=shirt" },
+        { name: "Trousers", href: "/custom/men?type=trouser" },
+        { name: "Vests", href: "/custom/men?type=vest" },
       ],
     },
     {
@@ -47,11 +76,11 @@ export default function SiteHeader() {
       title: "For Her",
       links: [
         { name: "All Women's", href: "/custom/women" },
-        { name: "Custom Suits", href: "/custom/women?type=suit" },
-        { name: "Custom Blazers", href: "/custom/women?type=blazer" },
-        { name: "Custom Coats", href: "/custom/women?type=coat" },
-        { name: "Custom Shirts", href: "/custom/women?type=shirt" },
-        { name: "Custom Trousers", href: "/custom/women?type=trouser" },
+        { name: "Suits", href: "/custom/women?type=suit" },
+        { name: "Blazers", href: "/custom/women?type=blazer" },
+        { name: "Coats", href: "/custom/women?type=coat" },
+        { name: "Shirts", href: "/custom/women?type=shirt" },
+        { name: "Trousers", href: "/custom/women?type=trouser" },
       ],
     },
     {
@@ -79,38 +108,64 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      <motion.header
+        animate={{ y: hidden ? -100 : 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${
           scrolled
             ? "bg-white/95 backdrop-blur-md border-b border-neutral-200/60"
             : "bg-transparent"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-10 py-4 md:py-5">
-          
           {/* LEFT: Hamburger + Search */}
           <div className="flex items-center gap-5 z-10">
             <button
               onClick={() => setMenuOpen(true)}
               className="group"
-              aria-label="Menu"
+              aria-label="Open menu"
             >
               <div className="flex flex-col gap-[5px]">
-                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
-                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"}`} />
-                <span className={`w-4 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-neutral-900" : "bg-white"} group-hover:w-6`} />
+                <span
+                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                    scrolled ? "bg-neutral-900" : "bg-white"
+                  }`}
+                />
+                <span
+                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                    scrolled ? "bg-neutral-900" : "bg-white"
+                  }`}
+                />
+                <span
+                  className={`w-4 h-[1.2px] transition-all duration-300 ${
+                    scrolled ? "bg-neutral-900" : "bg-white"
+                  } group-hover:w-6`}
+                />
               </div>
             </button>
 
-            <Link
-              href="/custom"
+            <button
+              onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className={`transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}
+              className={`transition-colors duration-500 ${
+                scrolled ? "text-neutral-900" : "text-white"
+              }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.2}
+                stroke="currentColor"
+                className="w-[18px] h-[18px]"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
               </svg>
-            </Link>
+            </button>
           </div>
 
           {/* CENTER: Logo */}
@@ -131,6 +186,7 @@ export default function SiteHeader() {
               className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 hidden md:block ${
                 scrolled ? "text-neutral-900" : "text-white"
               }`}
+              aria-label="Currency"
             >
               <option value="USD" className="text-neutral-900">USD ($)</option>
               <option value="CAD" className="text-neutral-900">CAD (C$)</option>
@@ -143,14 +199,27 @@ export default function SiteHeader() {
             <Link
               href="/admin/login"
               aria-label="Account"
-              className={`transition-colors duration-500 ${scrolled ? "text-neutral-900" : "text-white"}`}
+              className={`transition-colors duration-500 ${
+                scrolled ? "text-neutral-900" : "text-white"
+              }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.2}
+                stroke="currentColor"
+                className="w-[18px] h-[18px]"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
               </svg>
             </Link>
 
-            <Link href="/checkout" className="relative">
+            <Link href="/checkout" className="relative" aria-label="Cart">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -168,14 +237,66 @@ export default function SiteHeader() {
                 />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -top-1.5 -right-1.5 bg-brand-gold text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
                   {cartCount}
                 </span>
               )}
             </Link>
           </div>
         </div>
-      </header>
+      </motion.header>
+
+      {/* SEARCH OVERLAY */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[80] bg-white/98 backdrop-blur-md"
+          >
+            <div className="max-w-3xl mx-auto px-6 pt-32">
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="absolute top-8 right-8 text-neutral-500 hover:text-neutral-900 text-2xl"
+                aria-label="Close search"
+              >
+                ✕
+              </button>
+
+              <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-6">
+                Search
+              </p>
+
+              <input
+                type="text"
+                placeholder="Search for suits, blazers, fabrics..."
+                autoFocus
+                className="w-full border-0 border-b border-neutral-300 pb-4 text-2xl md:text-3xl font-serif text-neutral-900 placeholder:text-neutral-300 focus:border-brand-gold outline-none bg-transparent"
+              />
+
+              <div className="mt-12">
+                <p className="text-[10px] tracking-[0.3em] text-neutral-400 uppercase mb-4">
+                  Popular Searches
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {["Bespoke Suits", "Tuxedos", "Linen Shirts", "Wool Coats", "Trousers"].map(
+                    (tag) => (
+                      <button
+                        key={tag}
+                        className="px-5 py-2 border border-neutral-200 text-xs uppercase tracking-widest text-neutral-600 hover:border-brand-gold hover:text-brand-gold transition"
+                      >
+                        {tag}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* SIDE MENU DRAWER */}
       <AnimatePresence>
@@ -195,33 +316,33 @@ export default function SiteHeader() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
+              className="fixed top-0 left-0 h-full w-full md:w-[520px] bg-white z-[70] overflow-y-auto"
             >
-              {/* Drawer header */}
               <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
                 <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
                   Menu
                 </span>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="text-xl text-neutral-900 hover:text-neutral-500 transition"
-                  aria-label="Close"
+                  className="text-xl text-neutral-900 hover:text-brand-gold transition"
+                  aria-label="Close menu"
                 >
                   ✕
                 </button>
               </div>
 
-              {/* Menu content */}
               <div className="px-8 py-10">
                 {menuSections.map((section) => (
                   <div key={section.id} className="mb-8">
                     <button
                       onClick={() =>
-                        setOpenSubmenu(openSubmenu === section.id ? null : section.id)
+                        setOpenSubmenu(
+                          openSubmenu === section.id ? null : section.id
+                        )
                       }
                       className="w-full text-left flex items-center justify-between mb-4 group"
                     >
-                      <span className="text-xl md:text-2xl font-serif text-neutral-900 group-hover:text-neutral-500 transition">
+                      <span className="text-xl md:text-2xl font-serif text-neutral-900 group-hover:text-brand-gold transition-colors duration-300">
                         {section.title}
                       </span>
                       <span className="text-neutral-400 text-lg font-light">
@@ -244,7 +365,7 @@ export default function SiteHeader() {
                                 <Link
                                   href={link.href}
                                   onClick={() => setMenuOpen(false)}
-                                  className="block text-sm text-neutral-600 hover:text-neutral-900 transition tracking-wide"
+                                  className="block text-sm text-neutral-600 hover:text-brand-gold transition-colors tracking-wide"
                                 >
                                   {link.name}
                                 </Link>
@@ -258,19 +379,18 @@ export default function SiteHeader() {
                 ))}
               </div>
 
-              {/* Drawer footer */}
               <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
                 <Link
                   href="/track-order"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-sm text-neutral-700 hover:text-neutral-900"
+                  className="block text-sm text-neutral-700 hover:text-brand-gold transition-colors"
                 >
                   Track Order
                 </Link>
                 <Link
                   href="/contact"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-sm text-neutral-700 hover:text-neutral-900"
+                  className="block text-sm text-neutral-700 hover:text-brand-gold transition-colors"
                 >
                   Contact
                 </Link>
