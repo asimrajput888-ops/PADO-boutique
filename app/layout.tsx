@@ -21,7 +21,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "PADO Boutique | Bespoke Tailoring",
-  description: "Handcrafted bespoke menswear, made to your exact measurements. Worldwide shipping.",
+  description: "Handcrafted bespoke menswear, made to measure. Worldwide shipping.",
 };
 
 export default function RootLayout({
