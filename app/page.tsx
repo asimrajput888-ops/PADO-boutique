@@ -12,25 +12,29 @@ const CATEGORIES = [
   {
     name: "Men's Bespoke",
     href: "/custom/men",
-    image: "/images/categories/men.webp",
+    image:
+      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=90&auto=format&fit=crop",
     label: "Made to Measure",
   },
   {
     name: "Women's Bespoke",
     href: "/custom/women",
-    image: "/images/categories/women.webp",
+    image:
+      "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=1200&q=90&auto=format&fit=crop",
     label: "Made to Measure",
   },
   {
     name: "Signature Suits",
     href: "/signature-suit",
-    image: "/images/categories/signature.webp",
+    image:
+      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=90&auto=format&fit=crop",
     label: "The Collection",
   },
   {
     name: "Seasonal Edit",
     href: "/seasonal",
-    image: "/images/categories/seasonal.webp",
+    image:
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1200&q=90&auto=format&fit=crop",
     label: "New Arrivals",
   },
 ];
@@ -80,14 +84,16 @@ export default function HomePage() {
       >
         <motion.div style={{ y: heroY }} className="absolute inset-0">
           <Image
-            src="/images/hero.webp"
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=2400&q=90&auto=format&fit=crop"
             alt="PADO Boutique Bespoke Tailoring"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-center"
             sizes="100vw"
+            unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
         </motion.div>
 
         <motion.div
@@ -99,7 +105,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-[10px] tracking-[0.5em] text-white/70 uppercase mb-6"
+              className="text-[10px] tracking-[0.5em] text-brand-gold-light uppercase mb-6"
             >
               Bespoke Tailoring · Est. 2020
             </motion.p>
@@ -109,6 +115,7 @@ export default function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
               className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-[1.05] mb-8"
+              style={{ textShadow: "0 2px 30px rgba(0,0,0,0.5)" }}
             >
               Cut to your
               <br />
@@ -208,10 +215,11 @@ export default function HomePage() {
                     fill
                     className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                    <p className="text-[10px] tracking-[0.4em] text-white/60 uppercase mb-3">
+                    <p className="text-[10px] tracking-[0.4em] text-brand-gold-light uppercase mb-3">
                       {cat.label}
                     </p>
                     <h3 className="text-2xl md:text-3xl font-serif text-white mb-4">
@@ -269,11 +277,12 @@ export default function HomePage() {
           <Reveal>
             <div className="relative aspect-[3/4] overflow-hidden bg-brand-stone img-zoom-container">
               <Image
-                src="/images/atelier.webp"
+                src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=90&auto=format&fit=crop"
                 alt="PADO Boutique Atelier"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                unoptimized
               />
             </div>
           </Reveal>
@@ -320,13 +329,14 @@ export default function HomePage() {
 
       {/* ===== CTA SECTION ===== */}
       <section className="relative py-32 md:py-40 px-6 md:px-12 bg-brand-charcoal overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-20">
           <Image
-            src="/images/fabric-texture.webp"
+            src="https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?w=2000&q=90&auto=format&fit=crop"
             alt=""
             fill
             className="object-cover"
             sizes="100vw"
+            unoptimized
           />
         </div>
         <Reveal className="relative z-10 max-w-3xl mx-auto text-center">
