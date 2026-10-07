@@ -1,12 +1,27 @@
 // app/layout.tsx
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Cormorant_Garamond } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import { CurrencyProvider } from "@/context/currency-context";
+import { SiteHeader } from "@/components/site/site-header";
+import { SiteFooter } from "@/components/site/site-footer";
+import { CartDrawer } from "@/components/cart-drawer";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "PADO Boutique | Bespoke Tailoring",
@@ -19,10 +34,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
+      <body className="antialiased">
         <CurrencyProvider>
-          <SmoothScroll>{children}</SmoothScroll>
+          <SmoothScroll>
+            <SiteHeader />
+            <main className="min-h-screen">{children}</main>
+            <SiteFooter />
+            <CartDrawer />
+          </SmoothScroll>
         </CurrencyProvider>
       </body>
     </html>
