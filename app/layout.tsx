@@ -1,27 +1,12 @@
-// app/layout.tsx
-
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
-import SmoothScroll from "@/components/SmoothScroll";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-inter",
-  display: "swap",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PADO Boutique | Bespoke Tailoring",
-  description: "Handcrafted bespoke menswear, made to measure. Worldwide shipping.",
+  title: "PADO Boutique",
+  description: "Bespoke Tailoring",
 };
 
 export default function RootLayout({
@@ -30,10 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="antialiased">
-        <SmoothScroll>{children}</SmoothScroll>
-      </body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
