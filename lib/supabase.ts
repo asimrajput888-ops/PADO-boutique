@@ -2,8 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-// Lazy client — only created when first accessed
-let _supabase: ReturnType<typeof createClient> | null = null;
+let _supabase: any = null;
 
 function getSupabaseClient() {
   if (_supabase) return _supabase;
@@ -21,11 +20,13 @@ function getSupabaseClient() {
   return _supabase;
 }
 
-// Proxy so existing code keeps working: `supabase.from(...)` etc.
-export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
-  get(_target, prop) {
-    const client = getSupabaseClient();
-    const value = (client as any)[prop];
-    return typeof value === "function" ? value.bind(client) : value;
-  },
-});
+export const supabase: any = new Proxy(
+  {},
+  {
+    get(_target, prop) {
+      const client = getSupabaseClient();
+      const value = (client as any)[prop];
+      return typeof value === "function" ? value.bind(client) : value;
+    },
+  }
+);
