@@ -10,7 +10,13 @@ import { supabase } from "@/lib/supabase";
 
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
-const STANDARD_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
+// Women's US numeric sizing
+const STANDARD_JACKET_SIZES = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
+const STANDARD_JACKET_LENGTHS = ["Petite", "Regular", "Tall"];
+const STANDARD_TROUSER_SIZES = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
+const STANDARD_INSEAMS = ["Unhemmed", "28", "30", "32", "34", "36"];
+const STANDARD_SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: string; required: boolean }[]> = {
   blazer: [
@@ -107,7 +113,11 @@ export default function WomenBespokePage() {
   const [orderNumber, setOrderNumber] = useState("");
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
-  const [standardSize, setStandardSize] = useState("");
+  const [jacketSize, setJacketSize] = useState("");
+  const [jacketLength, setJacketLength] = useState("Regular");
+  const [trouserSize, setTrouserSize] = useState("");
+  const [inseam, setInseam] = useState("Unhemmed");
+
   const [profileName, setProfileName] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
@@ -117,7 +127,6 @@ export default function WomenBespokePage() {
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [activeField, setActiveField] = useState<string>("bust");
 
-  // Contact + Address
   const [contact, setContact] = useState({
     name: "",
     email: "",
@@ -164,6 +173,10 @@ export default function WomenBespokePage() {
   const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
   const needsTrouserFit = ["suit", "tuxedo", "trouser"].includes(pt);
 
+  const showJacketSelector = ["suit", "tuxedo", "blazer", "coat", "vest"].includes(pt);
+  const showTrouserSelector = ["suit", "tuxedo", "trouser"].includes(pt);
+  const showShirtSelector = pt === "shirt";
+
   const totalSteps = fitType === "standard" ? 3 : 4;
 
   const updateM = (key: string, value: string) =>
@@ -173,6 +186,11 @@ export default function WomenBespokePage() {
   const requiredMissing = fields
     .filter((f) => f.required && !m[f.id])
     .map((f) => f.label);
+
+  const standardSelectionComplete =
+    (showJacketSelector && !jacketSize) ||
+    (showTrouserSelector && !trouserSize) ||
+    (showShirtSelector && !jacketSize);
 
   const nextStep = () => {
     if (step === 0 && fitType === "standard") {
@@ -188,6 +206,22 @@ export default function WomenBespokePage() {
     } else {
       setStep((p) => Math.max(p - 1, -1));
     }
+  };
+
+  const getStandardSizeLabel = () => {
+    if (showJacketSelector && showTrouserSelector) {
+      return `Jacket ${jacketSize} ${jacketLength} / Trouser ${trouserSize} ${inseam}`;
+    }
+    if (showJacketSelector) {
+      return `Jacket ${jacketSize} ${jacketLength}`;
+    }
+    if (showTrouserSelector) {
+      return `Trouser ${trouserSize} ${inseam}`;
+    }
+    if (showShirtSelector) {
+      return `Shirt ${jacketSize}`;
+    }
+    return jacketSize || "Standard";
   };
 
   const handleSubmit = async () => {
@@ -211,7 +245,7 @@ export default function WomenBespokePage() {
           country: contact.country,
         },
         fit_type: fitType,
-        standard_size: fitType === "standard" ? standardSize : null,
+        standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
         model_id: String(model.id),
         model_name: model.name,
         category: "women",
@@ -412,28 +446,134 @@ export default function WomenBespokePage() {
             </button>
           </div>
 
+          {/* STANDARD SIZE SELECTORS */}
           {fitType === "standard" && (
-            <div className="mt-10 border border-neutral-200 p-6 md:p-8">
-              <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
-                Select Your Size
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {STANDARD_SIZES.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setStandardSize(size)}
-                    className={`px-6 py-3 text-sm border transition-all ${
-                      standardSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-              {standardSize && (
-                <p className="text-xs text-neutral-500 mt-5">
-                  You&apos;ve selected size <strong className="text-neutral-900">{standardSize}</strong>. Continue to enter your contact details.
-                </p>
+            <div className="mt-10 space-y-8">
+
+              {/* JACKET SIZE */}
+              {showJacketSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-5">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                      Jacket Size
+                    </label>
+                    <span className="text-[10px] uppercase tracking-widest text-neutral-400">US Sizing</span>
+                  </div>
+                  <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-6">
+                    {STANDARD_JACKET_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setJacketSize(size)}
+                        className={`py-2.5 text-sm border transition-all ${
+                          jacketSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                      Length
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {STANDARD_JACKET_LENGTHS.map((len) => (
+                        <button
+                          key={len}
+                          onClick={() => setJacketLength(len)}
+                          className={`py-3 text-sm border transition-all ${
+                            jacketLength === len ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                          }`}
+                        >
+                          {len}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TROUSER SIZE */}
+              {showTrouserSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <div className="flex items-center justify-between mb-5">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                      Trouser Size
+                    </label>
+                    <span className="text-[10px] uppercase tracking-widest text-neutral-400">US Sizing</span>
+                  </div>
+                  <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-6">
+                    {STANDARD_TROUSER_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setTrouserSize(size)}
+                        className={`py-2.5 text-sm border transition-all ${
+                          trouserSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">
+                      Inseam
+                    </label>
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                      {STANDARD_INSEAMS.map((ins) => (
+                        <button
+                          key={ins}
+                          onClick={() => setInseam(ins)}
+                          className={`py-3 text-xs border transition-all ${
+                            inseam === ins ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                          }`}
+                        >
+                          {ins}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SHIRT SIZE */}
+              {showShirtSelector && (
+                <div className="border border-neutral-200 p-6 md:p-8">
+                  <label className="block text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5 font-semibold">
+                    Shirt Size
+                  </label>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                    {STANDARD_SHIRT_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setJacketSize(size)}
+                        className={`py-3 text-sm border transition-all ${
+                          jacketSize === size ? "bg-neutral-900 text-white border-neutral-900" : "border-neutral-300 text-neutral-900 hover:border-neutral-900"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Summary */}
+              {(jacketSize || trouserSize) && (
+                <div className="bg-neutral-50 border border-neutral-200 p-5 text-sm text-neutral-600">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3 font-semibold">
+                    Your Selection
+                  </p>
+                  {jacketSize && showJacketSelector && (
+                    <p className="mb-1">Jacket: <strong className="text-neutral-900">US {jacketSize} · {jacketLength}</strong></p>
+                  )}
+                  {jacketSize && showShirtSelector && (
+                    <p className="mb-1">Shirt: <strong className="text-neutral-900">{jacketSize}</strong></p>
+                  )}
+                  {trouserSize && (
+                    <p>Trouser: <strong className="text-neutral-900">US {trouserSize} · {inseam}</strong></p>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -450,7 +590,7 @@ export default function WomenBespokePage() {
           <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-end">
             <button
               onClick={nextStep}
-              disabled={!fitType || (fitType === "standard" && !standardSize)}
+              disabled={!fitType || (fitType === "standard" && standardSelectionComplete)}
               className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
             >
               Continue →
@@ -613,8 +753,8 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 2 / STEP 3: Contact + Address
-  if (step === 2 || (step === 3 && fitType === "standard")) {
+  // STEP 2: Contact + Shipping
+  if (step === 2) {
     return (
       <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-2xl mx-auto">
@@ -623,6 +763,18 @@ export default function WomenBespokePage() {
           </button>
 
           <div className="mb-12">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border ${
+                    step >= i ? "bg-neutral-900 text-white border-neutral-900" : "bg-white text-neutral-400 border-neutral-300"
+                  }`}>
+                    {step > i ? "✓" : i + 1}
+                  </div>
+                  {i < 3 && <div className={`w-12 h-[1px] ${step > i ? "bg-neutral-900" : "bg-neutral-200"}`} />}
+                </div>
+              ))}
+            </div>
             <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
               Step {fitType === "standard" ? "2" : "3"} of {totalSteps} — Contact & Shipping
             </p>
@@ -686,7 +838,7 @@ export default function WomenBespokePage() {
           <div className="mt-12 pt-8 border-t border-neutral-200 flex justify-between items-center">
             <button onClick={prevStep} className="text-neutral-500 hover:text-neutral-900 font-medium text-sm tracking-wide">← Back</button>
             <button
-              onClick={() => setStep(3)}
+              onClick={nextStep}
               disabled={!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country}
               className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
             >
@@ -707,6 +859,14 @@ export default function WomenBespokePage() {
         </button>
 
         <div className="mb-12">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border bg-neutral-900 text-white border-neutral-900">✓</div>
+                {i < 3 && <div className="w-12 h-[1px] bg-neutral-900" />}
+              </div>
+            ))}
+          </div>
           <p className="text-center text-[10px] uppercase tracking-[0.4em] text-neutral-500">
             Step {totalSteps} of {totalSteps} — Review
           </p>
@@ -721,9 +881,20 @@ export default function WomenBespokePage() {
           <div className="border border-neutral-200 p-6">
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Order Summary</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between items-start gap-4"><span className="text-neutral-500">Model</span><span className="font-medium text-neutral-900 text-right">{model.name}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Fit</span><span className="font-medium text-neutral-900">{fitType === "custom" ? "Custom Measurements" : `Standard Size ${standardSize}`}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100"><span className="text-neutral-500">Total</span><span className="font-serif text-xl text-neutral-900">{formatPrice(model.price)}</span></div>
+              <div className="flex justify-between items-start gap-4">
+                <span className="text-neutral-500">Model</span>
+                <span className="font-medium text-neutral-900 text-right">{model.name}</span>
+              </div>
+              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100">
+                <span className="text-neutral-500">Fit</span>
+                <span className="font-medium text-neutral-900 text-right">
+                  {fitType === "custom" ? "Custom Measurements" : getStandardSizeLabel()}
+                </span>
+              </div>
+              <div className="flex justify-between items-start gap-4 pt-3 border-t border-neutral-100">
+                <span className="text-neutral-500">Total</span>
+                <span className="font-serif text-xl text-neutral-900">{formatPrice(model.price)}</span>
+              </div>
             </div>
           </div>
 
@@ -735,7 +906,16 @@ export default function WomenBespokePage() {
                 {fields.map((f) => m[f.id] ? (
                   <div key={f.id}><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">{f.label}</p><p className="font-medium text-neutral-900">{m[f.id]}&quot;</p></div>
                 ) : null)}
+                {needsJacketFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Jacket Fit</p><p className="font-medium text-neutral-900">{jacketFit}</p></div>}
+                {needsTrouserFit && <div><p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Trouser Fit</p><p className="font-medium text-neutral-900">{trouserFit}</p></div>}
               </div>
+            </div>
+          )}
+
+          {additionalInfo && (
+            <div className="border border-neutral-200 p-6">
+              <h3 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Additional Requests</h3>
+              <p className="text-sm text-neutral-700 whitespace-pre-line leading-relaxed">{additionalInfo}</p>
             </div>
           )}
 
