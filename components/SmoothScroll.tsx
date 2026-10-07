@@ -5,7 +5,7 @@ import { ReactLenis } from 'lenis/react'
 import { useEffect, useRef, type ReactNode } from 'react'
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
-  const lenisRef = useRef<any>(null)
+  const lenisRef = useRef<{ lenis?: { raf: (time: number) => void } } | null>(null)
 
   useEffect(() => {
     function update(time: number) {
@@ -19,7 +19,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   return (
     <ReactLenis
       root
-      ref={lenisRef}
+      ref={lenisRef as any}
       options={{
         duration: 1.2,
         smoothWheel: true,
