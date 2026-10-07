@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import { CurrencyProvider } from "@/context/currency-context";
-import { SiteHeader } from "@/components/site/site-header";
-import { SiteFooter } from "@/components/site/site-footer";
-import { CartDrawer } from "@/components/cart-drawer";
+import { CartProvider } from "@/context/cart-context";
+import SiteHeader from "@/components/site/site-header";
+import SiteFooter from "@/components/site/site-footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,12 +38,13 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
       <body className="antialiased">
         <CurrencyProvider>
-          <SmoothScroll>
-            <SiteHeader />
-            <main className="min-h-screen">{children}</main>
-            <SiteFooter />
-            <CartDrawer />
-          </SmoothScroll>
+          <CartProvider>
+            <SmoothScroll>
+              <SiteHeader />
+              <main className="min-h-screen">{children}</main>
+              <SiteFooter />
+            </SmoothScroll>
+          </CartProvider>
         </CurrencyProvider>
       </body>
     </html>
