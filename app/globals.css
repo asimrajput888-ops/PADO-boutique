@@ -15,19 +15,32 @@
   --color-brand-maroon: #5D1A24;
   --color-brand-maroon-light: #7A2530;
 
+  /* ===== SEMANTIC TOKENS (Mapped) ===== */
+  --color-foreground: #1E1E2C;
+  --color-muted-foreground: #6B6B7B;
+  --color-background: #FDFBF7;
+  --color-border: #E8E2D9;
+  --color-accent: #C5A059;
+
   /* ===== TYPOGRAPHY ===== */
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   --font-sans: 'Inter', 'Helvetica Neue', sans-serif;
 
-  /* ===== SPACING SYSTEM ===== */
+  /* ===== LETTER SPACING ===== */
+  --tracking-luxe: 0.4em;
+  --tracking-luxe-sm: 0.3em;
+  --tracking-luxe-lg: 0.5em;
+
+  /* ===== SPACING ===== */
   --spacing-section: 8rem;
   --spacing-section-sm: 5rem;
 
-  /* ===== ANIMATION ===== */
+  /* ===== EASING ===== */
   --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ===== BASE STYLES ===== */
+/* ===== BASE ===== */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,69 +51,67 @@ html {
 }
 
 body {
-  background-color: var(--color-brand-ivory);
-  color: var(--color-brand-charcoal);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-sans);
   font-weight: 300;
+  overflow-x: hidden;
 }
 
-/* ===== LUXURY TYPOGRAPHY ===== */
+/* ===== UTILITY CLASSES ===== */
+.tracking-luxe { letter-spacing: var(--tracking-luxe); }
+.tracking-luxe-sm { letter-spacing: var(--tracking-luxe-sm); }
+.tracking-luxe-lg { letter-spacing: var(--tracking-luxe-lg); }
+
+.text-muted-foreground { color: var(--color-muted-foreground); }
+.border-border { border-color: var(--color-border); }
+
 .font-serif {
   font-family: var(--font-serif);
   letter-spacing: -0.02em;
 }
 
-/* ===== CUSTOM SCROLLBAR ===== */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: var(--color-brand-gold);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-brand-gold-dark);
-}
+::-webkit-scrollbar-thumb:hover { background: var(--color-brand-gold-dark); }
 
-/* ===== SELECTION ===== */
 ::selection {
   background: var(--color-brand-gold);
   color: white;
 }
 
-/* ===== IMAGE HOVER ZOOM (Suitsupply Style) ===== */
-.img-zoom-container {
-  overflow: hidden;
-}
-.img-zoom-container img {
-  transition: transform 0.8s var(--ease-luxury);
-}
-.img-zoom-container:hover img {
-  transform: scale(1.05);
-}
-
-/* ===== LINK UNDERLINE ANIMATION ===== */
-.link-underline {
-  position: relative;
-}
-.link-underline::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: currentColor;
-  transition: width 0.4s var(--ease-luxury);
-}
-.link-underline:hover::after {
-  width: 100%;
+/* ===== REVEAL ANIMATION (FIXED — Matches reveal.tsx) ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.9s var(--ease-luxury),
+    transform 0.9s var(--ease-luxury);
+  will-change: opacity, transform;
 }
 
-/* ===== REVEAL ANIMATION UTILITY ===== */
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reveal variants */
+.reveal[data-direction="left"] { transform: translateX(-40px); }
+.reveal[data-direction="right"] { transform: translateX(40px); }
+.reveal[data-direction="none"] { transform: none; }
+
+.reveal.is-visible[data-direction="left"],
+.reveal.is-visible[data-direction="right"],
+.reveal.is-visible[data-direction="none"] {
+  transform: translate(0);
+}
+
+/* Legacy (keep for backward compat) */
 .reveal-up {
   opacity: 0;
   transform: translateY(30px);
@@ -111,42 +122,128 @@ body {
   transform: translateY(0);
 }
 
-/* ===== GOLD ACCENT LINE ===== */
+/* ===== IMAGE HOVER ZOOM ===== */
+.img-zoom-container { overflow: hidden; }
+.img-zoom-container img {
+  transition: transform 1.2s var(--ease-luxury);
+}
+.img-zoom-container:hover img { transform: scale(1.05); }
+
+/* ===== LINK UNDERLINE ===== */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.4s var(--ease-luxury);
+}
+.link-underline:hover::after { width: 100%; }
+
+/* ===== GOLD ACCENT ===== */
 .gold-line {
   width: 40px;
   height: 1px;
   background: var(--color-brand-gold);
 }
 
-/* ===== CARD HOVER LIFT ===== */
+/* ===== CARD LIFT ===== */
 .card-lift {
-  transition: transform 0.4s var(--ease-luxury), box-shadow 0.4s var(--ease-luxury);
+  transition: transform 0.5s var(--ease-luxury), box-shadow 0.5s var(--ease-luxury);
 }
 .card-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(30, 30, 44, 0.10);
 }
 
-/* ===== FADE IN ANIMATION ===== */
+/* ===== FADE IN ===== */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in-up {
   animation: fadeInUp 0.8s var(--ease-luxury) forwards;
 }
 
-/* ===== MARQUEE SCROLL ===== */
+/* ===== MARQUEE ===== */
 @keyframes marquee {
-  0% { transform: translateX(0); }
+  0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 .animate-marquee {
   animation: marquee 30s linear infinite;
+}
+
+/* ===== SUBTLE FLOAT (For decorative elements) ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* ===== SHIMMER (Loading skeletons) ===== */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #E8E2D9 0%, #F5F0E8 50%, #E8E2D9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ===== LUXURY BUTTON BASE ===== */
+.btn-luxe {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.125rem 2.5rem;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 500;
+  overflow: hidden;
+  transition: all 0.5s var(--ease-luxury);
+}
+
+.btn-luxe-primary {
+  background: var(--color-foreground);
+  color: white;
+}
+.btn-luxe-primary:hover {
+  background: var(--color-brand-gold);
+  color: white;
+}
+
+.btn-luxe-outline {
+  background: transparent;
+  border: 1px solid var(--color-foreground);
+  color: var(--color-foreground);
+}
+.btn-luxe-outline:hover {
+  background: var(--color-foreground);
+  color: white;
+}
+
+.btn-luxe-gold {
+  background: var(--color-brand-gold);
+  color: white;
+}
+.btn-luxe-gold:hover {
+  background: var(--color-brand-gold-dark);
+}
+
+/* ===== INPUT FOCUS GLOW ===== */
+.input-luxe {
+  transition: all 0.3s var(--ease-luxury);
+}
+.input-luxe:focus {
+  outline: none;
+  border-color: var(--color-brand-gold);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.10);
 }
