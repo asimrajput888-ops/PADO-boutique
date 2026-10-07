@@ -20,11 +20,9 @@ export default function SiteHeader() {
   const { currency, setCurrency } = useCurrency();
   const pathname = usePathname();
 
-  // Hide on scroll down, show on scroll up
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
       setScrolled(currentScrollY > 40);
 
       if (currentScrollY > lastScrollY && currentScrollY > 200) {
@@ -32,7 +30,6 @@ export default function SiteHeader() {
       } else {
         setHidden(false);
       }
-
       setLastScrollY(currentScrollY);
     };
 
@@ -40,7 +37,6 @@ export default function SiteHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // Lock body scroll when drawer/search open
   useEffect(() => {
     document.body.style.overflow = menuOpen || searchOpen ? "hidden" : "unset";
     return () => {
@@ -48,7 +44,6 @@ export default function SiteHeader() {
     };
   }, [menuOpen, searchOpen]);
 
-  // Close on route change
   useEffect(() => {
     setMenuOpen(false);
     setSearchOpen(false);
@@ -281,16 +276,20 @@ export default function SiteHeader() {
                   Popular Searches
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  {["Bespoke Suits", "Tuxedos", "Linen Shirts", "Wool Coats", "Trousers"].map(
-                    (tag) => (
-                      <button
-                        key={tag}
-                        className="px-5 py-2 border border-neutral-200 text-xs uppercase tracking-widest text-neutral-600 hover:border-brand-gold hover:text-brand-gold transition"
-                      >
-                        {tag}
-                      </button>
-                    )
-                  )}
+                  {[
+                    "Bespoke Suits",
+                    "Tuxedos",
+                    "Linen Shirts",
+                    "Wool Coats",
+                    "Trousers",
+                  ].map((tag) => (
+                    <button
+                      key={tag}
+                      className="px-5 py-2 border border-neutral-200 text-xs uppercase tracking-widest text-neutral-600 hover:border-brand-gold hover:text-brand-gold transition"
+                    >
+                      {tag}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
