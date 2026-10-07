@@ -51,20 +51,22 @@ export default function SiteFooter() {
               PADO
             </h3>
             <p className="text-sm leading-relaxed mb-6 max-w-xs text-brand-slate">
-              Luxury bespoke tailoring and silk loungewear. Crafted for the modern
-              individual.
+              Luxury bespoke tailoring and silk loungewear. Crafted for the
+              modern individual.
             </p>
             <div className="flex items-center gap-4">
-              {["Instagram", "Facebook", "Pinterest", "YouTube"].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  aria-label={social}
-                  className="w-9 h-9 border border-brand-stone flex items-center justify-center text-[10px] text-brand-slate hover:border-brand-gold hover:text-brand-gold transition-colors duration-300"
-                >
-                  {social[0]}
-                </a>
-              ))}
+              {["Instagram", "Facebook", "Pinterest", "YouTube"].map(
+                (social) => (
+                  <a
+                    key={social}
+                    href="#"
+                    aria-label={social}
+                    className="w-9 h-9 border border-brand-stone flex items-center justify-center text-[10px] text-brand-slate hover:border-brand-gold hover:text-brand-gold transition-colors duration-300"
+                  >
+                    {social[0]}
+                  </a>
+                )
+              )}
             </div>
           </div>
 
@@ -78,7 +80,6 @@ export default function SiteFooter() {
                 { name: "Men's Bespoke", href: "/custom/men" },
                 { name: "Women's Bespoke", href: "/custom/women" },
                 { name: "Seasonal & Novelty", href: "/seasonal" },
-                { name: "Signature Suits", href: "/signature-suit" },
               ].map((item) => (
                 <li key={item.name}>
                   <Link
