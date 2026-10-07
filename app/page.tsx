@@ -24,18 +24,11 @@ const CATEGORIES = [
     label: "Made to Measure",
   },
   {
-    name: "Signature Suits",
-    href: "/signature-suit",
-    image:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=90&auto=format&fit=crop",
-    label: "The Collection",
-  },
-  {
-    name: "Seasonal Edit",
+    name: "Seasonal & Novelty",
     href: "/seasonal",
     image:
       "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1200&q=90&auto=format&fit=crop",
-    label: "New Arrivals",
+    label: "Made to Measure",
   },
 ];
 
@@ -202,23 +195,23 @@ export default function HomePage() {
             </h2>
           </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {CATEGORIES.map((cat, i) => (
               <Reveal key={cat.name} delay={i * 100}>
                 <Link
                   href={cat.href}
-                  className="group block relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-brand-stone"
+                  className="group block relative aspect-[3/4] overflow-hidden bg-brand-stone"
                 >
                   <Image
                     src={cat.image}
                     alt={cat.name}
                     fill
                     className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
                     <p className="text-[10px] tracking-[0.4em] text-brand-gold-light uppercase mb-3">
                       {cat.label}
                     </p>
