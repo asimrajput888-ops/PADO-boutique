@@ -38,27 +38,27 @@ const CATEGORIES = [
 const PROCESS = [
   {
     number: "01",
-    title: "Choose Your Garment",
+    title: "Choose Your Design",
     description:
-      "Select from our curated collection of bespoke suits, blazers, shirts, and trousers.",
+      "Browse our collection and select the piece you want — from bespoke suits and blazers to shirts, trousers, and seasonal pieces.",
   },
   {
     number: "02",
     title: "Provide Measurements",
     description:
-      "Use our guided measurement form or send us a photo of your best-fitting garment.",
+      "Use our guided measurement form or send us a photo of your best-fitting garment. Our tailors are here to help.",
   },
   {
     number: "03",
     title: "Handcrafted in Atelier",
     description:
-      "Our master tailors cut, stitch, and finish your piece over 14–18 days.",
+      "Our master tailors cut, stitch, and finish your piece with precision over 14–18 days.",
   },
   {
     number: "04",
     title: "Delivered Worldwide",
     description:
-      "Your garment is carefully packaged and shipped to your door with tracking.",
+      "Your garment is carefully packaged and shipped to your door with tracking — worldwide.",
   },
 ];
 
