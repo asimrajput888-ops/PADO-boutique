@@ -25,7 +25,8 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: "PADO Boutique | Bespoke Tailoring",
-  description: "Handcrafted bespoke menswear, made to measure. Worldwide shipping.",
+  description:
+    "Handcrafted bespoke menswear, made to measure. Worldwide shipping.",
 };
 
 export default function RootLayout({
