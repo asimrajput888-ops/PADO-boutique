@@ -12,21 +12,19 @@ const CATEGORIES = [
   {
     name: "Men's Bespoke",
     href: "/custom/men",
-    image:
-      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&q=90&auto=format&fit=crop",
+    image: "/images/categories/men.jpg",
     label: "Made to Measure",
   },
   {
     name: "Women's Bespoke",
     href: "/custom/women",
-    image: "/images/categories/women.png",
+    image: "/images/categories/women.jpg",
     label: "Made to Measure",
   },
   {
     name: "Seasonal & Novelty",
     href: "/seasonal",
-    image:
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1200&q=90&auto=format&fit=crop",
+    image: "/images/categories/seasonal.jpg",
     label: "Made to Measure",
   },
 ];
@@ -204,9 +202,8 @@ export default function HomePage() {
                     src={cat.image}
                     alt={cat.name}
                     fill
-                    className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
+                    className="object-cover object-top transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
