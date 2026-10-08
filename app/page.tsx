@@ -22,11 +22,11 @@ const CATEGORIES = [
     label: "Made to Measure",
   },
   {
-    name: "Seasonal & Novelty",
-    href: "/seasonal",
-    image: "/images/categories/seasonal.jpg",
-    label: "Made to Measure",
-  },
+  name: "Seasonal & Novelty",
+  href: "/seasonal",
+  image: "/images/categories/seasonal.webp",   // ← .webp
+  label: "Made to Measure",
+},
 ];
 
 const PROCESS = [
