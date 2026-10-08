@@ -19,8 +19,7 @@ const CATEGORIES = [
   {
     name: "Women's Bespoke",
     href: "/custom/women",
-    image:
-      "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=1200&q=90&auto=format&fit=crop",
+    image: "/images/categories/women.png",
     label: "Made to Measure",
   },
   {
@@ -81,11 +80,11 @@ export default function HomePage() {
             alt="PADO Boutique Bespoke Tailoring"
             fill
             priority
-            className="object-cover object-center"
+            className="object-cover object-[70%_30%] md:object-[75%_35%]"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
         </motion.div>
 
         <motion.div
