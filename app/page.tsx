@@ -22,11 +22,11 @@ const CATEGORIES = [
     label: "Made to Measure",
   },
   {
-  name: "Seasonal & Novelty",
-  href: "/seasonal",
-  image: "/images/categories/seasonal.webp",   // ← .webp
-  label: "Made to Measure",
-},
+    name: "Seasonal & Novelty",
+    href: "/seasonal",
+    image: "/images/categories/seasonal.webp",
+    label: "Made to Measure",
+  },
 ];
 
 const PROCESS = [
@@ -78,7 +78,7 @@ export default function HomePage() {
             alt="PADO Boutique Bespoke Tailoring"
             fill
             priority
-            className="object-cover object-[70%_30%] md:object-[75%_35%]"
+            className="object-cover object-[70%_25%] md:object-[75%_30%]"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
