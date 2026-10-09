@@ -11,12 +11,29 @@ import { supabase } from "@/lib/supabase";
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
 
-// Women's US numeric sizing
 const STANDARD_JACKET_SIZES = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
 const STANDARD_JACKET_LENGTHS = ["Petite", "Regular", "Tall"];
 const STANDARD_TROUSER_SIZES = ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22", "24"];
 const STANDARD_INSEAMS = ["Unhemmed", "28", "30", "32", "34", "36"];
 const STANDARD_SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
+// Measurement limits (in inches) — realistic women's bespoke ranges
+const MEASUREMENT_LIMITS: Record<string, { min: number; max: number }> = {
+  bust: { min: 28, max: 56 },
+  underbust: { min: 24, max: 50 },
+  shoulder: { min: 12, max: 20 },
+  sleeve: { min: 18, max: 28 },
+  jacketLength: { min: 22, max: 32 },
+  bicep: { min: 8, max: 18 },
+  waist: { min: 22, max: 48 },
+  seat: { min: 30, max: 58 },
+  pantsLength: { min: 24, max: 36 },
+  thigh: { min: 16, max: 30 },
+  knee: { min: 10, max: 22 },
+  legOpening: { min: 8, max: 20 },
+  frontRise: { min: 7, max: 14 },
+  backRise: { min: 11, max: 20 },
+};
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: string; required: boolean }[]> = {
   blazer: [
@@ -38,7 +55,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "waist", label: "Waist", hint: "Where you wear your trousers", required: true },
     { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thighs", label: "Thigh", hint: "Fullest part of thigh", required: false },
+    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
     { id: "knee", label: "Knee", hint: "Around knee, slightly bent", required: false },
     { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
   ],
@@ -52,7 +69,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "waist", label: "Jacket Waist", hint: "Narrowest part of waist", required: true },
     { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thighs", label: "Thigh", hint: "Fullest part of thigh", required: false },
+    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
     { id: "knee", label: "Knee", hint: "Around knee", required: false },
     { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
   ],
@@ -65,7 +82,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "waist", label: "Jacket Waist", hint: "Narrowest part of waist", required: true },
     { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thighs", label: "Thigh", hint: "Fullest part of thigh", required: false },
+    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
     { id: "knee", label: "Knee", hint: "Around knee", required: false },
     { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
   ],
@@ -94,7 +111,7 @@ const MEASUREMENT_IMAGES: Record<string, string> = {
   seat: "/images/measurements-women/wom_seat.webp",
   pantsLength: "/images/measurements-women/wom_pants_length.webp",
   knee: "/images/measurements-women/wom_knee.webp",
-  thighs: "/images/measurements-women/wom_thighs.webp",
+  thigh: "/images/measurements-women/wom_thighs.webp",
   legOpening: "/images/measurements-women/body_leg_opening.webp",
   frontRise: "/images/measurements-women/front-rise-women.webp",
   backRise: "/images/measurements-women/back-rise-women.webp",
@@ -182,10 +199,30 @@ export default function WomenBespokePage() {
   const updateM = (key: string, value: string) =>
     setM({ ...m, [key]: value });
 
+  // Validate a measurement field
+  const getFieldError = (fieldId: string, value: string): string | null => {
+    if (!value || value.trim() === "") return null;
+    const num = parseFloat(value);
+    if (isNaN(num)) return "Enter a valid number";
+    if (num <= 0) return "Must be greater than 0";
+    const limits = MEASUREMENT_LIMITS[fieldId];
+    if (!limits) return null;
+    if (num < limits.min || num > limits.max) {
+      return `Must be between ${limits.min}–${limits.max} inches`;
+    }
+    return null;
+  };
+
   const filledCount = fields.filter((f) => m[f.id]).length;
-  const requiredMissing = fields
-    .filter((f) => f.required && !m[f.id])
-    .map((f) => f.label);
+
+  // Fields that are required and missing OR out of range
+  const invalidOrMissing = fields.filter((f) => {
+    const value = m[f.id];
+    if (!value || value.trim() === "") return f.required;
+    return getFieldError(f.id, value) !== null;
+  });
+
+  const requiredMissing = invalidOrMissing.map((f) => f.label);
 
   const standardSelectionComplete =
     (showJacketSelector && !jacketSize) ||
@@ -601,7 +638,7 @@ export default function WomenBespokePage() {
     );
   }
 
-  // STEP 1: Measurements (Custom only)
+  // STEP 1: Measurements (Custom only) — WITH VALIDATION
   if (step === 1 && fitType === "custom") {
     return (
       <div className="min-h-screen bg-white py-12 md:py-16 px-4 md:px-6">
@@ -632,6 +669,7 @@ export default function WomenBespokePage() {
             <h1 className="text-3xl md:text-5xl font-serif mb-4 text-neutral-900">Your Measurements</h1>
             <p className="text-neutral-500 text-sm max-w-xl mx-auto leading-relaxed">
               Provide your measurements in inches. Fields marked with * are required.
+              Values must fall within realistic tailoring ranges.
             </p>
           </div>
 
@@ -662,22 +700,41 @@ export default function WomenBespokePage() {
                   <p className="text-[10px] uppercase tracking-widest text-neutral-400">{filledCount} / {fields.length} filled</p>
                 </div>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                  {fields.map((f) => (
-                    <div key={f.id}>
-                      <label className="block text-[11px] uppercase tracking-[0.15em] text-neutral-700 mb-2 font-medium">
-                        {f.label} {f.required && <span className="text-red-500">*</span>}
-                      </label>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        value={m[f.id] || ""}
-                        onChange={(e) => updateM(f.id, e.target.value)}
-                        onFocus={() => setActiveField(f.id)}
-                        placeholder="—"
-                        className={`w-full border p-3 focus:border-neutral-900 outline-none text-sm transition-colors ${activeField === f.id ? "border-neutral-900 bg-neutral-50" : "border-neutral-200"}`}
-                      />
-                    </div>
-                  ))}
+                  {fields.map((f) => {
+                    const value = m[f.id] || "";
+                    const error = getFieldError(f.id, value);
+                    const limits = MEASUREMENT_LIMITS[f.id];
+                    return (
+                      <div key={f.id}>
+                        <label className="block text-[11px] uppercase tracking-[0.15em] text-neutral-700 mb-2 font-medium">
+                          {f.label} {f.required && <span className="text-red-500">*</span>}
+                          {limits && (
+                            <span className="ml-2 text-[9px] text-neutral-400 tracking-normal font-normal normal-case">
+                              ({limits.min}–{limits.max} in)
+                            </span>
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={value}
+                          onChange={(e) => updateM(f.id, e.target.value)}
+                          onFocus={() => setActiveField(f.id)}
+                          placeholder="—"
+                          className={`w-full border p-3 focus:outline-none text-sm transition-colors ${
+                            error
+                              ? "border-red-400 bg-red-50 focus:border-red-500"
+                              : activeField === f.id
+                              ? "border-neutral-900 bg-neutral-50"
+                              : "border-neutral-200 focus:border-neutral-900"
+                          }`}
+                        />
+                        {error && (
+                          <p className="text-[10px] text-red-500 mt-1.5 leading-tight">{error}</p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -739,12 +796,21 @@ export default function WomenBespokePage() {
           <div className="mt-14 pt-8 border-t border-neutral-200 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <div>
               {requiredMissing.length > 0 ? (
-                <p className="text-xs text-neutral-500"><span className="font-medium text-neutral-900">Still needed:</span> {requiredMissing.join(", ")}</p>
+                <p className="text-xs text-neutral-500">
+                  <span className="font-medium text-neutral-900">
+                    {invalidOrMissing.some((f) => m[f.id]) ? "Fix or complete:" : "Still needed:"}
+                  </span>{" "}
+                  {requiredMissing.join(", ")}
+                </p>
               ) : (
-                <p className="text-xs text-neutral-500">All required fields completed ✓</p>
+                <p className="text-xs text-green-600">✓ All measurements valid</p>
               )}
             </div>
-            <button onClick={nextStep} disabled={requiredMissing.length > 0 || !heightFt || !heightIn} className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40">
+            <button
+              onClick={nextStep}
+              disabled={requiredMissing.length > 0 || !heightFt || !heightIn}
+              className="bg-neutral-900 text-white px-12 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition disabled:opacity-40"
+            >
               Continue to Contact →
             </button>
           </div>
@@ -786,7 +852,6 @@ export default function WomenBespokePage() {
           </div>
 
           <div className="space-y-8">
-            {/* Contact Section */}
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Contact Details</p>
               <div className="space-y-5">
@@ -805,7 +870,6 @@ export default function WomenBespokePage() {
               </div>
             </div>
 
-            {/* Shipping Address */}
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-4 font-semibold">Shipping Address</p>
               <div className="space-y-5">
