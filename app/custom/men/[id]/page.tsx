@@ -383,9 +383,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================================
   // STEP -1: Product Showcase
-  // ============================================================
   if (step === -1) {
     return (
       <div className="min-h-screen bg-brand-ivory pt-32 pb-24 px-6 md:px-12">
@@ -464,9 +462,9 @@ export default function MenBespokePage() {
                 <div className="space-y-4">
                   <button
                     onClick={() => setStep(0)}
-                    className="w-full bg-brand-charcoal text-white py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500 group relative overflow-hidden"
+                    className="w-full bg-brand-charcoal text-white py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500"
                   >
-                    <span className="relative z-10">Begin Your Order →</span>
+                    Begin Your Order →
                   </button>
                   <a
                     href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`}
@@ -485,23 +483,19 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================================
-  // STEP 0: Choose Fit Type — PREMIUM VERSION
-  // ============================================================
+  // STEP 0: Choose Fit Type
   if (step === 0) {
     return (
       <div className="min-h-screen bg-brand-ivory">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
 
-          <Link
-            href={`/custom/men/${id}`}
-            onClick={(e) => { e.preventDefault(); setStep(-1); }}
+          <button
+            onClick={() => setStep(-1)}
             className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
           >
             <span>←</span> Back to Product
-          </Link>
+          </button>
 
-          {/* Progress */}
           <div className="mb-20">
             <div className="flex items-center justify-between max-w-md mx-auto mb-4">
               {[0, 1, 2, 3].map((i) => (
@@ -526,7 +520,6 @@ export default function MenBespokePage() {
             </p>
           </div>
 
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -542,10 +535,8 @@ export default function MenBespokePage() {
             </p>
           </motion.div>
 
-          {/* Fit Type Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
 
-            {/* Standard Size Card */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -587,7 +578,6 @@ export default function MenBespokePage() {
               )}
             </motion.button>
 
-            {/* Custom Measurements Card */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -634,7 +624,6 @@ export default function MenBespokePage() {
             </motion.button>
           </div>
 
-          {/* Standard size selectors — appears when standard is chosen */}
           <AnimatePresence>
             {fitType === "standard" && (
               <motion.div
@@ -770,7 +759,6 @@ export default function MenBespokePage() {
                   </div>
                 )}
 
-                {/* Selection Summary */}
                 {(jacketSize || trouserSize) && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -813,7 +801,6 @@ export default function MenBespokePage() {
             </motion.div>
           )}
 
-          {/* Continue button */}
           <div className="max-w-5xl mx-auto mt-20 pt-12 border-t border-brand-stone flex justify-end">
             <button
               onClick={nextStep}
@@ -828,9 +815,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================================
-  // STEP 1: Measurements — PREMIUM VERSION
-  // ============================================================
+  // STEP 1: Measurements
   if (step === 1 && fitType === "custom") {
     const activeFieldData = fields.find((f) => f.id === activeField);
     const progressPercent = Math.round((filledCount / fields.length) * 100);
@@ -846,7 +831,6 @@ export default function MenBespokePage() {
             <span>←</span> Back to Fit Selection
           </button>
 
-          {/* Progress Bar */}
           <div className="mb-16 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] uppercase tracking-[0.4em] text-brand-gold">
@@ -866,7 +850,6 @@ export default function MenBespokePage() {
             </div>
           </div>
 
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -884,7 +867,6 @@ export default function MenBespokePage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
-            {/* LEFT: Form */}
             <div className="lg:col-span-7">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -892,8 +874,6 @@ export default function MenBespokePage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="space-y-10"
               >
-
-                {/* Profile Name */}
                 <div>
                   <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
                     Measurement Profile Name *
@@ -906,7 +886,6 @@ export default function MenBespokePage() {
                   />
                 </div>
 
-                {/* Height */}
                 <div>
                   <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
                     Height *
@@ -935,7 +914,6 @@ export default function MenBespokePage() {
                   </div>
                 </div>
 
-                {/* Measurement Fields */}
                 <div>
                   <div className="flex items-center gap-4 mb-8">
                     <span className="w-8 h-[1px] bg-brand-gold" />
@@ -1000,13 +978,7 @@ export default function MenBespokePage() {
                             )}
                           </div>
                           {error && (
-                            <motion.p
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="text-[10px] text-red-500 mt-2"
-                            >
-                              {error}
-                            </p>
+                            <p className="text-[10px] text-red-500 mt-2">{error}</p>
                           )}
                         </motion.div>
                       );
@@ -1014,7 +986,6 @@ export default function MenBespokePage() {
                   </div>
                 </div>
 
-                {/* Fit Preferences */}
                 {needsJacketFit && (
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
@@ -1049,7 +1020,6 @@ export default function MenBespokePage() {
                   </div>
                 )}
 
-                {/* Additional Requests */}
                 <div>
                   <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
                     Additional Requests
@@ -1068,11 +1038,9 @@ export default function MenBespokePage() {
               </motion.div>
             </div>
 
-            {/* RIGHT: Sticky Guide */}
             <div className="lg:col-span-5">
               <div className="lg:sticky lg:top-32 space-y-6">
 
-                {/* Guide Card */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1115,7 +1083,6 @@ export default function MenBespokePage() {
                   </div>
                 </motion.div>
 
-                {/* Assistance Card */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1141,7 +1108,6 @@ export default function MenBespokePage() {
             </div>
           </div>
 
-          {/* Bottom Actions */}
           <div className="mt-20 pt-12 border-t border-brand-stone flex flex-col md:flex-row md:justify-between md:items-center gap-6 max-w-5xl mx-auto">
             <div>
               {requiredMissing.length > 0 ? (
@@ -1168,9 +1134,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================================
   // STEP 2: Contact + Shipping
-  // ============================================================
   if (step === 2) {
     return (
       <div className="min-h-screen bg-brand-ivory">
@@ -1199,7 +1163,6 @@ export default function MenBespokePage() {
           </motion.div>
 
           <div className="space-y-10">
-            {/* Contact */}
             <div>
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-8 h-[1px] bg-brand-gold" />
@@ -1244,7 +1207,6 @@ export default function MenBespokePage() {
               </div>
             </div>
 
-            {/* Shipping */}
             <div>
               <div className="flex items-center gap-4 mb-6">
                 <span className="w-8 h-[1px] bg-brand-gold" />
@@ -1336,9 +1298,7 @@ export default function MenBespokePage() {
     );
   }
 
-  // ============================================================
   // STEP 3: Review
-  // ============================================================
   return (
     <div className="min-h-screen bg-brand-ivory">
       <div className="max-w-3xl mx-auto px-6 md:px-12 py-16 md:py-24">
