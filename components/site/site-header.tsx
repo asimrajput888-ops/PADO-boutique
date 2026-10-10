@@ -116,11 +116,23 @@ export default function SiteHeader() {
           {/* CENTER: Logo */}
           <Link
             href="/"
-            className={`absolute left-1/2 -translate-x-1/2 text-[11px] md:text-sm font-serif tracking-[0.4em] transition-colors duration-500 ${
-              scrolled ? "text-ink" : "text-paper"
-            }`}
+            className="absolute left-1/2 -translate-x-1/2 group flex flex-col items-center"
+            aria-label="PADO Boutique"
           >
-            PADO BOUTIQUE
+            <span
+              className={`block font-serif text-2xl md:text-3xl tracking-[0.5em] transition-colors duration-500 ${
+                scrolled ? "text-ink" : "text-paper"
+              }`}
+            >
+              PADO
+            </span>
+            <span
+              className={`block text-[8px] md:text-[9px] tracking-[0.4em] mt-0.5 transition-colors duration-500 ${
+                scrolled ? "text-stone" : "text-paper/60"
+              }`}
+            >
+              BESPOKE
+            </span>
           </Link>
 
           {/* RIGHT: Currency + Account + Cart */}
