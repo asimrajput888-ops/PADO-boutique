@@ -21,6 +21,7 @@ const cormorant = Cormorant_Garamond({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-cormorant",
   display: "swap",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
