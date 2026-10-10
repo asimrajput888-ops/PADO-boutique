@@ -60,18 +60,38 @@ function SeasonalContent() {
   useEffect(() => {
     const fetchModels = async () => {
       setLoading(true);
+
       let query = supabase
         .from("models")
         .select("*")
         .eq("category", "seasonal")
         .order("created_at", { ascending: false });
 
+      // Filter by subcategory (your DB uses 'subcategory' column)
       if (typeFilter) {
-        query = query.eq("product_type", typeFilter);
+        query = query.eq("subcategory", typeFilter);
       }
 
-      const { data } = await query;
-      setModels(data || []);
+      const { data, error } = await query;
+
+      if (error) {
+        // Fallback: try product_type if subcategory column doesn't exist
+        let fallbackQuery = supabase
+          .from("models")
+          .select("*")
+          .eq("category", "seasonal")
+          .order("created_at", { ascending: false });
+
+        if (typeFilter) {
+          fallbackQuery = fallbackQuery.eq("product_type", typeFilter);
+        }
+
+        const fallback = await fallbackQuery;
+        setModels(fallback.data || []);
+      } else {
+        setModels(data || []);
+      }
+
       setLoading(false);
     };
     fetchModels();
@@ -194,7 +214,7 @@ function SeasonalContent() {
 
                       <div className="space-y-2">
                         <p className="text-[10px] uppercase tracking-label text-stone">
-                          {m.product_type || "Seasonal"}
+                          {m.subcategory || m.product_type || "Seasonal"}
                         </p>
                         <h3 className="text-[15px] md:text-base font-serif text-ink leading-snug group-hover:text-bronze transition-colors duration-500">
                           {m.name}
