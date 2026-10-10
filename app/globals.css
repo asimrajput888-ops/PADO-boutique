@@ -3,29 +3,35 @@
 @import "tailwindcss";
 
 @theme {
-  /* ===== HOCKERTY-STYLE PALETTE (No Bright Gold) ===== */
-  --color-ink: #0A0A0A;           /* Deep black — headings, text */
-  --color-charcoal: #1A1A1A;      /* Slightly lighter black */
-  --color-graphite: #3D3D3D;      /* Body text */
-  --color-stone: #6B6B6B;         /* Muted text */
-  --color-mist: #B8B3AB;          /* Light text */
-  --color-bone: #EFEBE4;          /* Subtle background */
-  --color-cream: #F7F5F0;         /* Warm white */
-  --color-paper: #FDFCFA;         /* Near-white */
-  --color-bronze: #8B7355;        /* Accent (very subtle) */
-  --color-border: #E5E0D8;        /* Hairline borders */
+  /* ===== HOCKERTY PALETTE ===== */
+  --color-ink: #0A0A0A;
+  --color-charcoal: #1A1A1A;
+  --color-graphite: #3D3D3D;
+  --color-stone: #6B6B6B;
+  --color-mist: #B8B3AB;
+  --color-bone: #EFEBE4;
+  --color-cream: #F7F5F0;
+  --color-paper: #FDFCFA;
+  --color-bronze: #8B7355;
+  --color-border: #E5E0D8;
+
+  /* ===== LEGACY ALIASES (mapping to same colors) ===== */
+  --color-brand-ivory: #FDFCFA;      /* = paper */
+  --color-brand-cream: #F7F5F0;      /* = cream */
+  --color-brand-stone: #E5E0D8;      /* = border */
+  --color-brand-gold: #8B7355;       /* = bronze */
+  --color-brand-gold-light: #A88F6B;
+  --color-brand-gold-dark: #6F5A3F;
+  --color-brand-charcoal: #0A0A0A;   /* = ink */
+  --color-brand-slate: #6B6B6B;      /* = stone */
+  --color-brand-maroon: #8B3A3A;
 
   /* ===== TYPOGRAPHY ===== */
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
   --font-sans: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
 
-  /* ===== SPACING ===== */
-  --spacing-section: 10rem;
-  --spacing-section-sm: 6rem;
-
   /* ===== EASING ===== */
   --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== BASE ===== */
@@ -34,9 +40,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--color-paper);
@@ -54,30 +58,45 @@ body {
 }
 
 h1, h2, h3, h4 {
-  color: var(--color-ink);
   font-family: var(--font-serif);
   letter-spacing: -0.01em;
 }
 
-/* ===== UTILITY ===== */
+/* ===== TRACKING UTILITIES ===== */
 .tracking-editorial { letter-spacing: 0.3em; }
 .tracking-label { letter-spacing: 0.4em; }
-.tracking-tight { letter-spacing: 0.15em; }
 
+/* ===== TEXT COLORS ===== */
+.text-ink { color: var(--color-ink); }
 .text-stone { color: var(--color-stone); }
 .text-graphite { color: var(--color-graphite); }
 .text-mist { color: var(--color-mist); }
 .text-bronze { color: var(--color-bronze); }
-.text-ink { color: var(--color-ink); }
+.text-paper { color: var(--color-paper); }
+.text-cream { color: var(--color-cream); }
+.text-brand-charcoal { color: var(--color-brand-charcoal); }
+.text-brand-slate { color: var(--color-brand-slate); }
+.text-brand-gold { color: var(--color-brand-gold); }
+.text-brand-maroon { color: var(--color-brand-maroon); }
 
+/* ===== BACKGROUND COLORS ===== */
 .bg-ink { background-color: var(--color-ink); }
 .bg-charcoal { background-color: var(--color-charcoal); }
-.bg-bone { background-color: var(--color-bone); }
-.bg-cream { background-color: var(--color-cream); }
 .bg-paper { background-color: var(--color-paper); }
+.bg-cream { background-color: var(--color-cream); }
+.bg-bone { background-color: var(--color-bone); }
+.bg-brand-ivory { background-color: var(--color-brand-ivory); }
+.bg-brand-cream { background-color: var(--color-brand-cream); }
+.bg-brand-charcoal { background-color: var(--color-brand-charcoal); }
+.bg-brand-gold { background-color: var(--color-brand-gold); }
+.bg-brand-stone { background-color: var(--color-brand-stone); }
 
+/* ===== BORDER COLORS ===== */
 .border-border { border-color: var(--color-border); }
 .border-mist { border-color: var(--color-mist); }
+.border-brand-stone { border-color: var(--color-brand-stone); }
+.border-brand-charcoal { border-color: var(--color-brand-charcoal); }
+.border-brand-gold { border-color: var(--color-brand-gold); }
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 4px; }
@@ -86,20 +105,16 @@ h1, h2, h3, h4 {
   background: var(--color-mist);
   border-radius: 2px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--color-stone); }
-
 ::selection {
   background: var(--color-ink);
   color: var(--color-paper);
 }
 
-/* ===== REVEAL ANIMATION ===== */
+/* ===== REVEAL ===== */
 .reveal {
   opacity: 0;
   transform: translateY(40px);
-  transition:
-    opacity 1s var(--ease-luxury),
-    transform 1s var(--ease-luxury);
+  transition: opacity 1s var(--ease-luxury), transform 1s var(--ease-luxury);
 }
 .reveal.is-visible {
   opacity: 1;
@@ -127,7 +142,7 @@ h1, h2, h3, h4 {
 }
 .link-underline:hover::after { width: 100%; }
 
-/* ===== BUTTONS — HOCKERTY STYLE ===== */
+/* ===== BUTTONS ===== */
 .btn-primary {
   display: inline-flex;
   align-items: center;
