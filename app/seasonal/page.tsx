@@ -44,7 +44,7 @@ const SEASONAL_CATEGORIES = [
     type: "party",
     name: "Party & Events",
     href: "/seasonal?type=party",
-    image: "/images/seasonal/party.jpg",
+    image: "/images/seasonal/party.webp",
     label: "Evening Wear",
   },
 ];
