@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
@@ -126,8 +126,9 @@ const MEASUREMENT_IMAGES: Record<string, string> = {
   backRise: "/images/measurements-men/back-rise.webp",
 };
 
-export default function MenBespokePage() {
+function MenBespokePageContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
   const { formatPrice } = useCurrency();
 
@@ -163,6 +164,13 @@ export default function MenBespokePage() {
     postalCode: "",
     country: "",
   });
+
+  // Auto-start: agar URL mein ?start=order hai, seedha step 0 pe jao
+  useEffect(() => {
+    if (searchParams.get("start") === "order") {
+      setStep(0);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -312,6 +320,15 @@ export default function MenBespokePage() {
 
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
+
+      // Trigger factory submission (async, background)
+      if (data.order?.id) {
+        fetch("/api/orders/submit-to-factory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: data.order.id }),
+        }).catch((err) => console.error("Factory submit failed:", err));
+      }
     } catch (err: any) {
       alert("Error: " + err.message);
     } finally {
@@ -321,18 +338,18 @@ export default function MenBespokePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-ivory">
-        <div className="w-8 h-8 border-2 border-brand-stone border-t-brand-gold rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-paper">
+        <div className="w-8 h-8 border border-border border-t-ink rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!model) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-ivory">
+      <div className="min-h-screen flex items-center justify-center bg-paper">
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-brand-charcoal mb-4">Model Not Found</h1>
-          <Link href="/custom/men" className="text-brand-slate hover:text-brand-gold underline">
+          <h1 className="text-4xl font-serif text-ink mb-4">Model Not Found</h1>
+          <Link href="/custom/men" className="text-stone hover:text-ink underline">
             ← Back to Men&apos;s Collection
           </Link>
         </div>
@@ -342,7 +359,7 @@ export default function MenBespokePage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-brand-ivory flex items-center justify-center px-5 py-20">
+      <div className="min-h-screen bg-paper flex items-center justify-center px-5 py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -353,19 +370,19 @@ export default function MenBespokePage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-            className="w-24 h-24 rounded-full bg-brand-charcoal text-white flex items-center justify-center mx-auto mb-10 text-4xl"
+            className="w-24 h-24 rounded-full bg-ink text-paper flex items-center justify-center mx-auto mb-10 text-4xl"
           >
             ✓
           </motion.div>
-          <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-4">Order Confirmed</p>
-          <h1 className="text-4xl font-serif text-brand-charcoal mb-6">
+          <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">Order Confirmed</p>
+          <h1 className="text-4xl font-serif text-ink mb-6">
             Thank you, {contact.name.split(" ")[0]}.
           </h1>
-          <p className="text-brand-slate mb-3 text-sm">Order number</p>
-          <p className="text-xl font-mono text-brand-charcoal mb-10 tracking-wider">{orderNumber}</p>
-          <div className="border border-brand-stone bg-white p-8 text-left mb-10">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-brand-gold mb-4 font-semibold">Shipping to</p>
-            <p className="text-sm text-brand-slate leading-relaxed">
+          <p className="text-stone mb-3 text-sm">Order number</p>
+          <p className="text-xl font-mono text-ink mb-10 tracking-wider">{orderNumber}</p>
+          <div className="border border-border bg-white p-8 text-left mb-10">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-bronze mb-4 font-semibold">Shipping to</p>
+            <p className="text-sm text-graphite leading-relaxed">
               {contact.address1}<br />
               {contact.address2 && <>{contact.address2}<br /></>}
               {contact.city} {contact.postalCode}<br />
@@ -374,7 +391,7 @@ export default function MenBespokePage() {
           </div>
           <Link
             href="/custom/men"
-            className="inline-block bg-brand-charcoal text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-brand-gold transition-colors duration-500"
+            className="inline-block bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-bronze transition-colors duration-500"
           >
             Back to Collection
           </Link>
@@ -386,11 +403,11 @@ export default function MenBespokePage() {
   // STEP -1: Product Showcase
   if (step === -1) {
     return (
-      <div className="min-h-screen bg-brand-ivory pt-32 pb-24 px-6 md:px-12">
+      <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
         <div className="max-w-[1500px] mx-auto">
           <Link
             href="/custom/men"
-            className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
+            className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"
           >
             <span>←</span> Back to Collection
           </Link>
@@ -403,7 +420,7 @@ export default function MenBespokePage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: i * 0.15 }}
-                  className="relative aspect-[3/4] overflow-hidden bg-brand-cream"
+                  className="relative aspect-[3/4] overflow-hidden bg-cream"
                 >
                   <img
                     src={img}
@@ -421,30 +438,30 @@ export default function MenBespokePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-6">
+                <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-6">
                   {pt} · Bespoke
                 </p>
-                <h1 className="text-4xl md:text-6xl font-serif mb-8 text-brand-charcoal leading-[1.05]">
+                <h1 className="text-4xl md:text-6xl font-serif mb-8 text-ink leading-[1.05]">
                   {model.name}
                 </h1>
-                <p className="text-3xl text-brand-charcoal mb-12 pb-12 border-b border-brand-stone font-serif">
+                <p className="text-3xl text-ink mb-12 pb-12 border-b border-border font-serif">
                   {formatPrice(model.price)}
                 </p>
 
                 <div className="mb-12">
-                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6 font-semibold">
+                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-6 font-semibold">
                     Description
                   </h2>
-                  <p className="text-brand-slate leading-[1.8] text-[15px] whitespace-pre-line">
+                  <p className="text-graphite leading-[1.8] text-[15px] whitespace-pre-line">
                     {model.description}
                   </p>
                 </div>
 
-                <div className="border-t border-brand-stone pt-10 mb-12">
-                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6 font-semibold">
+                <div className="border-t border-border pt-10 mb-12">
+                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-6 font-semibold">
                     The PADO Promise
                   </h2>
-                  <ul className="space-y-4 text-sm text-brand-slate">
+                  <ul className="space-y-4 text-sm text-graphite">
                     {[
                       "Cut to your exact measurements",
                       "Hand-finished by master tailors",
@@ -452,7 +469,7 @@ export default function MenBespokePage() {
                       "Complimentary worldwide shipping",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-4">
-                        <span className="w-6 h-[1px] bg-brand-gold" />
+                        <span className="w-6 h-[1px] bg-ink" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -462,7 +479,7 @@ export default function MenBespokePage() {
                 <div className="space-y-4">
                   <button
                     onClick={() => setStep(0)}
-                    className="w-full bg-brand-charcoal text-white py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500"
+                    className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500"
                   >
                     Begin Your Order →
                   </button>
@@ -470,7 +487,7 @@ export default function MenBespokePage() {
                     href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full border border-brand-charcoal text-brand-charcoal text-center py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-charcoal hover:text-white transition-all duration-500"
+                    className="block w-full border border-ink text-ink text-center py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-ink hover:text-paper transition-all duration-500"
                   >
                     Speak to a Tailor
                   </a>
@@ -486,12 +503,11 @@ export default function MenBespokePage() {
   // STEP 0: Choose Fit Type
   if (step === 0) {
     return (
-      <div className="min-h-screen bg-brand-ivory">
+      <div className="min-h-screen bg-paper">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
-
           <button
             onClick={() => setStep(-1)}
-            className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
+            className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"
           >
             <span>←</span> Back to Product
           </button>
@@ -500,22 +516,26 @@ export default function MenBespokePage() {
             <div className="flex items-center justify-between max-w-md mx-auto mb-4">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-all duration-500 ${
-                    step >= i
-                      ? "bg-brand-charcoal text-white border-brand-charcoal"
-                      : "bg-transparent text-brand-stone border-brand-stone"
-                  }`}>
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-all duration-500 ${
+                      step >= i
+                        ? "bg-ink text-paper border-ink"
+                        : "bg-transparent text-mist border-border"
+                    }`}
+                  >
                     {step > i ? "✓" : i + 1}
                   </div>
                   {i < 3 && (
-                    <div className={`w-16 md:w-24 h-[1px] transition-colors duration-500 ${
-                      step > i ? "bg-brand-charcoal" : "bg-brand-stone"
-                    }`} />
+                    <div
+                      className={`w-16 md:w-24 h-[1px] transition-colors duration-500 ${
+                        step > i ? "bg-ink" : "bg-border"
+                      }`}
+                    />
                   )}
                 </div>
               ))}
             </div>
-            <p className="text-center text-[10px] uppercase tracking-[0.5em] text-brand-gold">
+            <p className="text-center text-[10px] uppercase tracking-[0.5em] text-bronze">
               Step 1 of {totalSteps}
             </p>
           </div>
@@ -526,17 +546,17 @@ export default function MenBespokePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-20 max-w-3xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-brand-charcoal leading-[1.1]">
-              How would you like<br />
-              <em className="text-brand-gold">your {pt}?</em>
+            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-ink leading-[1.1]">
+              How would you like
+              <br />
+              <em className="text-bronze">your {pt}?</em>
             </h1>
-            <p className="text-brand-slate text-[15px] leading-relaxed max-w-xl mx-auto">
+            <p className="text-stone text-[15px] leading-relaxed max-w-xl mx-auto">
               Choose a standard size for faster delivery, or provide your measurements for a perfect bespoke fit.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -544,24 +564,24 @@ export default function MenBespokePage() {
               onClick={() => setFitType("standard")}
               className={`text-left relative overflow-hidden transition-all duration-500 ${
                 fitType === "standard"
-                  ? "border-brand-charcoal bg-white shadow-[0_20px_60px_rgba(30,30,44,0.08)]"
-                  : "border-brand-stone bg-white/50 hover:border-brand-charcoal/50 hover:bg-white"
+                  ? "border-ink bg-white shadow-[0_20px_60px_rgba(10,10,10,0.08)]"
+                  : "border-border bg-white/50 hover:border-ink/50 hover:bg-white"
               } border`}
             >
               <div className="p-8 md:p-12">
-                <p className="text-[10px] uppercase tracking-[0.5em] text-brand-gold mb-4">
+                <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">
                   Fastest Delivery
                 </p>
-                <h3 className="text-3xl md:text-4xl font-serif mb-6 text-brand-charcoal">
+                <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
                   Standard Size
                 </h3>
-                <p className="text-sm text-brand-slate leading-relaxed mb-8">
+                <p className="text-sm text-stone leading-relaxed mb-8">
                   Choose from our standard sizes. Crafted on a ready pattern and dispatched within 7–10 days.
                 </p>
-                <ul className="space-y-3 text-[13px] text-brand-slate">
+                <ul className="space-y-3 text-[13px] text-stone">
                   {["Fixed price", "No measurements required", "7–10 day dispatch"].map((item) => (
                     <li key={item} className="flex items-center gap-3">
-                      <span className="w-4 h-[1px] bg-brand-gold" />
+                      <span className="w-4 h-[1px] bg-ink" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -571,9 +591,9 @@ export default function MenBespokePage() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute top-6 right-6 w-6 h-6 rounded-full bg-brand-gold flex items-center justify-center"
+                  className="absolute top-6 right-6 w-6 h-6 rounded-full bg-ink flex items-center justify-center"
                 >
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-paper text-xs">✓</span>
                 </motion.div>
               )}
             </motion.button>
@@ -585,28 +605,27 @@ export default function MenBespokePage() {
               onClick={() => setFitType("custom")}
               className={`text-left relative overflow-hidden transition-all duration-500 ${
                 fitType === "custom"
-                  ? "border-brand-charcoal bg-white shadow-[0_20px_60px_rgba(30,30,44,0.08)]"
-                  : "border-brand-stone bg-white/50 hover:border-brand-charcoal/50 hover:bg-white"
+                  ? "border-ink bg-white shadow-[0_20px_60px_rgba(10,10,10,0.08)]"
+                  : "border-border bg-white/50 hover:border-ink/50 hover:bg-white"
               } border`}
             >
-              <div className="absolute top-0 right-0 bg-brand-charcoal text-white text-[9px] uppercase tracking-[0.4em] px-5 py-2">
+              <div className="absolute top-0 right-0 bg-ink text-paper text-[9px] uppercase tracking-[0.4em] px-5 py-2">
                 Recommended
               </div>
-
               <div className="p-8 md:p-12">
-                <p className="text-[10px] uppercase tracking-[0.5em] text-brand-gold mb-4">
+                <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">
                   Perfect Fit
                 </p>
-                <h3 className="text-3xl md:text-4xl font-serif mb-6 text-brand-charcoal">
+                <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
                   Custom Measurements
                 </h3>
-                <p className="text-sm text-brand-slate leading-relaxed mb-8">
+                <p className="text-sm text-stone leading-relaxed mb-8">
                   Made to your exact measurements by our master tailors. Delivered within 3 weeks.
                 </p>
-                <ul className="space-y-3 text-[13px] text-brand-slate">
+                <ul className="space-y-3 text-[13px] text-stone">
                   {["Made to your measurements", "15+ measurement fields", "3 week delivery"].map((item) => (
                     <li key={item} className="flex items-center gap-3">
-                      <span className="w-4 h-[1px] bg-brand-gold" />
+                      <span className="w-4 h-[1px] bg-ink" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -616,9 +635,9 @@ export default function MenBespokePage() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute bottom-6 right-6 w-6 h-6 rounded-full bg-brand-gold flex items-center justify-center"
+                  className="absolute bottom-6 right-6 w-6 h-6 rounded-full bg-ink flex items-center justify-center"
                 >
-                  <span className="text-white text-xs">✓</span>
+                  <span className="text-paper text-xs">✓</span>
                 </motion.div>
               )}
             </motion.button>
@@ -634,15 +653,15 @@ export default function MenBespokePage() {
                 className="max-w-5xl mx-auto mt-16 space-y-8 overflow-hidden"
               >
                 {showJacketSelector && (
-                  <div className="border border-brand-stone bg-white p-8 md:p-12">
+                  <div className="border border-border bg-white p-8 md:p-12">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-2">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">
                           Jacket
                         </p>
-                        <h4 className="text-2xl font-serif text-brand-charcoal">Size & Length</h4>
+                        <h4 className="text-2xl font-serif text-ink">Size & Length</h4>
                       </div>
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-brand-slate">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-stone">
                         Inches
                       </span>
                     </div>
@@ -653,8 +672,8 @@ export default function MenBespokePage() {
                           onClick={() => setJacketSize(size)}
                           className={`py-3 text-sm transition-all duration-300 border ${
                             jacketSize === size
-                              ? "bg-brand-charcoal text-white border-brand-charcoal"
-                              : "border-brand-stone text-brand-charcoal hover:border-brand-charcoal"
+                              ? "bg-ink text-paper border-ink"
+                              : "border-border text-ink hover:border-ink"
                           }`}
                         >
                           {size}
@@ -662,7 +681,7 @@ export default function MenBespokePage() {
                       ))}
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4">
                         Length
                       </p>
                       <div className="grid grid-cols-3 gap-3">
@@ -672,8 +691,8 @@ export default function MenBespokePage() {
                             onClick={() => setJacketLength(len)}
                             className={`py-3 text-sm transition-all duration-300 border ${
                               jacketLength === len
-                                ? "bg-brand-charcoal text-white border-brand-charcoal"
-                                : "border-brand-stone text-brand-charcoal hover:border-brand-charcoal"
+                                ? "bg-ink text-paper border-ink"
+                                : "border-border text-ink hover:border-ink"
                             }`}
                           >
                             {len}
@@ -685,15 +704,15 @@ export default function MenBespokePage() {
                 )}
 
                 {showTrouserSelector && (
-                  <div className="border border-brand-stone bg-white p-8 md:p-12">
+                  <div className="border border-border bg-white p-8 md:p-12">
                     <div className="flex items-center justify-between mb-8">
                       <div>
-                        <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-2">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">
                           Trouser
                         </p>
-                        <h4 className="text-2xl font-serif text-brand-charcoal">Waist & Inseam</h4>
+                        <h4 className="text-2xl font-serif text-ink">Waist & Inseam</h4>
                       </div>
-                      <span className="text-[10px] uppercase tracking-[0.3em] text-brand-slate">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-stone">
                         Inches
                       </span>
                     </div>
@@ -704,8 +723,8 @@ export default function MenBespokePage() {
                           onClick={() => setTrouserSize(size)}
                           className={`py-3 text-sm transition-all duration-300 border ${
                             trouserSize === size
-                              ? "bg-brand-charcoal text-white border-brand-charcoal"
-                              : "border-brand-stone text-brand-charcoal hover:border-brand-charcoal"
+                              ? "bg-ink text-paper border-ink"
+                              : "border-border text-ink hover:border-ink"
                           }`}
                         >
                           {size}
@@ -713,7 +732,7 @@ export default function MenBespokePage() {
                       ))}
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4">
+                      <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4">
                         Inseam
                       </p>
                       <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
@@ -723,8 +742,8 @@ export default function MenBespokePage() {
                             onClick={() => setInseam(ins)}
                             className={`py-3 text-xs transition-all duration-300 border ${
                               inseam === ins
-                                ? "bg-brand-charcoal text-white border-brand-charcoal"
-                                : "border-brand-stone text-brand-charcoal hover:border-brand-charcoal"
+                                ? "bg-ink text-paper border-ink"
+                                : "border-border text-ink hover:border-ink"
                             }`}
                           >
                             {ins}
@@ -736,11 +755,11 @@ export default function MenBespokePage() {
                 )}
 
                 {showShirtSelector && (
-                  <div className="border border-brand-stone bg-white p-8 md:p-12">
-                    <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-2">
+                  <div className="border border-border bg-white p-8 md:p-12">
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">
                       Shirt
                     </p>
-                    <h4 className="text-2xl font-serif text-brand-charcoal mb-8">Neck Size</h4>
+                    <h4 className="text-2xl font-serif text-ink mb-8">Neck Size</h4>
                     <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2">
                       {["14", "14.5", "15", "15.5", "16", "16.5", "17", "17.5", "18", "18.5"].map((size) => (
                         <button
@@ -748,8 +767,8 @@ export default function MenBespokePage() {
                           onClick={() => setJacketSize(size)}
                           className={`py-3 text-sm transition-all duration-300 border ${
                             jacketSize === size
-                              ? "bg-brand-charcoal text-white border-brand-charcoal"
-                              : "border-brand-stone text-brand-charcoal hover:border-brand-charcoal"
+                              ? "bg-ink text-paper border-ink"
+                              : "border-border text-ink hover:border-ink"
                           }`}
                         >
                           {size}
@@ -763,12 +782,12 @@ export default function MenBespokePage() {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="border border-brand-gold/30 bg-brand-cream p-6 md:p-8"
+                    className="border border-bronze/30 bg-cream p-6 md:p-8"
                   >
-                    <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                       Your Selection
                     </p>
-                    <div className="space-y-2 text-sm text-brand-charcoal">
+                    <div className="space-y-2 text-sm text-ink">
                       {jacketSize && showJacketSelector && (
                         <p>Jacket — <strong className="font-medium">{jacketSize} · {jacketLength}</strong></p>
                       )}
@@ -789,23 +808,23 @@ export default function MenBespokePage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="max-w-5xl mx-auto mt-16 border border-brand-gold/30 bg-brand-cream p-8 md:p-10 text-center"
+              className="max-w-5xl mx-auto mt-16 border border-bronze/30 bg-cream p-8 md:p-10 text-center"
             >
-              <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4">
+              <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4">
                 Bespoke Guidance
               </p>
-              <p className="text-sm text-brand-slate leading-relaxed max-w-xl mx-auto">
+              <p className="text-sm text-stone leading-relaxed max-w-xl mx-auto">
                 You&apos;ll be guided through our measurement form on the next step.
                 If you need assistance, our master tailors are available on WhatsApp.
               </p>
             </motion.div>
           )}
 
-          <div className="max-w-5xl mx-auto mt-20 pt-12 border-t border-brand-stone flex justify-end">
+          <div className="max-w-5xl mx-auto mt-20 pt-12 border-t border-border flex justify-end">
             <button
               onClick={nextStep}
               disabled={!fitType || (fitType === "standard" && standardSelectionComplete)}
-              className="group bg-brand-charcoal text-white px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Continue <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
             </button>
@@ -821,28 +840,27 @@ export default function MenBespokePage() {
     const progressPercent = Math.round((filledCount / fields.length) * 100);
 
     return (
-      <div className="min-h-screen bg-brand-ivory">
+      <div className="min-h-screen bg-paper">
         <div className="max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24">
-
           <button
             onClick={() => setStep(0)}
-            className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
+            className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"
           >
             <span>←</span> Back to Fit Selection
           </button>
 
           <div className="mb-16 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] uppercase tracking-[0.4em] text-brand-gold">
+              <span className="text-[10px] uppercase tracking-[0.4em] text-bronze">
                 Step 2 of {totalSteps} — Measurements
               </span>
-              <span className="text-[10px] uppercase tracking-[0.3em] text-brand-slate">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-stone">
                 {filledCount} / {fields.length} complete
               </span>
             </div>
-            <div className="h-[2px] bg-brand-stone overflow-hidden">
+            <div className="h-[2px] bg-border overflow-hidden">
               <motion.div
-                className="h-full bg-brand-gold"
+                className="h-full bg-ink"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
@@ -856,17 +874,17 @@ export default function MenBespokePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-20 max-w-2xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-brand-charcoal leading-[1.1]">
-              Your<br />
-              <em className="text-brand-gold">measurements</em>
+            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-ink leading-[1.1]">
+              Your
+              <br />
+              <em className="text-bronze">measurements</em>
             </h1>
-            <p className="text-brand-slate text-[15px] leading-relaxed">
+            <p className="text-stone text-[15px] leading-relaxed">
               Provide your measurements in inches. Fields marked with * are required.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-
             <div className="lg:col-span-7">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -875,26 +893,26 @@ export default function MenBespokePage() {
                 className="space-y-10"
               >
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                     Measurement Profile Name *
                   </label>
                   <input
                     type="text"
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
-                    className="w-full border-0 border-b border-brand-stone pb-4 focus:border-brand-gold outline-none text-base bg-transparent text-brand-charcoal transition-colors duration-300"
+                    className="w-full border-0 border-b border-border pb-4 focus:border-ink outline-none text-base bg-transparent text-ink transition-colors duration-300"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                     Height *
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <select
                       value={heightFt}
                       onChange={(e) => setHeightFt(e.target.value)}
-                      className="border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     >
                       <option value="">Feet</option>
                       {[4, 5, 6, 7].map((ft) => (
@@ -904,7 +922,7 @@ export default function MenBespokePage() {
                     <select
                       value={heightIn}
                       onChange={(e) => setHeightIn(e.target.value)}
-                      className="border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     >
                       <option value="">Inches</option>
                       {Array.from({ length: 12 }, (_, i) => i).map((inch) => (
@@ -916,8 +934,8 @@ export default function MenBespokePage() {
 
                 <div>
                   <div className="flex items-center gap-4 mb-8">
-                    <span className="w-8 h-[1px] bg-brand-gold" />
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+                    <span className="w-8 h-[1px] bg-ink" />
+                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                       {pt} Measurements
                     </h3>
                   </div>
@@ -938,13 +956,15 @@ export default function MenBespokePage() {
                           transition={{ duration: 0.4, delay: index * 0.03 }}
                         >
                           <label className="flex items-center justify-between mb-3">
-                            <span className={`text-[10px] uppercase tracking-[0.3em] font-medium transition-colors ${
-                              isActive ? "text-brand-gold" : "text-brand-charcoal"
-                            }`}>
-                              {f.label} {f.required && <span className="text-brand-maroon">*</span>}
+                            <span
+                              className={`text-[10px] uppercase tracking-[0.3em] font-medium transition-colors ${
+                                isActive ? "text-bronze" : "text-ink"
+                              }`}
+                            >
+                              {f.label} {f.required && <span className="text-red-500">*</span>}
                             </span>
                             {limits && (
-                              <span className="text-[9px] text-brand-slate tracking-wider">
+                              <span className="text-[9px] text-stone tracking-wider">
                                 {limits.min}–{limits.max} in
                               </span>
                             )}
@@ -961,19 +981,19 @@ export default function MenBespokePage() {
                                 error
                                   ? "border-red-400 bg-red-50/50 focus:border-red-500"
                                   : isActive
-                                  ? "border-brand-gold shadow-[0_0_0_3px_rgba(197,160,89,0.1)]"
+                                  ? "border-bronze shadow-[0_0_0_3px_rgba(139,115,85,0.1)]"
                                   : isFilled
-                                  ? "border-brand-gold/40"
-                                  : "border-brand-stone hover:border-brand-charcoal/30"
+                                  ? "border-bronze/40"
+                                  : "border-border hover:border-ink/30"
                               }`}
                             />
                             {isFilled && (
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-brand-gold flex items-center justify-center"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-ink flex items-center justify-center"
                               >
-                                <span className="text-white text-[10px] font-bold">✓</span>
+                                <span className="text-paper text-[10px] font-bold">✓</span>
                               </motion.div>
                             )}
                           </div>
@@ -988,13 +1008,13 @@ export default function MenBespokePage() {
 
                 {needsJacketFit && (
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                       Jacket Fit
                     </label>
                     <select
                       value={jacketFit}
                       onChange={(e) => setJacketFit(e.target.value)}
-                      className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     >
                       {JACKET_FITS.map((f) => (
                         <option key={f} value={f}>{f}</option>
@@ -1005,13 +1025,13 @@ export default function MenBespokePage() {
 
                 {needsTrouserFit && (
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                       Trouser Fit
                     </label>
                     <select
                       value={trouserFit}
                       onChange={(e) => setTrouserFit(e.target.value)}
-                      className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     >
                       {TROUSER_FITS.map((f) => (
                         <option key={f} value={f}>{f}</option>
@@ -1021,10 +1041,10 @@ export default function MenBespokePage() {
                 )}
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                     Additional Requests
                   </label>
-                  <p className="text-xs text-brand-slate mb-4">
+                  <p className="text-xs text-stone mb-4">
                     Any changes to fit, style, or special requests.
                   </p>
                   <textarea
@@ -1032,7 +1052,7 @@ export default function MenBespokePage() {
                     onChange={(e) => setAdditionalInfo(e.target.value)}
                     rows={5}
                     placeholder="e.g. Taper trousers, add monogram, longer sleeves..."
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none resize-none text-sm text-brand-charcoal transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none resize-none text-sm text-ink transition-colors duration-300"
                   />
                 </div>
               </motion.div>
@@ -1040,14 +1060,13 @@ export default function MenBespokePage() {
 
             <div className="lg:col-span-5">
               <div className="lg:sticky lg:top-32 space-y-6">
-
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="border border-brand-stone bg-white overflow-hidden"
+                  className="border border-border bg-white overflow-hidden"
                 >
-                  <div className="relative aspect-square bg-brand-cream flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-square bg-cream flex items-center justify-center overflow-hidden">
                     <AnimatePresence mode="wait">
                       {activeField && MEASUREMENT_IMAGES[activeField] ? (
                         <motion.img
@@ -1061,22 +1080,22 @@ export default function MenBespokePage() {
                           className="w-full h-full object-contain p-8"
                         />
                       ) : (
-                        <p className="text-brand-slate text-[10px] uppercase tracking-[0.3em]">
+                        <p className="text-stone text-[10px] uppercase tracking-[0.3em]">
                           Select a field to see guide
                         </p>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  <div className="p-6 md:p-8 text-center border-t border-brand-stone">
-                    <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3">
+                  <div className="p-6 md:p-8 text-center border-t border-border">
+                    <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-3">
                       How to Measure
                     </p>
-                    <h3 className="text-2xl font-serif text-brand-charcoal mb-3">
+                    <h3 className="text-2xl font-serif text-ink mb-3">
                       {activeFieldData?.label || "Select a Field"}
                     </h3>
                     {activeFieldData?.hint && (
-                      <p className="text-xs text-brand-slate leading-relaxed">
+                      <p className="text-xs text-stone leading-relaxed">
                         {activeFieldData.hint}
                       </p>
                     )}
@@ -1087,19 +1106,19 @@ export default function MenBespokePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 }}
-                  className="border border-brand-gold/30 bg-brand-cream p-6 md:p-8"
+                  className="border border-bronze/30 bg-cream p-6 md:p-8"
                 >
-                  <p className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-4 font-semibold">
+                  <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">
                     Need assistance?
                   </p>
-                  <p className="text-xs text-brand-slate leading-relaxed mb-6">
+                  <p className="text-xs text-stone leading-relaxed mb-6">
                     Send us a photo of your best-fitting {pt}. Our master tailors will match the measurements for you.
                   </p>
                   <a
                     href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] tracking-[0.4em] uppercase border-b border-brand-charcoal pb-1 inline-block hover:border-brand-gold hover:text-brand-gold transition-colors duration-300"
+                    className="text-[10px] tracking-[0.4em] uppercase border-b border-ink pb-1 inline-block hover:border-bronze hover:text-bronze transition-colors duration-300"
                   >
                     WhatsApp Us →
                   </a>
@@ -1108,23 +1127,23 @@ export default function MenBespokePage() {
             </div>
           </div>
 
-          <div className="mt-20 pt-12 border-t border-brand-stone flex flex-col md:flex-row md:justify-between md:items-center gap-6 max-w-5xl mx-auto">
+          <div className="mt-20 pt-12 border-t border-border flex flex-col md:flex-row md:justify-between md:items-center gap-6 max-w-5xl mx-auto">
             <div>
               {requiredMissing.length > 0 ? (
-                <p className="text-xs text-brand-slate max-w-md">
-                  <span className="font-medium text-brand-charcoal">
+                <p className="text-xs text-stone max-w-md">
+                  <span className="font-medium text-ink">
                     {invalidOrMissing.some((f) => m[f.id]) ? "Fix or complete:" : "Still needed:"}
                   </span>{" "}
                   {requiredMissing.join(", ")}
                 </p>
               ) : (
-                <p className="text-xs text-brand-gold">✓ All measurements valid — ready to continue</p>
+                <p className="text-xs text-bronze">✓ All measurements valid — ready to continue</p>
               )}
             </div>
             <button
               onClick={nextStep}
               disabled={requiredMissing.length > 0 || !heightFt || !heightIn}
-              className="group bg-brand-charcoal text-white px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Continue to Contact <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
             </button>
@@ -1137,12 +1156,11 @@ export default function MenBespokePage() {
   // STEP 2: Contact + Shipping
   if (step === 2) {
     return (
-      <div className="min-h-screen bg-brand-ivory">
+      <div className="min-h-screen bg-paper">
         <div className="max-w-2xl mx-auto px-6 md:px-12 py-16 md:py-24">
-
           <button
             onClick={prevStep}
-            className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
+            className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"
           >
             <span>←</span> Back
           </button>
@@ -1152,56 +1170,56 @@ export default function MenBespokePage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-16"
           >
-            <p className="text-[10px] uppercase tracking-[0.5em] text-brand-gold mb-4">
+            <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">
               Step {fitType === "standard" ? "2" : "3"} of {totalSteps}
             </p>
-            <h1 className="text-4xl md:text-5xl font-serif text-brand-charcoal mb-4">
+            <h1 className="text-4xl md:text-5xl font-serif text-ink mb-4">
               Contact &<br />
-              <em className="text-brand-gold">shipping</em>
+              <em className="text-bronze">shipping</em>
             </h1>
-            <p className="text-brand-slate text-sm">Where should we send your order?</p>
+            <p className="text-stone text-sm">Where should we send your order?</p>
           </motion.div>
 
           <div className="space-y-10">
             <div>
               <div className="flex items-center gap-4 mb-6">
-                <span className="w-8 h-[1px] bg-brand-gold" />
-                <p className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+                <span className="w-8 h-[1px] bg-ink" />
+                <p className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                   Contact Details
                 </p>
               </div>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Full Name *
                   </label>
                   <input
                     type="text"
                     value={contact.name}
                     onChange={(e) => setContact({ ...contact, name: e.target.value })}
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Email Address *
                   </label>
                   <input
                     type="email"
                     value={contact.email}
                     onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Phone / WhatsApp
                   </label>
                   <input
                     type="text"
                     value={contact.phone}
                     onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                   />
                 </div>
               </div>
@@ -1209,14 +1227,14 @@ export default function MenBespokePage() {
 
             <div>
               <div className="flex items-center gap-4 mb-6">
-                <span className="w-8 h-[1px] bg-brand-gold" />
-                <p className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+                <span className="w-8 h-[1px] bg-ink" />
+                <p className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                   Shipping Address
                 </p>
               </div>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Address Line 1 *
                   </label>
                   <input
@@ -1224,11 +1242,11 @@ export default function MenBespokePage() {
                     value={contact.address1}
                     onChange={(e) => setContact({ ...contact, address1: e.target.value })}
                     placeholder="House / Street"
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal placeholder:text-brand-slate/50 transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink placeholder:text-mist transition-colors duration-300"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Address Line 2
                   </label>
                   <input
@@ -1236,59 +1254,59 @@ export default function MenBespokePage() {
                     value={contact.address2}
                     onChange={(e) => setContact({ ...contact, address2: e.target.value })}
                     placeholder="Apartment, suite, etc. (optional)"
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal placeholder:text-brand-slate/50 transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink placeholder:text-mist transition-colors duration-300"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                       City *
                     </label>
                     <input
                       type="text"
                       value={contact.city}
                       onChange={(e) => setContact({ ...contact, city: e.target.value })}
-                      className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                       Postal Code
                     </label>
                     <input
                       type="text"
                       value={contact.postalCode}
                       onChange={(e) => setContact({ ...contact, postalCode: e.target.value })}
-                      className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                      className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-3 font-semibold">
+                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">
                     Country *
                   </label>
                   <input
                     type="text"
                     value={contact.country}
                     onChange={(e) => setContact({ ...contact, country: e.target.value })}
-                    className="w-full border border-brand-stone bg-white p-4 focus:border-brand-gold outline-none text-sm text-brand-charcoal transition-colors duration-300"
+                    className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-16 pt-12 border-t border-brand-stone flex justify-between items-center">
+          <div className="mt-16 pt-12 border-t border-border flex justify-between items-center">
             <button
               onClick={prevStep}
-              className="text-brand-slate hover:text-brand-gold font-medium text-sm tracking-wide transition-colors"
+              className="text-stone hover:text-ink font-medium text-sm tracking-wide transition-colors"
             >
               ← Back
             </button>
             <button
               onClick={nextStep}
               disabled={!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country}
-              className="group bg-brand-charcoal text-white px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Review Order <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
             </button>
@@ -1300,12 +1318,11 @@ export default function MenBespokePage() {
 
   // STEP 3: Review
   return (
-    <div className="min-h-screen bg-brand-ivory">
+    <div className="min-h-screen bg-paper">
       <div className="max-w-3xl mx-auto px-6 md:px-12 py-16 md:py-24">
-
         <button
           onClick={prevStep}
-          className="text-[10px] uppercase tracking-[0.4em] text-brand-slate hover:text-brand-gold mb-12 inline-flex items-center gap-2 transition-colors"
+          className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"
         >
           <span>←</span> Back
         </button>
@@ -1315,14 +1332,14 @@ export default function MenBespokePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <p className="text-[10px] uppercase tracking-[0.5em] text-brand-gold mb-4">
+          <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">
             Step {totalSteps} of {totalSteps}
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif text-brand-charcoal mb-4">
+          <h1 className="text-4xl md:text-5xl font-serif text-ink mb-4">
             Review your<br />
-            <em className="text-brand-gold">order</em>
+            <em className="text-bronze">order</em>
           </h1>
-          <p className="text-brand-slate text-sm">Confirm everything looks correct before submitting.</p>
+          <p className="text-stone text-sm">Confirm everything looks correct before submitting.</p>
         </motion.div>
 
         <div className="space-y-6">
@@ -1330,28 +1347,28 @@ export default function MenBespokePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="border border-brand-stone bg-white p-8"
+            className="border border-border bg-white p-8"
           >
             <div className="flex items-center gap-4 mb-6">
-              <span className="w-8 h-[1px] bg-brand-gold" />
-              <h3 className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+              <span className="w-8 h-[1px] bg-ink" />
+              <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                 Order Summary
               </h3>
             </div>
             <div className="space-y-4 text-sm">
               <div className="flex justify-between items-start gap-4">
-                <span className="text-brand-slate">Model</span>
-                <span className="font-medium text-brand-charcoal text-right">{model.name}</span>
+                <span className="text-stone">Model</span>
+                <span className="font-medium text-ink text-right">{model.name}</span>
               </div>
-              <div className="flex justify-between items-start gap-4 pt-4 border-t border-brand-stone">
-                <span className="text-brand-slate">Fit</span>
-                <span className="font-medium text-brand-charcoal text-right">
+              <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
+                <span className="text-stone">Fit</span>
+                <span className="font-medium text-ink text-right">
                   {fitType === "custom" ? "Custom Measurements" : getStandardSizeLabel()}
                 </span>
               </div>
-              <div className="flex justify-between items-start gap-4 pt-4 border-t border-brand-stone">
-                <span className="text-brand-slate">Total</span>
-                <span className="font-serif text-2xl text-brand-charcoal">{formatPrice(model.price)}</span>
+              <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
+                <span className="text-stone">Total</span>
+                <span className="font-serif text-2xl text-ink">{formatPrice(model.price)}</span>
               </div>
             </div>
           </motion.div>
@@ -1361,37 +1378,37 @@ export default function MenBespokePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="border border-brand-stone bg-white p-8"
+              className="border border-border bg-white p-8"
             >
               <div className="flex items-center gap-4 mb-6">
-                <span className="w-8 h-[1px] bg-brand-gold" />
-                <h3 className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+                <span className="w-8 h-[1px] bg-ink" />
+                <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                   Measurements (inches)
                 </h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-5 text-sm">
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.3em] text-brand-slate mb-2">Height</p>
-                  <p className="font-medium text-brand-charcoal">{heightFt}&apos; {heightIn}&quot;</p>
+                  <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Height</p>
+                  <p className="font-medium text-ink">{heightFt}&apos; {heightIn}&quot;</p>
                 </div>
                 {fields.map((f) =>
                   m[f.id] ? (
                     <div key={f.id}>
-                      <p className="text-[9px] uppercase tracking-[0.3em] text-brand-slate mb-2">{f.label}</p>
-                      <p className="font-medium text-brand-charcoal">{m[f.id]}&quot;</p>
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">{f.label}</p>
+                      <p className="font-medium text-ink">{m[f.id]}&quot;</p>
                     </div>
                   ) : null
                 )}
                 {needsJacketFit && (
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-brand-slate mb-2">Jacket Fit</p>
-                    <p className="font-medium text-brand-charcoal">{jacketFit}</p>
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Jacket Fit</p>
+                    <p className="font-medium text-ink">{jacketFit}</p>
                   </div>
                 )}
                 {needsTrouserFit && (
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-brand-slate mb-2">Trouser Fit</p>
-                    <p className="font-medium text-brand-charcoal">{trouserFit}</p>
+                    <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Trouser Fit</p>
+                    <p className="font-medium text-ink">{trouserFit}</p>
                   </div>
                 )}
               </div>
@@ -1403,15 +1420,15 @@ export default function MenBespokePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="border border-brand-stone bg-white p-8"
+              className="border border-border bg-white p-8"
             >
               <div className="flex items-center gap-4 mb-6">
-                <span className="w-8 h-[1px] bg-brand-gold" />
-                <h3 className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+                <span className="w-8 h-[1px] bg-ink" />
+                <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                   Additional Requests
                 </h3>
               </div>
-              <p className="text-sm text-brand-slate whitespace-pre-line leading-relaxed">
+              <p className="text-sm text-stone whitespace-pre-line leading-relaxed">
                 {additionalInfo}
               </p>
             </motion.div>
@@ -1421,23 +1438,23 @@ export default function MenBespokePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="border border-brand-stone bg-white p-8"
+            className="border border-border bg-white p-8"
           >
             <div className="flex items-center gap-4 mb-6">
-              <span className="w-8 h-[1px] bg-brand-gold" />
-              <h3 className="text-[10px] uppercase tracking-[0.4em] text-brand-charcoal font-semibold">
+              <span className="w-8 h-[1px] bg-ink" />
+              <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
                 Shipping Address
               </h3>
             </div>
-            <div className="text-sm text-brand-slate leading-relaxed">
-              <p className="font-medium text-brand-charcoal mb-2">{contact.name}</p>
+            <div className="text-sm text-stone leading-relaxed">
+              <p className="font-medium text-ink mb-2">{contact.name}</p>
               <p>{contact.address1}</p>
               {contact.address2 && <p>{contact.address2}</p>}
               <p>{contact.city} {contact.postalCode}</p>
               <p>{contact.country}</p>
-              <div className="mt-5 pt-5 border-t border-brand-stone space-y-1">
-                <p className="text-brand-slate">{contact.email}</p>
-                {contact.phone && <p className="text-brand-slate">{contact.phone}</p>}
+              <div className="mt-5 pt-5 border-t border-border space-y-1">
+                <p className="text-stone">{contact.email}</p>
+                {contact.phone && <p className="text-stone">{contact.phone}</p>}
               </div>
             </div>
           </motion.div>
@@ -1448,12 +1465,26 @@ export default function MenBespokePage() {
             transition={{ delay: 0.5 }}
             onClick={handleSubmit}
             disabled={submitting}
-            className="w-full bg-brand-charcoal text-white py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-brand-gold transition-colors duration-500 disabled:opacity-50"
+            className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-50"
           >
             {submitting ? "Submitting Order..." : "Submit Order"}
           </motion.button>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MenBespokePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-paper flex items-center justify-center">
+          <div className="w-8 h-8 border border-border border-t-ink rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <MenBespokePageContent />
+    </Suspense>
   );
 }
