@@ -60,6 +60,7 @@ export default function SeasonalDetailPage() {
   }
 
   const pt = model?.subcategory || model?.product_type || "seasonal";
+  const category = model.category === "women" ? "women" : "men";
 
   return (
     <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
@@ -148,16 +149,12 @@ export default function SeasonalDetailPage() {
               </div>
 
               <div className="space-y-4">
-                <button
-                  onClick={() => {
-                    // Redirect to appropriate customize page based on category
-                    const category = model.category === "women" ? "women" : "men";
-                    window.location.href = `/custom/${category}/${model.id}`;
-                  }}
-                  className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500"
+                <Link
+                  href={`/custom/${category}/${model.id}?start=order`}
+                  className="block w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 text-center"
                 >
                   Begin Your Order →
-                </button>
+                </Link>
                 <a
                   href={`https://wa.me/16393840265?text=${encodeURIComponent(
                     `Hi, I'm interested in: ${model.name}`
