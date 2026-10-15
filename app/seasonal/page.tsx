@@ -49,6 +49,15 @@ const SEASONAL_CATEGORIES = [
   },
 ];
 
+// Aliases: handle typos in DB (holloween, helloween, halloween)
+const TYPE_ALIASES: Record<string, string[]> = {
+  halloween: ["halloween", "holloween", "helloween", "hallowen"],
+  superhero: ["superhero", "super-hero", "super_hero"],
+  gothic: ["gothic", "goth"],
+  movie: ["movie", "film", "cinema"],
+  party: ["party", "event", "events"],
+};
+
 function SeasonalContent() {
   const searchParams = useSearchParams();
   const typeFilter = searchParams.get("type") || "";
@@ -64,34 +73,31 @@ function SeasonalContent() {
       let query = supabase
         .from("models")
         .select("*")
-        .eq("category", "seasonal")
         .order("created_at", { ascending: false });
 
-      // Filter by subcategory (your DB uses 'subcategory' column)
       if (typeFilter) {
-        query = query.eq("subcategory", typeFilter);
+        // Flexible: match subcategory OR product_type, case-insensitive, with typo aliases
+        const aliases = TYPE_ALIASES[typeFilter.toLowerCase()] || [typeFilter];
+
+        const orParts: string[] = [];
+        aliases.forEach((alias) => {
+          orParts.push(`subcategory.ilike.${alias}`);
+          orParts.push(`product_type.ilike.${alias}`);
+        });
+
+        query = query.or(orParts.join(","));
+      } else {
+        // No filter — show only main seasonal items
+        query = query.eq("category", "seasonal");
       }
 
       const { data, error } = await query;
 
       if (error) {
-        // Fallback: try product_type if subcategory column doesn't exist
-        let fallbackQuery = supabase
-          .from("models")
-          .select("*")
-          .eq("category", "seasonal")
-          .order("created_at", { ascending: false });
-
-        if (typeFilter) {
-          fallbackQuery = fallbackQuery.eq("product_type", typeFilter);
-        }
-
-        const fallback = await fallbackQuery;
-        setModels(fallback.data || []);
-      } else {
-        setModels(data || []);
+        console.error("Query error:", error);
       }
 
+      setModels(data || []);
       setLoading(false);
     };
     fetchModels();
