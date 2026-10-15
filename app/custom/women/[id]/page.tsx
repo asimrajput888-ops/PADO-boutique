@@ -156,7 +156,6 @@ function WomenBespokePageContent() {
     country: "",
   });
 
-  // Auto-start: agar URL mein ?start=order hai, seedha step 0 pe jao
   useEffect(() => {
     if (searchParams.get("start") === "order") {
       setStep(0);
@@ -312,13 +311,13 @@ function WomenBespokePageContent() {
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
 
-      // Trigger factory submission (async, background)
+      // Trigger supplier submission (async, background)
       if (data.order?.id) {
-        fetch("/api/orders/submit-to-factory", {
+        fetch("/api/orders/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId: data.order.id }),
-        }).catch((err) => console.error("Factory submit failed:", err));
+        }).catch((err) => console.error("Supplier submit failed:", err));
       }
     } catch (err: any) {
       alert("Error: " + err.message);
