@@ -32,12 +32,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Defensive: warn if shipping_address is missing
+    if (!order.shipping_address) {
+      console.warn(
+        `Order ${order.id} missing shipping_address — using fallback flat fields`
+      );
+    }
+
     const payload = buildFactoryPayload({
       id: order.id,
-      customer_name: order.customer_name,
-      customer_email: order.customer_email,
+      customer_name: order.customer_name || "Guest Customer",
+      customer_email: order.customer_email || "",
       customer_phone: order.customer_phone,
-      shipping_address: order.shipping_address,
+      shipping_address: order.shipping_address || {},
+      // Flat fallbacks (agar DB mein alag columns hain)
+      address1: order.address1,
+      address2: order.address2,
+      city: order.city,
+      postal_code: order.postal_code || order.postalCode,
+      country: order.country,
       measurements: order.measurements || {},
       customization: order.customization || {},
       fabric_code: order.fabric_code,
