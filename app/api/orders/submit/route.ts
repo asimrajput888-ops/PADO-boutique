@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .select("*")
       .eq("id", orderId)
-      .single();
+      .maybeSingle();
 
     if (orderError || !order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -27,37 +27,36 @@ export async function POST(request: NextRequest) {
 
     let supplier = null;
 
-    // 1. Try to get supplier from the model
+    // 1. Try to get supplier from model
     if (order.model_id) {
       const { data: model } = await supabase
         .from("models")
-        .select("supplier_id, supplier_type")
+        .select("supplier_id")
         .eq("id", Number(order.model_id))
-        .single();
+        .maybeSingle();
 
       if (model?.supplier_id) {
         const { data: supplierData } = await supabase
           .from("suppliers")
           .select("*")
           .eq("id", model.supplier_id)
-          .single();
+          .maybeSingle();
 
         supplier = supplierData;
       }
     }
 
-    // 2. Fallback: default manual supplier
+    // 2. Fallback: first active manual supplier
     if (!supplier) {
-      const { data: fallback } = await supabase
+      const { data: fallbackList } = await supabase
         .from("suppliers")
         .select("*")
         .eq("type", "manual")
         .eq("active", true)
         .order("priority", { ascending: true })
-        .limit(1)
-        .single();
+        .limit(1);
 
-      supplier = fallback;
+      supplier = fallbackList?.[0] || null;
     }
 
     if (!supplier) {
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
 
     // 4. Route based on supplier type
     if (supplier.type === "api" || supplier.type === "dropship") {
-      // ===== API SUPPLIER =====
       try {
         const payload = buildFactoryPayload({
           id: order.id,
@@ -112,7 +110,6 @@ export async function POST(request: NextRequest) {
           supplier_order_id: factoryResponse.supplier_order_id,
         });
       } catch (apiError: any) {
-        // API failed — mark as needing manual attention
         await supabase
           .from("orders")
           .update({
@@ -129,7 +126,6 @@ export async function POST(request: NextRequest) {
         });
       }
     } else {
-      // ===== MANUAL SUPPLIER =====
       return NextResponse.json({
         success: true,
         type: "manual",
