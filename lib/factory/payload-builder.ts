@@ -4,26 +4,27 @@ import { FactoryOrderPayload } from "./types";
 
 interface OrderData {
   id: string;
-  customer_name: string;
-  customer_email: string;
+  customer_name?: string;
+  customer_email?: string;
   customer_phone?: string;
-  shipping_address?: {
-    address1?: string;
-    address2?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-  };
-  // Fallback flat fields (agar shipping_address object na ho)
-  address1?: string;
-  address2?: string;
-  city?: string;
-  postal_code?: string;
-  country?: string;
-  measurements: Record<string, string>;
-  customization: Record<string, string>;
+  customer_country?: string;
+  shipping_address?: any;
+  measurements?: Record<string, string>;
+  customization?: Record<string, string>;
   fabric_code?: string;
+  fabric_name?: string;
   customer_notes?: string;
+  // Customization flat fields
+  lapel?: string;
+  buttons?: string;
+  vent?: string;
+  lining?: string;
+  collar?: string;
+  pocket?: string;
+  fit?: string;
+  trouser?: string;
+  vest?: string;
+  sleeve?: string;
 }
 
 export function buildFactoryPayload(order: OrderData): FactoryOrderPayload {
@@ -34,35 +35,30 @@ export function buildFactoryPayload(order: OrderData): FactoryOrderPayload {
   const measurements = order.measurements || {};
   const customization = order.customization || {};
 
-  // Handle both nested shipping_address object AND flat fields
+  // Shipping: prefer nested JSON, else use country
   const shipping = order.shipping_address || {};
-  const address1 = shipping.address1 || order.address1 || "";
-  const address2 = shipping.address2 || order.address2 || "";
-  const city = shipping.city || order.city || "";
-  const postalCode = shipping.postalCode || order.postal_code || "";
-  const country = shipping.country || order.country || "";
 
   const parseMeasurement = (key: string, fallback = 0): number => {
     const value = measurements[key];
     if (!value) return fallback;
-    const num = parseFloat(value);
+    const num = parseFloat(String(value));
     return isNaN(num) ? fallback : num;
   };
 
   return {
-    order_id: order.id,
+    order_id: String(order.id),
     brand_label: "PADO",
     fabric_code: order.fabric_code || customization.fabric_code || "DEFAULT",
     shipping_address: {
       first_name: firstName,
       last_name: lastName,
-      address_line_1: address1,
-      address_line_2: address2,
-      city: city,
-      postal_code: postalCode,
-      country: country,
+      address_line_1: shipping.address1 || shipping.address_line_1 || "",
+      address_line_2: shipping.address2 || shipping.address_line_2 || "",
+      city: shipping.city || "",
+      postal_code: shipping.postalCode || shipping.postal_code || "",
+      country: shipping.country || order.customer_country || "",
       phone: order.customer_phone || "",
-      email: order.customer_email,
+      email: order.customer_email || "",
     },
     measurements: {
       chest: parseMeasurement("chest"),
@@ -79,11 +75,11 @@ export function buildFactoryPayload(order: OrderData): FactoryOrderPayload {
       leg_opening: parseMeasurement("legOpening"),
     },
     customization: {
-      lapel_style: (customization.lapel as any) || "notch",
-      lining_code: customization.lining || "DEFAULT",
-      buttons: customization.buttons || "HORN_BROWN",
-      vents: (customization.vents as any) || "double",
-      pocket_style: customization.pocket || "flap",
+      lapel_style: (customization.lapel || order.lapel || "notch") as any,
+      lining_code: customization.lining || order.lining || "DEFAULT",
+      buttons: customization.buttons || order.buttons || "HORN_BROWN",
+      vents: (customization.vents || order.vent || "double") as any,
+      pocket_style: customization.pocket || order.pocket || "flap",
       monogram: customization.monogram || "",
     },
     notes: order.customer_notes || "",
