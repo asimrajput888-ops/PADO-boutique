@@ -6,8 +6,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 type Currency = "USD" | "CAD" | "EUR" | "AUD" | "GBP" | "AED";
 
-// Static exchange rates (fallback — no API call needed)
-// Update these manually if rates change significantly
+// Static exchange rates (no API call — never crashes)
 const EXCHANGE_RATES: Record<Currency, number> = {
   USD: 1,
   CAD: 1.36,
@@ -40,7 +39,6 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>("USD");
 
-  // Load saved currency from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("pado_currency") as Currency | null;
@@ -48,7 +46,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         setCurrencyState(saved);
       }
     } catch (err) {
-      console.error("Currency load error:", err);
+      // Silent fail — use default USD
     }
   }, []);
 
@@ -57,7 +55,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem("pado_currency", newCurrency);
     } catch (err) {
-      console.error("Currency save error:", err);
+      // Silent fail
     }
   };
 
@@ -74,7 +72,6 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const converted = convertPrice(usdPrice);
     const symbol = CURRENCY_SYMBOLS[currency] || "$";
 
-    // Format based on currency
     if (currency === "AED") {
       return `${symbol}${converted.toFixed(0)}`;
     }
