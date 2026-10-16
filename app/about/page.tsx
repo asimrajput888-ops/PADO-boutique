@@ -66,8 +66,8 @@ const ATELIER_IMAGES = [
     alt: "Men's formal bespoke suit",
   },
   {
-    src: "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=800&q=90&auto=format&fit=crop",
-    alt: "Women's tailored suit",
+    src: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&q=90&auto=format&fit=crop",
+    alt: "Women's white tailored suit",
   },
   {
     src: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=90&auto=format&fit=crop",
@@ -146,7 +146,7 @@ export default function AboutPage() {
       </section>
 
       {/* ===== STATS ===== */}
-      <section className="pb-24 md:pb-32 px-6 md:px-16 bg-cream py-24 md:py-32">
+      <section className="px-6 md:px-16 bg-cream py-24 md:py-32">
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {[
