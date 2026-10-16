@@ -58,15 +58,16 @@ const PROCESS = [
 export default function HomePage() {
   return (
     <div className="bg-brand-ivory">
-      {/* ===== HERO SECTION — Split Screen ===== */}
-      <section className="relative min-h-screen w-full grid grid-cols-1 lg:grid-cols-2">
-        {/* LEFT: Text (Dark background) */}
-        <div className="relative bg-brand-charcoal flex items-center justify-center px-6 md:px-12 py-32 lg:py-0 order-2 lg:order-1">
+      {/* ===== HERO SECTION — Split Screen (Text Left, Full Image Right) ===== */}
+      <section className="relative w-full min-h-screen grid grid-cols-1 lg:grid-cols-2">
+
+        {/* LEFT: Text on Dark Background */}
+        <div className="relative bg-brand-charcoal flex items-center justify-center px-6 md:px-12 lg:px-16 py-20 lg:py-0 order-2 lg:order-1">
           <div className="max-w-lg w-full">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
               className="text-[10px] tracking-[0.5em] text-brand-gold-light uppercase mb-8"
             >
               Bespoke Tailoring · Est. 2020
@@ -75,8 +76,8 @@ export default function HomePage() {
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.05] mb-8"
+              transition={{ duration: 1, delay: 0.4 }}
+              className="text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.08] mb-8"
             >
               Cut to your
               <br />
@@ -86,54 +87,67 @@ export default function HomePage() {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
               className="text-white/70 text-base leading-relaxed mb-10 max-w-md"
             >
-              Handcrafted bespoke suits, made to your exact measurements. Designed
-              in Canada, handcrafted in Karachi, delivered worldwide.
+              Handcrafted bespoke suits, made to your exact measurements.
+              Designed in Canada, handcrafted in Karachi, delivered worldwide.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
               className="flex flex-wrap gap-4"
             >
               <Link
                 href="/custom/men"
-                className="inline-block bg-white text-brand-charcoal px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-brand-gold hover:text-white transition-all duration-500"
+                className="inline-block bg-white text-brand-charcoal px-8 md:px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-brand-gold hover:text-white transition-all duration-500"
               >
                 Begin Your Order
               </Link>
               <Link
                 href="/about"
-                className="inline-block border border-white/40 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-white/10 transition-all duration-500"
+                className="inline-block border border-white/40 text-white px-8 md:px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-white/10 transition-all duration-500"
               >
                 Our Story
               </Link>
             </motion.div>
+
+            {/* Bottom details */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 1.2 }}
+              className="mt-12 pt-8 border-t border-white/10 flex flex-wrap gap-8 text-[10px] uppercase tracking-[0.3em] text-white/40"
+            >
+              <span>Handcrafted</span>
+              <span>Made to Measure</span>
+              <span>Worldwide</span>
+            </motion.div>
           </div>
         </div>
 
-        {/* RIGHT: Image */}
-        <div className="relative h-[60vh] lg:h-screen order-1 lg:order-2 overflow-hidden bg-brand-charcoal">
+        {/* RIGHT: FULL Image (no crop) */}
+        <div className="relative h-[70vh] lg:h-screen order-1 lg:order-2 bg-brand-charcoal overflow-hidden flex items-center justify-center">
           <motion.div
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute inset-0"
+            className="relative w-full h-full"
           >
             <Image
               src="/images/hero-model.jpg"
               alt="PADO Boutique Bespoke Tailoring"
               fill
               priority
-              className="object-cover object-center"
+              className="object-contain object-center"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
-            {/* Subtle gradient for depth */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-black/30 lg:via-transparent lg:to-transparent" />
           </motion.div>
+
+          {/* Subtle vignette on edges */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-brand-charcoal via-transparent to-transparent lg:bg-gradient-to-r lg:from-brand-charcoal/40 lg:via-transparent lg:to-transparent" />
         </div>
       </section>
 
