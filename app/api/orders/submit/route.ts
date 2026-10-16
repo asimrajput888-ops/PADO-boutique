@@ -15,10 +15,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "orderId required" }, { status: 400 });
     }
 
+    // Force number conversion (id is bigint in DB)
+    const numericOrderId = Number(orderId);
+    if (isNaN(numericOrderId)) {
+      return NextResponse.json({ error: "Invalid orderId" }, { status: 400 });
+    }
+
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
-      .eq("id", orderId)
+      .eq("id", numericOrderId)
       .maybeSingle();
 
     if (orderError || !order) {
@@ -66,8 +72,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Update order with supplier info
-    await supabase
+    // 3. Update order with supplier info — use numeric ID
+    const { error: updateError } = await supabase
       .from("orders")
       .update({
         supplier_id: supplier.id,
@@ -75,7 +81,15 @@ export async function POST(request: NextRequest) {
         supplier_status:
           supplier.type === "manual" ? "PENDING_MANUAL" : "PENDING_API",
       })
-      .eq("id", orderId);
+      .eq("id", numericOrderId);
+
+    if (updateError) {
+      console.error("Update error:", updateError);
+      return NextResponse.json(
+        { error: "Failed to update order: " + updateError.message },
+        { status: 500 }
+      );
+    }
 
     // 4. Route based on supplier type
     if (supplier.type === "api" || supplier.type === "dropship") {
@@ -101,7 +115,7 @@ export async function POST(request: NextRequest) {
             supplier_order_id: factoryResponse.supplier_order_id,
             supplier_status: factoryResponse.status,
           })
-          .eq("id", orderId);
+          .eq("id", numericOrderId);
 
         return NextResponse.json({
           success: true,
@@ -116,7 +130,7 @@ export async function POST(request: NextRequest) {
             supplier_status: "API_FAILED",
             supplier_notes: apiError.message,
           })
-          .eq("id", orderId);
+          .eq("id", numericOrderId);
 
         return NextResponse.json({
           success: false,
