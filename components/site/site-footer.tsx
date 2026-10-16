@@ -4,23 +4,23 @@ import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-brand-ivory border-t border-brand-stone">
+    <footer className="bg-[#FDFBF7] border-t border-neutral-200">
       {/* Newsletter */}
-      <div className="border-b border-brand-stone">
+      <div className="border-b border-neutral-200">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center">
             <div>
-              <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-4">
+              <p className="text-[10px] tracking-[0.5em] text-[#C5A059] uppercase mb-4">
                 Newsletter
               </p>
-              <h3 className="text-2xl md:text-4xl font-serif text-brand-charcoal leading-tight">
+              <h3 className="text-2xl md:text-4xl font-serif text-[#0A0A0A] leading-tight">
                 Join the atelier.
                 <br />
-                <em className="text-brand-gold">Receive our stories.</em>
+                <em className="text-[#C5A059]">Receive our stories.</em>
               </h3>
             </div>
             <div>
-              <p className="text-sm text-brand-slate leading-relaxed mb-6">
+              <p className="text-sm text-neutral-600 leading-relaxed mb-6">
                 Subscribe for early access to new collections, fabric drops, and
                 stories from our master tailors.
               </p>
@@ -28,11 +28,11 @@ export default function SiteFooter() {
                 <input
                   type="email"
                   placeholder="your@email.com"
-                  className="flex-1 border border-brand-stone bg-white px-5 py-4 text-sm text-brand-charcoal placeholder:text-neutral-400 focus:border-brand-gold outline-none transition-colors"
+                  className="flex-1 border border-neutral-200 bg-white px-5 py-4 text-sm text-[#0A0A0A] placeholder:text-neutral-400 focus:border-[#C5A059] outline-none transition-colors"
                 />
                 <button
                   type="submit"
-                  className="bg-brand-charcoal text-white px-8 py-4 text-[10px] uppercase tracking-[0.3em] font-medium hover:bg-brand-gold transition-colors duration-500"
+                  className="bg-[#0A0A0A] text-white px-8 py-4 text-[10px] uppercase tracking-[0.3em] font-medium hover:bg-[#C5A059] transition-colors duration-500"
                 >
                   Subscribe
                 </button>
@@ -47,12 +47,12 @@ export default function SiteFooter() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4 lg:col-span-2">
-            <h3 className="text-2xl font-serif text-brand-charcoal mb-6 tracking-[0.3em]">
+            <h3 className="text-2xl font-serif text-[#0A0A0A] mb-6 tracking-[0.3em]">
               PADO
             </h3>
-            <p className="text-sm leading-relaxed mb-6 max-w-xs text-brand-slate">
-              Luxury bespoke tailoring and silk loungewear. Crafted for the
-              modern individual.
+            <p className="text-sm leading-relaxed mb-6 max-w-xs text-neutral-600">
+              Luxury bespoke tailoring and silk loungewear. Crafted for the modern
+              individual.
             </p>
             <div className="flex items-center gap-4">
               {["Instagram", "Facebook", "Pinterest", "YouTube"].map(
@@ -61,7 +61,7 @@ export default function SiteFooter() {
                     key={social}
                     href="#"
                     aria-label={social}
-                    className="w-9 h-9 border border-brand-stone flex items-center justify-center text-[10px] text-brand-slate hover:border-brand-gold hover:text-brand-gold transition-colors duration-300"
+                    className="w-9 h-9 border border-neutral-200 flex items-center justify-center text-[10px] text-neutral-600 hover:border-[#C5A059] hover:text-[#C5A059] transition-colors duration-300"
                   >
                     {social[0]}
                   </a>
@@ -72,7 +72,7 @@ export default function SiteFooter() {
 
           {/* Custom Made */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
+            <h4 className="text-[#0A0A0A] text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
               Custom Made
             </h4>
             <ul className="space-y-3 text-sm">
@@ -84,7 +84,7 @@ export default function SiteFooter() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
+                    className="text-neutral-600 hover:text-[#C5A059] transition-colors duration-300"
                   >
                     {item.name}
                   </Link>
@@ -95,7 +95,7 @@ export default function SiteFooter() {
 
           {/* Customer Care */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
+            <h4 className="text-[#0A0A0A] text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
               Customer Care
             </h4>
             <ul className="space-y-3 text-sm">
@@ -109,7 +109,7 @@ export default function SiteFooter() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
+                    className="text-neutral-600 hover:text-[#C5A059] transition-colors duration-300"
                   >
                     {item.name}
                   </Link>
@@ -120,7 +120,7 @@ export default function SiteFooter() {
 
           {/* Company */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
+            <h4 className="text-[#0A0A0A] text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
               Company
             </h4>
             <ul className="space-y-3 text-sm">
@@ -133,7 +133,7 @@ export default function SiteFooter() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
+                    className="text-neutral-600 hover:text-[#C5A059] transition-colors duration-300"
                   >
                     {item.name}
                   </Link>
@@ -145,7 +145,7 @@ export default function SiteFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-brand-stone">
+      <div className="border-t border-neutral-200">
         <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[10px] text-neutral-500 tracking-[0.3em] uppercase text-center md:text-left">
             © {new Date().getFullYear()} PADO BOUTIQUE. All rights reserved.
@@ -158,7 +158,7 @@ export default function SiteFooter() {
               {["VISA", "MC", "AMEX", "PAY"].map((brand) => (
                 <span
                   key={brand}
-                  className="text-[9px] tracking-widest text-neutral-400 border border-brand-stone px-2 py-1"
+                  className="text-[9px] tracking-widest text-neutral-400 border border-neutral-200 px-2 py-1"
                 >
                   {brand}
                 </span>
