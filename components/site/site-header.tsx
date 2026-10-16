@@ -75,7 +75,9 @@ export default function SiteHeader() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "bg-white shadow-sm" : "bg-transparent"
+          scrolled
+            ? "bg-white shadow-sm"
+            : "bg-gradient-to-b from-black/70 via-black/40 to-transparent"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
@@ -130,7 +132,7 @@ export default function SiteHeader() {
             </Link>
           </div>
 
-          {/* CENTER: PADO Logo — Solid Gold */}
+          {/* CENTER: PADO Logo */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
