@@ -81,7 +81,9 @@ export default function SiteHeader() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? "bg-paper border-b border-border" : "bg-transparent"
+          scrolled
+            ? "bg-paper/95 backdrop-blur-md border-b border-border"
+            : "bg-ink/30 backdrop-blur-sm"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
@@ -136,7 +138,7 @@ export default function SiteHeader() {
             </Link>
           </div>
 
-          {/* CENTER: Logo — PADO with Gold Shine */}
+          {/* CENTER: Logo */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
@@ -147,7 +149,7 @@ export default function SiteHeader() {
             </span>
             <span
               className={`block text-[8px] md:text-[9px] tracking-[0.4em] mt-0.5 transition-colors duration-500 ${
-                scrolled ? "text-stone" : "text-paper/60"
+                scrolled ? "text-stone" : "text-paper/80"
               }`}
             >
               BESPOKE
