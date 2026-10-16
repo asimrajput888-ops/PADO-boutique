@@ -3,7 +3,6 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import Script from "next/script";
-import SmoothScroll from "@/components/SmoothScroll";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
 import SiteHeader from "@/components/site/site-header";
@@ -44,7 +43,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
-      <head>
+      <body className="antialiased">
+        <CurrencyProvider>
+          <CartProvider>
+            <SiteHeader />
+            <main className="min-h-screen">{children}</main>
+            <SiteFooter />
+          </CartProvider>
+        </CurrencyProvider>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3BE6XFB1WC"
           strategy="afterInteractive"
@@ -57,17 +63,6 @@ export default function RootLayout({
             gtag('config', 'G-3BE6XFB1WC');
           `}
         </Script>
-      </head>
-      <body className="antialiased">
-        <CurrencyProvider>
-          <CartProvider>
-            <SmoothScroll>
-              <SiteHeader />
-              <main className="min-h-screen">{children}</main>
-              <SiteFooter />
-            </SmoothScroll>
-          </CartProvider>
-        </CurrencyProvider>
       </body>
     </html>
   );
