@@ -5,7 +5,6 @@ import { Inter, Cormorant_Garamond } from "next/font/google";
 import Script from "next/script";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
-import SiteHeader from "@/components/site/site-header";
 import SiteFooter from "@/components/site/site-footer";
 import "./globals.css";
 
@@ -46,9 +45,27 @@ export default function RootLayout({
       <body className="antialiased">
         <CurrencyProvider>
           <CartProvider>
-            <SiteHeader />
-            <main className="min-h-screen">{children}</main>
-            <SiteFooter />
+            {/* TEST BAR — yeh dikh raha hai toh providers chal rahe hain */}
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                background: "blue",
+                color: "white",
+                padding: "20px",
+                fontSize: "20px",
+                zIndex: 9999,
+                textAlign: "center",
+              }}
+            >
+              ✅ PROVIDERS OK — Header abhi test mein hai
+            </div>
+            <div style={{ paddingTop: "80px" }}>
+              <main className="min-h-screen">{children}</main>
+              <SiteFooter />
+            </div>
           </CartProvider>
         </CurrencyProvider>
         <Script
