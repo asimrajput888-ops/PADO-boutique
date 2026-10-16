@@ -1,27 +1,256 @@
-/* ===== SHINING GOLD TEXT ===== */
-.text-gold-shine {
-  background: linear-gradient(
-    90deg,
-    #BF953F 0%,
-    #FCF6BA 20%,
-    #B38728 40%,
-    #FBF5B7 60%,
-    #AA771C 80%,
-    #BF953F 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: gold-shine 3s linear infinite;
+/* app/globals.css */
+
+@import "tailwindcss";
+
+@theme {
+  /* ===== BRAND COLORS ===== */
+  --color-brand-cream: #FFF8F0;
+  --color-brand-ivory: #FDFBF7;
+  --color-brand-stone: #E8E2D9;
+  --color-brand-gold: #C5A059;
+  --color-brand-gold-light: #D4B87A;
+  --color-brand-gold-dark: #A88840;
+  --color-brand-charcoal: #1E1E2C;
+  --color-brand-slate: #4A4A5A;
+  --color-brand-maroon: #5D1A24;
+  --color-brand-maroon-light: #7A2530;
+
+  /* Semantic tokens */
+  --color-ink: #0A0A0A;
+  --color-charcoal: #1A1A1A;
+  --color-graphite: #3D3D3D;
+  --color-stone: #6B6B6B;
+  --color-mist: #B8B3AB;
+  --color-bone: #EFEBE4;
+  --color-cream: #F7F5F0;
+  --color-paper: #FDFCFA;
+  --color-bronze: #8B7355;
+  --color-border: #E5E0D8;
+  --color-foreground: #1E1E2C;
+  --color-muted-foreground: #6B6B7B;
+  --color-background: #FDFBF7;
+
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', 'Helvetica Neue', sans-serif;
+
+  /* Letter spacing */
+  --tracking-luxe: 0.4em;
+  --tracking-luxe-sm: 0.3em;
+  --tracking-luxe-lg: 0.5em;
+
+  /* Easing */
+  --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes gold-shine {
-  0% {
-    background-position: 0% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+/* ===== BASE ===== */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-charcoal);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.tracking-luxe { letter-spacing: var(--tracking-luxe); }
+.tracking-luxe-sm { letter-spacing: var(--tracking-luxe-sm); }
+.tracking-luxe-lg { letter-spacing: var(--tracking-luxe-lg); }
+
+.text-muted-foreground { color: var(--color-muted-foreground); }
+.border-border { border-color: var(--color-border); }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gold);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-gold-dark);
+}
+
+::selection {
+  background: var(--color-brand-gold);
+  color: white;
+}
+
+/* ===== REVEAL ANIMATION ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.9s var(--ease-luxury),
+    transform 0.9s var(--ease-luxury);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal[data-direction="left"] { transform: translateX(-40px); }
+.reveal[data-direction="right"] { transform: translateX(40px); }
+.reveal[data-direction="none"] { transform: none; }
+.reveal.is-visible[data-direction="left"],
+.reveal.is-visible[data-direction="right"],
+.reveal.is-visible[data-direction="none"] {
+  transform: translate(0);
+}
+
+/* Legacy reveal classes */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-luxury), transform 0.8s var(--ease-luxury);
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== IMAGE ZOOM ===== */
+.img-zoom-container { overflow: hidden; }
+.img-zoom-container img {
+  transition: transform 1.2s var(--ease-luxury);
+}
+.img-zoom-container:hover img {
+  transform: scale(1.05);
+}
+
+/* ===== LINK UNDERLINE ===== */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.4s var(--ease-luxury);
+}
+.link-underline:hover::after { width: 100%; }
+
+/* ===== GOLD ACCENT LINE ===== */
+.gold-line {
+  width: 40px;
+  height: 1px;
+  background: var(--color-brand-gold);
+}
+
+/* ===== CARD LIFT ===== */
+.card-lift {
+  transition: transform 0.5s var(--ease-luxury), box-shadow 0.5s var(--ease-luxury);
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(30, 30, 44, 0.10);
+}
+
+/* ===== FADE IN ANIMATION ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s var(--ease-luxury) forwards;
+}
+
+/* ===== MARQUEE ===== */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* ===== FLOAT ===== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* ===== SHIMMER ===== */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #E8E2D9 0%, #F5F0E8 50%, #E8E2D9 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ===== BUTTONS ===== */
+.btn-luxe {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.125rem 2.5rem;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-weight: 500;
+  overflow: hidden;
+  transition: all 0.5s var(--ease-luxury);
+}
+.btn-luxe-primary {
+  background: var(--color-ink);
+  color: white;
+}
+.btn-luxe-primary:hover {
+  background: var(--color-brand-gold);
+  color: white;
+}
+.btn-luxe-outline {
+  background: transparent;
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
+}
+.btn-luxe-outline:hover {
+  background: var(--color-ink);
+  color: white;
+}
+.btn-luxe-gold {
+  background: var(--color-brand-gold);
+  color: white;
+}
+.btn-luxe-gold:hover {
+  background: var(--color-brand-gold-dark);
+}
+
+/* ===== INPUT FOCUS ===== */
+.input-luxe {
+  transition: all 0.3s var(--ease-luxury);
+}
+.input-luxe:focus {
+  outline: none;
+  border-color: var(--color-brand-gold);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.10);
 }
