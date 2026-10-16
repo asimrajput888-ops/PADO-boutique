@@ -81,9 +81,7 @@ export default function SiteHeader() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-paper border-b border-border"
-            : "bg-transparent"
+          scrolled ? "bg-paper border-b border-border" : "bg-transparent"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
@@ -96,34 +94,55 @@ export default function SiteHeader() {
               aria-label="Menu"
             >
               <div className="flex flex-col gap-[5px]">
-                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-ink" : "bg-paper"}`} />
-                <span className={`w-6 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-ink" : "bg-paper"}`} />
-                <span className={`w-4 h-[1.2px] transition-colors duration-500 ${scrolled ? "bg-ink" : "bg-paper"} group-hover:w-6`} />
+                <span
+                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                    scrolled ? "bg-ink" : "bg-paper"
+                  }`}
+                />
+                <span
+                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
+                    scrolled ? "bg-ink" : "bg-paper"
+                  }`}
+                />
+                <span
+                  className={`w-4 h-[1.2px] transition-colors duration-500 ${
+                    scrolled ? "bg-ink" : "bg-paper"
+                  } group-hover:w-6`}
+                />
               </div>
             </button>
 
             <Link
               href="/custom"
               aria-label="Search"
-              className={`transition-colors duration-500 ${scrolled ? "text-ink" : "text-paper"}`}
+              className={`transition-colors duration-500 ${
+                scrolled ? "text-ink" : "text-paper"
+              }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.2}
+                stroke="currentColor"
+                className="w-[18px] h-[18px]"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
               </svg>
             </Link>
           </div>
 
-          {/* CENTER: Logo */}
+          {/* CENTER: Logo — PADO with Gold Shine */}
           <Link
             href="/"
-            className="absolute left-1/2 -translate-x-1/2 group flex flex-col items-center"
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
             aria-label="PADO Boutique"
           >
-            <span
-              className={`block font-serif text-2xl md:text-3xl tracking-[0.5em] transition-colors duration-500 ${
-                scrolled ? "text-ink" : "text-paper"
-              }`}
-            >
+            <span className="text-gold-shine block font-serif text-2xl md:text-3xl tracking-[0.5em]">
               PADO
             </span>
             <span
@@ -155,10 +174,23 @@ export default function SiteHeader() {
             <Link
               href="/admin/login"
               aria-label="Account"
-              className={`transition-colors duration-500 ${scrolled ? "text-ink" : "text-paper"}`}
+              className={`transition-colors duration-500 ${
+                scrolled ? "text-ink" : "text-paper"
+              }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="currentColor" className="w-[18px] h-[18px]">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.2}
+                stroke="currentColor"
+                className="w-[18px] h-[18px]"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
               </svg>
             </Link>
 
@@ -209,9 +241,8 @@ export default function SiteHeader() {
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-paper z-[70] overflow-y-auto"
             >
-              {/* Drawer header */}
               <div className="flex items-center justify-between px-8 py-6 border-b border-border sticky top-0 bg-paper z-10">
-                <span className="text-[10px] uppercase tracking-label text-stone">
+                <span className="text-[10px] uppercase tracking-[0.4em] text-stone">
                   Menu
                 </span>
                 <button
@@ -223,13 +254,14 @@ export default function SiteHeader() {
                 </button>
               </div>
 
-              {/* Menu content */}
               <div className="px-8 py-10">
                 {menuSections.map((section) => (
                   <div key={section.id} className="mb-8">
                     <button
                       onClick={() =>
-                        setOpenSubmenu(openSubmenu === section.id ? null : section.id)
+                        setOpenSubmenu(
+                          openSubmenu === section.id ? null : section.id
+                        )
                       }
                       className="w-full text-left flex items-center justify-between mb-4 group"
                     >
@@ -270,7 +302,6 @@ export default function SiteHeader() {
                 ))}
               </div>
 
-              {/* Drawer footer */}
               <div className="px-8 py-6 border-t border-border space-y-3">
                 <Link
                   href="/track-order"
@@ -287,7 +318,7 @@ export default function SiteHeader() {
                   Contact
                 </Link>
                 <div className="pt-4 border-t border-border mt-4">
-                  <p className="text-[10px] text-stone uppercase tracking-label mb-3">
+                  <p className="text-[10px] text-stone uppercase tracking-[0.4em] mb-3">
                     Get in touch
                   </p>
                   <p className="text-sm text-graphite">www.padoshop.com</p>
