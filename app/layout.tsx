@@ -44,6 +44,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${cormorant.variable}`}>
       <body className="antialiased">
+        {/* Film-grain overlay — subtle premium texture across the whole site */}
+        <div className="grain-overlay" aria-hidden="true" />
+
         <CurrencyProvider>
           <CartProvider>
             <SiteHeader />
@@ -51,6 +54,7 @@ export default function RootLayout({
             <SiteFooter />
           </CartProvider>
         </CurrencyProvider>
+
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3BE6XFB1WC"
           strategy="afterInteractive"
