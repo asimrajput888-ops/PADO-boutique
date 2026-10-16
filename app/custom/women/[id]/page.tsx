@@ -257,7 +257,7 @@ function WomenBespokePageContent() {
     if (showJacketSelector) return `Jacket ${jacketSize} ${jacketLength}`;
     if (showTrouserSelector) return `Trouser ${trouserSize} ${inseam}`;
     if (showShirtSelector) return `Shirt ${jacketSize}`;
-    return jacketSize || "Standard";
+    return jacketSize || "Ready to Wear";
   };
 
   const handleSubmit = async () => {
@@ -311,7 +311,6 @@ function WomenBespokePageContent() {
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
 
-      // Trigger supplier submission (async, background)
       if (data.order?.id) {
         fetch("/api/orders/submit", {
           method: "POST",
@@ -490,7 +489,7 @@ function WomenBespokePageContent() {
     );
   }
 
-  // STEP 0: Choose Fit Type
+  // STEP 0: Choose Fulfillment
   if (step === 0) {
     return (
       <div className="min-h-screen bg-paper">
@@ -542,7 +541,7 @@ function WomenBespokePageContent() {
               <em className="text-bronze">your {pt}?</em>
             </h1>
             <p className="text-stone text-[15px] leading-relaxed max-w-xl mx-auto">
-              Choose a standard size for faster delivery, or provide your measurements for a perfect bespoke fit.
+              Choose Ready to Wear for faster delivery, or Made to Measure for a perfect bespoke fit.
             </p>
           </motion.div>
 
@@ -563,10 +562,10 @@ function WomenBespokePageContent() {
                   Fastest Delivery
                 </p>
                 <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
-                  Standard Size
+                  Ready to Wear
                 </h3>
                 <p className="text-sm text-stone leading-relaxed mb-8">
-                  Choose from our standard sizes. Crafted on a ready pattern and dispatched within 7–10 days.
+                  Choose from our ready-to-wear sizes. Crafted on a ready pattern and dispatched within 7–10 days.
                 </p>
                 <ul className="space-y-3 text-[13px] text-stone">
                   {["Fixed price", "No measurements required", "7–10 day dispatch"].map((item) => (
@@ -607,7 +606,7 @@ function WomenBespokePageContent() {
                   Perfect Fit
                 </p>
                 <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
-                  Custom Measurements
+                  Made to Measure
                 </h3>
                 <p className="text-sm text-stone leading-relaxed mb-8">
                   Made to your exact measurements by our master tailors. Delivered within 3 weeks.
@@ -1353,7 +1352,7 @@ function WomenBespokePageContent() {
               <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
                 <span className="text-stone">Fit</span>
                 <span className="font-medium text-ink text-right">
-                  {fitType === "custom" ? "Custom Measurements" : getStandardSizeLabel()}
+                  {fitType === "custom" ? "Made to Measure" : getStandardSizeLabel()}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
@@ -1385,96 +1384,4 @@ function WomenBespokePageContent() {
                   m[f.id] ? (
                     <div key={f.id}>
                       <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">{f.label}</p>
-                      <p className="font-medium text-ink">{m[f.id]}&quot;</p>
-                    </div>
-                  ) : null
-                )}
-                {needsJacketFit && (
-                  <div>
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Jacket Fit</p>
-                    <p className="font-medium text-ink">{jacketFit}</p>
-                  </div>
-                )}
-                {needsTrouserFit && (
-                  <div>
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Trouser Fit</p>
-                    <p className="font-medium text-ink">{trouserFit}</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {additionalInfo && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="border border-border bg-white p-8"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <span className="w-8 h-[1px] bg-ink" />
-                <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
-                  Additional Requests
-                </h3>
-              </div>
-              <p className="text-sm text-stone whitespace-pre-line leading-relaxed">
-                {additionalInfo}
-              </p>
-            </motion.div>
-          )}
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="border border-border bg-white p-8"
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <span className="w-8 h-[1px] bg-ink" />
-              <h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">
-                Shipping Address
-              </h3>
-            </div>
-            <div className="text-sm text-stone leading-relaxed">
-              <p className="font-medium text-ink mb-2">{contact.name}</p>
-              <p>{contact.address1}</p>
-              {contact.address2 && <p>{contact.address2}</p>}
-              <p>{contact.city} {contact.postalCode}</p>
-              <p>{contact.country}</p>
-              <div className="mt-5 pt-5 border-t border-border space-y-1">
-                <p className="text-stone">{contact.email}</p>
-                {contact.phone && <p className="text-stone">{contact.phone}</p>}
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            onClick={handleSubmit}
-            disabled={submitting}
-            className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-50"
-          >
-            {submitting ? "Submitting Order..." : "Submit Order"}
-          </motion.button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function WomenBespokePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-paper flex items-center justify-center">
-          <div className="w-8 h-8 border border-border border-t-ink rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <WomenBespokePageContent />
-    </Suspense>
-  );
-}
+                      <
