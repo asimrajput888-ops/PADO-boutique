@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type Currency = "USD" | "CAD" | "EUR" | "AUD" | "GBP" | "AED";
 
@@ -24,33 +24,37 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
   AED: "AED ",
 };
 
-interface CurrencyContextType {
-  currency: Currency;
-  setCurrency: (currency: Currency) => void;
-  formatPrice: (usdPrice: number) => string;
-  convertPrice: (usdPrice: number) => number;
-}
+// Global state outside React — no Context needed
+let globalCurrency: Currency = "USD";
+const listeners = new Set<(c: Currency) => void>();
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(
-  undefined
-);
-
-export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<Currency>("USD");
+// Simple hook — works anywhere, no provider needed
+export function useCurrency() {
+  const [currency, setCurrencyState] = useState<Currency>(globalCurrency);
 
   useEffect(() => {
+    const listener = (c: Currency) => setCurrencyState(c);
+    listeners.add(listener);
+
+    // Load from localStorage on mount
     try {
       const saved = localStorage.getItem("pado_currency") as Currency | null;
       if (saved && EXCHANGE_RATES[saved]) {
+        globalCurrency = saved;
         setCurrencyState(saved);
       }
     } catch (err) {
       // silent fail
     }
+
+    return () => {
+      listeners.delete(listener);
+    };
   }, []);
 
   const setCurrency = (newCurrency: Currency) => {
-    setCurrencyState(newCurrency);
+    globalCurrency = newCurrency;
+    listeners.forEach((l) => l(newCurrency));
     try {
       localStorage.setItem("pado_currency", newCurrency);
     } catch (err) {
@@ -67,30 +71,18 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     if (typeof usdPrice !== "number" || isNaN(usdPrice)) {
       return "$0";
     }
-
     const converted = convertPrice(usdPrice);
     const symbol = CURRENCY_SYMBOLS[currency] || "$";
-
     if (currency === "AED") {
       return `${symbol}${converted.toFixed(0)}`;
     }
-
     return `${symbol}${converted.toFixed(2)}`;
   };
 
-  return (
-    <CurrencyContext.Provider
-      value={{ currency, setCurrency, formatPrice, convertPrice }}
-    >
-      {children}
-    </CurrencyContext.Provider>
-  );
+  return { currency, setCurrency, formatPrice, convertPrice };
 }
 
-export function useCurrency() {
-  const context = useContext(CurrencyContext);
-  if (!context) {
-    throw new Error("useCurrency must be used within a CurrencyProvider");
-  }
-  return context;
+// Dummy provider for backward compatibility — does nothing
+export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
