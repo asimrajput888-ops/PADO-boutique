@@ -2,103 +2,90 @@
 
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-type Currency = "USD" | "PKR" | "AED" | "GBP" | "EUR" | "CAD" | "AUD";
+type Currency = "USD" | "CAD" | "EUR" | "AUD" | "GBP" | "AED";
+
+// Static exchange rates (fallback — no API call needed)
+// Update these manually if rates change significantly
+const EXCHANGE_RATES: Record<Currency, number> = {
+  USD: 1,
+  CAD: 1.36,
+  EUR: 0.92,
+  AUD: 1.52,
+  GBP: 0.79,
+  AED: 3.67,
+};
+
+const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  USD: "$",
+  CAD: "C$",
+  EUR: "€",
+  AUD: "A$",
+  GBP: "£",
+  AED: "AED ",
+};
 
 interface CurrencyContextType {
   currency: Currency;
-  setCurrency: (c: Currency) => void;
-  formatPrice: (amount: number) => string;
-  rates: Record<string, number>;
+  setCurrency: (currency: Currency) => void;
+  formatPrice: (usdPrice: number) => string;
+  convertPrice: (usdPrice: number) => number;
 }
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+  undefined
+);
 
-// Fallback rates (agar API fail ho jaye)
-const FALLBACK_RATES: Record<string, number> = {
-  USD: 1,
-  PKR: 278,
-  AED: 3.67,
-  GBP: 0.79,
-  EUR: 0.92,
-  CAD: 1.36,
-  AUD: 1.52,
-};
+export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  const [currency, setCurrencyState] = useState<Currency>("USD");
 
-export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrency] = useState<Currency>("USD");
-  const [rates, setRates] = useState<Record<string, number>>(FALLBACK_RATES);
-
+  // Load saved currency from localStorage
   useEffect(() => {
-    // Check localStorage cache first (valid for 24 hours)
-    const cached = typeof window !== "undefined" ? localStorage.getItem("pado-rates") : null;
-    const cachedTime = typeof window !== "undefined" ? localStorage.getItem("pado-rates-time") : null;
-
-    if (cached && cachedTime) {
-      const hoursSince = (Date.now() - Number(cachedTime)) / (1000 * 60 * 60);
-      if (hoursSince < 24) {
-        try {
-          setRates(JSON.parse(cached));
-          return;
-        } catch {
-          // Invalid cache, continue to fetch
-        }
+    try {
+      const saved = localStorage.getItem("pado_currency") as Currency | null;
+      if (saved && EXCHANGE_RATES[saved]) {
+        setCurrencyState(saved);
       }
+    } catch (err) {
+      console.error("Currency load error:", err);
     }
-
-    const fetchRates = async () => {
-      try {
-        const response = await fetch(
-          "https://api.frankfurter.app/latest?from=USD"
-        );
-
-        if (!response.ok) {
-          return;
-        }
-
-        const data = await response.json();
-
-        if (data?.rates) {
-          const newRates = { USD: 1, ...data.rates };
-          setRates(newRates);
-
-          // Cache for 24 hours
-          if (typeof window !== "undefined") {
-            localStorage.setItem("pado-rates", JSON.stringify(newRates));
-            localStorage.setItem("pado-rates-time", String(Date.now()));
-          }
-        }
-      } catch {
-        // Silent fail — fallback rates already set
-        // CORS errors are common, fallback handles them
-      }
-    };
-
-    fetchRates();
   }, []);
 
-  const formatPrice = (amount: number) => {
-    const rate = rates[currency] || 1;
-    const converted = amount * rate;
+  const setCurrency = (newCurrency: Currency) => {
+    setCurrencyState(newCurrency);
+    try {
+      localStorage.setItem("pado_currency", newCurrency);
+    } catch (err) {
+      console.error("Currency save error:", err);
+    }
+  };
 
-    const symbols: Record<Currency, string> = {
-      USD: "$",
-      PKR: "Rs. ",
-      AED: "AED ",
-      GBP: "£",
-      EUR: "€",
-      CAD: "C$",
-      AUD: "A$",
-    };
+  const convertPrice = (usdPrice: number): number => {
+    const rate = EXCHANGE_RATES[currency] || 1;
+    return usdPrice * rate;
+  };
 
-    return `${symbols[currency]}${converted.toLocaleString(undefined, {
-      maximumFractionDigits: 0,
-    })}`;
+  const formatPrice = (usdPrice: number): string => {
+    if (typeof usdPrice !== "number" || isNaN(usdPrice)) {
+      return "$0";
+    }
+
+    const converted = convertPrice(usdPrice);
+    const symbol = CURRENCY_SYMBOLS[currency] || "$";
+
+    // Format based on currency
+    if (currency === "AED") {
+      return `${symbol}${converted.toFixed(0)}`;
+    }
+
+    return `${symbol}${converted.toFixed(2)}`;
   };
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice, rates }}>
+    <CurrencyContext.Provider
+      value={{ currency, setCurrency, formatPrice, convertPrice }}
+    >
       {children}
     </CurrencyContext.Provider>
   );
@@ -107,7 +94,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 export function useCurrency() {
   const context = useContext(CurrencyContext);
   if (!context) {
-    throw new Error("useCurrency must be used within CurrencyProvider");
+    throw new Error("useCurrency must be used within a CurrencyProvider");
   }
   return context;
 }
