@@ -79,13 +79,11 @@ export default function HomePage() {
             alt="PADO Boutique Bespoke Tailoring"
             fill
             priority
-            className="object-cover object-[65%_center] md:object-[60%_center] lg:object-center"
+            className="object-cover object-[70%_center] md:object-[65%_center] lg:object-[58%_center]"
             sizes="100vw"
           />
-          {/* Dark gradient overlay — left side dark, right side clear */}
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-charcoal via-brand-charcoal/60 to-transparent lg:from-black/80 lg:via-black/40 lg:to-transparent" />
-          {/* Mobile — full dark overlay */}
-          <div className="absolute inset-0 bg-black/40 lg:hidden" />
+          {/* Single lighter overlay — left dark for text, right clear for image */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         </motion.div>
 
         {/* TEXT — LEFT SIDE OVERLAY */}
@@ -98,7 +96,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-[10px] tracking-[0.5em] text-brand-gold-light uppercase mb-8"
+              className="text-[10px] tracking-[0.5em] text-white uppercase mb-6"
             >
               Bespoke Tailoring · Est. 2020
             </motion.p>
@@ -107,19 +105,19 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-serif text-white leading-[1.02] mb-8"
-              style={{ textShadow: "0 4px 40px rgba(0,0,0,0.5)" }}
+              className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif text-white leading-[1.05] mb-6"
+              style={{ textShadow: "0 4px 40px rgba(0,0,0,0.6)" }}
             >
               Cut to your
               <br />
-              <em className="text-brand-gold-light">exact measure.</em>
+              <em className="text-white">exact measure.</em>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
-              className="text-white/75 text-base md:text-lg leading-relaxed mb-10 max-w-md"
+              className="text-white text-sm md:text-base leading-relaxed mb-8 max-w-md"
             >
               Handcrafted bespoke suits, made to your exact measurements.
               Designed in Canada, handcrafted in Karachi, delivered worldwide.
@@ -150,7 +148,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 1.2 }}
-              className="mt-12 pt-8 border-t border-white/15 flex flex-wrap gap-6 md:gap-8 text-[10px] uppercase tracking-[0.3em] text-white/50"
+              className="mt-10 pt-6 border-t border-white/20 flex flex-wrap gap-6 md:gap-8 text-[10px] uppercase tracking-[0.3em] text-white"
             >
               <span>Handcrafted</span>
               <span>Made to Measure</span>
@@ -166,7 +164,7 @@ export default function HomePage() {
           transition={{ delay: 1.5 }}
           className="absolute bottom-8 right-6 md:right-12 hidden md:flex flex-col items-center gap-3 z-10"
         >
-          <span className="text-[9px] tracking-[0.4em] text-white/60 uppercase">
+          <span className="text-[9px] tracking-[0.4em] text-white uppercase">
             Scroll
           </span>
           <div className="w-[1px] h-14 bg-white/30 relative overflow-hidden">
