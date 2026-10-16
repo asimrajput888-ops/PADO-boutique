@@ -3,12 +3,16 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import Script from "next/script";
+import dynamic from "next/dynamic";
 import SmoothScroll from "@/components/SmoothScroll";
-import { CurrencyProvider } from "@/context/currency-context";
-import { CartProvider } from "@/context/cart-context";
 import SiteHeader from "@/components/site/site-header";
 import SiteFooter from "@/components/site/site-footer";
 import "./globals.css";
+
+// Client-only providers — prevents SSR crashes
+const Providers = dynamic(() => import("@/components/providers"), {
+  ssr: false,
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -59,15 +63,13 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="antialiased">
-        <CurrencyProvider>
-          <CartProvider>
-            <SmoothScroll>
-              <SiteHeader />
-              <main className="min-h-screen">{children}</main>
-              <SiteFooter />
-            </SmoothScroll>
-          </CartProvider>
-        </CurrencyProvider>
+        <Providers>
+          <SmoothScroll>
+            <SiteHeader />
+            <main className="min-h-screen">{children}</main>
+            <SiteFooter />
+          </SmoothScroll>
+        </Providers>
       </body>
     </html>
   );
