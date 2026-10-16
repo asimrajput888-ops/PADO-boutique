@@ -4,16 +4,12 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useCart } from "@/context/cart-context";
-import { useCurrency } from "@/context/currency-context";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const { cart } = useCart();
-  const { currency, setCurrency } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -24,8 +20,6 @@ export default function SiteHeader() {
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "unset";
   }, [menuOpen]);
-
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const menuSections = [
     {
@@ -79,21 +73,14 @@ export default function SiteHeader() {
 
   return (
     <>
-      {/* TOP DARK GRADIENT — always visible */}
-      {!scrolled && (
-        <div className="fixed top-0 left-0 right-0 h-32 z-40 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
-      )}
-
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white shadow-sm border-b border-neutral-200"
-            : "bg-transparent"
+          scrolled ? "bg-white shadow-sm" : "bg-transparent"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
 
-          {/* LEFT: Hamburger + Search */}
+          {/* LEFT: Menu + Search */}
           <div className="flex items-center gap-5 z-10">
             <button
               onClick={() => setMenuOpen(true)}
@@ -161,23 +148,8 @@ export default function SiteHeader() {
             </span>
           </Link>
 
-          {/* RIGHT: Currency + Account + Cart */}
+          {/* RIGHT: Account + Cart */}
           <div className="flex items-center gap-4 md:gap-6 z-10">
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as any)}
-              className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 hidden md:block ${
-                scrolled ? "text-black" : "text-white"
-              }`}
-            >
-              <option value="USD" className="text-black">USD ($)</option>
-              <option value="CAD" className="text-black">CAD (C$)</option>
-              <option value="EUR" className="text-black">EUR (€)</option>
-              <option value="AUD" className="text-black">AUD (A$)</option>
-              <option value="GBP" className="text-black">GBP (£)</option>
-              <option value="AED" className="text-black">AED</option>
-            </select>
-
             <Link
               href="/admin/login"
               aria-label="Account"
@@ -218,17 +190,12 @@ export default function SiteHeader() {
                   d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"
                 />
               </svg>
-              {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#D4AF37] text-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                  {cartCount}
-                </span>
-              )}
             </Link>
           </div>
         </div>
       </header>
 
-      {/* SIDE MENU DRAWER */}
+      {/* MENU DRAWER */}
       <AnimatePresence>
         {menuOpen && (
           <>
