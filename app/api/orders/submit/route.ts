@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Update order with supplier info — use numeric ID
+    // 3. Update order with supplier info — capture errors
     const { error: updateError } = await supabase
       .from("orders")
       .update({
