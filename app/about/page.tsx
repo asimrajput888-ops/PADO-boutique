@@ -60,6 +60,21 @@ const VALUES = [
   },
 ];
 
+const ATELIER_IMAGES = [
+  {
+    src: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=90&auto=format&fit=crop",
+    alt: "Men's formal bespoke suit",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=800&q=90&auto=format&fit=crop",
+    alt: "Women's tailored suit",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=90&auto=format&fit=crop",
+    alt: "Party wear tuxedo",
+  },
+];
+
 export default function AboutPage() {
   return (
     <div className="bg-paper">
@@ -204,20 +219,7 @@ export default function AboutPage() {
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              {
-                src: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&q=90&auto=format&fit=crop",
-                alt: "Fabric selection",
-              },
-              {
-                src: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=90&auto=format&fit=crop",
-                alt: "Tailor working",
-              },
-              {
-                src: "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=800&q=90&auto=format&fit=crop",
-                alt: "Finished garment",
-              },
-            ].map((img, i) => (
+            {ATELIER_IMAGES.map((img, i) => (
               <Reveal key={i} delay={i * 150}>
                 <div className="relative aspect-[3/4] overflow-hidden bg-cream img-zoom-container">
                   <Image
@@ -239,7 +241,7 @@ export default function AboutPage() {
       <section className="py-24 md:py-32 px-6 md:px-16 bg-ink">
         <div className="max-w-[1400px] mx-auto">
           <Reveal className="mb-20">
-            <p className="text-[10px] tracking-[0.5em] text-bronze-light uppercase mb-4">
+            <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">
               Our Values
             </p>
             <h2 className="text-3xl md:text-5xl font-serif text-paper">
