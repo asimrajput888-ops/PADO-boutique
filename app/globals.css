@@ -39,9 +39,17 @@
   --tracking-luxe-sm: 0.3em;
   --tracking-luxe-lg: 0.5em;
 
-  /* Easing */
+  /* Easing — refined */
   --ease-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Motion durations */
+  --duration-fast: 300ms;
+  --duration-base: 500ms;
+  --duration-slow: 900ms;
+  --duration-cinematic: 1200ms;
 }
 
 /* ===== BASE ===== */
@@ -62,7 +70,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== TYPOGRAPHY ===== */
+/* ===== TYPOGRAPHY SYSTEM ===== */
 .font-serif {
   font-family: var(--font-serif);
   letter-spacing: -0.01em;
@@ -73,6 +81,36 @@ h1, h2, h3, h4 {
   letter-spacing: -0.01em;
 }
 
+/* Editorial heading scale — use these classes for consistency */
+.h-display {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+.h-section {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+}
+.h-card {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
 /* ===== UTILITY CLASSES ===== */
 .tracking-luxe { letter-spacing: var(--tracking-luxe); }
 .tracking-luxe-sm { letter-spacing: var(--tracking-luxe-sm); }
@@ -80,6 +118,33 @@ h1, h2, h3, h4 {
 
 .text-muted-foreground { color: var(--color-muted-foreground); }
 .border-border { border-color: var(--color-border); }
+
+/* ===== GRAIN OVERLAY (premium texture) ===== */
+/* Adds a subtle film-grain texture over the entire site.
+   No image asset needed — pure SVG turbulence. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ===== HAIRLINE DIVIDER ===== */
+/* Use instead of heavy borders for editorial feel */
+.hairline {
+  height: 1px;
+  background-color: var(--color-border);
+  width: 100%;
+}
+.hairline-dark {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.12);
+  width: 100%;
+}
 
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; }
@@ -153,6 +218,15 @@ h1, h2, h3, h4 {
 }
 .link-underline:hover::after { width: 100%; }
 
+/* ===== LETTER-SPACING HOVER (nav links, inline links) ===== */
+.link-tracking {
+  transition: letter-spacing var(--duration-base) var(--ease-luxury),
+              opacity var(--duration-base) var(--ease-luxury);
+}
+.link-tracking:hover {
+  letter-spacing: 0.45em;
+}
+
 /* ===== GOLD ACCENT LINE ===== */
 .gold-line {
   width: 40px;
@@ -203,6 +277,18 @@ h1, h2, h3, h4 {
   background: linear-gradient(90deg, #E8E2D9 0%, #F5F0E8 50%, #E8E2D9 100%);
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ===== TEXT MASK REVEAL (for Framer Motion) ===== */
+/* Wrap each line in .text-mask and animate inner element */
+.text-mask {
+  display: block;
+  overflow: hidden;
+  line-height: 1.05;
+}
+.text-mask > span {
+  display: block;
+  will-change: transform;
 }
 
 /* ===== BUTTONS ===== */
