@@ -79,10 +79,15 @@ export default function SiteHeader() {
 
   return (
     <>
+      {/* TOP DARK GRADIENT — always visible */}
+      {!scrolled && (
+        <div className="fixed top-0 left-0 right-0 h-32 z-40 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+      )}
+
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-paper border-b border-border"
+            ? "bg-white shadow-sm border-b border-neutral-200"
             : "bg-transparent"
         }`}
       >
@@ -97,18 +102,18 @@ export default function SiteHeader() {
             >
               <div className="flex flex-col gap-[5px]">
                 <span
-                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-white"
+                  className={`w-6 h-[1.5px] transition-colors duration-500 ${
+                    scrolled ? "bg-black" : "bg-white"
                   }`}
                 />
                 <span
-                  className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-white"
+                  className={`w-6 h-[1.5px] transition-colors duration-500 ${
+                    scrolled ? "bg-black" : "bg-white"
                   }`}
                 />
                 <span
-                  className={`w-4 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-white"
+                  className={`w-4 h-[1.5px] transition-colors duration-500 ${
+                    scrolled ? "bg-black" : "bg-white"
                   } group-hover:w-6`}
                 />
               </div>
@@ -118,14 +123,14 @@ export default function SiteHeader() {
               href="/custom"
               aria-label="Search"
               className={`transition-colors duration-500 ${
-                scrolled ? "text-ink" : "text-white"
+                scrolled ? "text-black" : "text-white"
               }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.2}
+                strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-[18px] h-[18px]"
               >
@@ -138,18 +143,18 @@ export default function SiteHeader() {
             </Link>
           </div>
 
-          {/* CENTER: Logo */}
+          {/* CENTER: PADO Logo — Solid Gold */}
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
             aria-label="PADO Boutique"
           >
-            <span className="block font-serif text-2xl md:text-3xl tracking-[0.5em] text-[#C5A059]">
+            <span className="block font-serif text-2xl md:text-3xl tracking-[0.5em] text-[#D4AF37]">
               PADO
             </span>
             <span
               className={`block text-[8px] md:text-[9px] tracking-[0.4em] mt-0.5 transition-colors duration-500 ${
-                scrolled ? "text-stone" : "text-white/70"
+                scrolled ? "text-neutral-500" : "text-white/80"
               }`}
             >
               BESPOKE
@@ -162,29 +167,29 @@ export default function SiteHeader() {
               value={currency}
               onChange={(e) => setCurrency(e.target.value as any)}
               className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 hidden md:block ${
-                scrolled ? "text-ink" : "text-white"
+                scrolled ? "text-black" : "text-white"
               }`}
             >
-              <option value="USD" className="text-ink">USD ($)</option>
-              <option value="CAD" className="text-ink">CAD (C$)</option>
-              <option value="EUR" className="text-ink">EUR (€)</option>
-              <option value="AUD" className="text-ink">AUD (A$)</option>
-              <option value="GBP" className="text-ink">GBP (£)</option>
-              <option value="AED" className="text-ink">AED</option>
+              <option value="USD" className="text-black">USD ($)</option>
+              <option value="CAD" className="text-black">CAD (C$)</option>
+              <option value="EUR" className="text-black">EUR (€)</option>
+              <option value="AUD" className="text-black">AUD (A$)</option>
+              <option value="GBP" className="text-black">GBP (£)</option>
+              <option value="AED" className="text-black">AED</option>
             </select>
 
             <Link
               href="/admin/login"
               aria-label="Account"
               className={`transition-colors duration-500 ${
-                scrolled ? "text-ink" : "text-white"
+                scrolled ? "text-black" : "text-white"
               }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.2}
+                strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-[18px] h-[18px]"
               >
@@ -201,10 +206,10 @@ export default function SiteHeader() {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1}
+                strokeWidth={1.5}
                 stroke="currentColor"
                 className={`w-[18px] h-[18px] md:w-5 md:h-5 transition-colors duration-500 ${
-                  scrolled ? "text-ink" : "text-white"
+                  scrolled ? "text-black" : "text-white"
                 }`}
               >
                 <path
@@ -214,7 +219,7 @@ export default function SiteHeader() {
                 />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#C5A059] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#D4AF37] text-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                   {cartCount}
                 </span>
               )}
@@ -241,15 +246,15 @@ export default function SiteHeader() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-paper z-[70] overflow-y-auto"
+              className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto"
             >
-              <div className="flex items-center justify-between px-8 py-6 border-b border-border sticky top-0 bg-paper z-10">
-                <span className="text-[10px] uppercase tracking-[0.4em] text-stone">
+              <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
+                <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
                   Menu
                 </span>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="text-xl text-ink hover:text-[#C5A059] transition"
+                  className="text-xl text-black hover:text-[#D4AF37] transition"
                   aria-label="Close"
                 >
                   ✕
@@ -267,10 +272,10 @@ export default function SiteHeader() {
                       }
                       className="w-full text-left flex items-center justify-between mb-4 group"
                     >
-                      <span className="text-xl md:text-2xl font-serif text-ink group-hover:text-[#C5A059] transition">
+                      <span className="text-xl md:text-2xl font-serif text-black group-hover:text-[#D4AF37] transition">
                         {section.title}
                       </span>
-                      <span className="text-stone text-lg font-light">
+                      <span className="text-neutral-400 text-lg font-light">
                         {openSubmenu === section.id ? "−" : "+"}
                       </span>
                     </button>
@@ -284,13 +289,13 @@ export default function SiteHeader() {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <ul className="space-y-3 pl-4 border-l border-border">
+                          <ul className="space-y-3 pl-4 border-l border-neutral-200">
                             {section.links.map((link) => (
                               <li key={link.name}>
                                 <Link
                                   href={link.href}
                                   onClick={() => setMenuOpen(false)}
-                                  className="block text-sm text-graphite hover:text-ink transition tracking-wide"
+                                  className="block text-sm text-neutral-600 hover:text-black transition tracking-wide"
                                 >
                                   {link.name}
                                 </Link>
@@ -304,27 +309,27 @@ export default function SiteHeader() {
                 ))}
               </div>
 
-              <div className="px-8 py-6 border-t border-border space-y-3">
+              <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
                 <Link
                   href="/track-order"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-sm text-graphite hover:text-ink transition"
+                  className="block text-sm text-neutral-600 hover:text-black transition"
                 >
                   Track Order
                 </Link>
                 <Link
                   href="/contact"
                   onClick={() => setMenuOpen(false)}
-                  className="block text-sm text-graphite hover:text-ink transition"
+                  className="block text-sm text-neutral-600 hover:text-black transition"
                 >
                   Contact
                 </Link>
-                <div className="pt-4 border-t border-border mt-4">
-                  <p className="text-[10px] text-stone uppercase tracking-[0.4em] mb-3">
+                <div className="pt-4 border-t border-neutral-200 mt-4">
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-[0.4em] mb-3">
                     Get in touch
                   </p>
-                  <p className="text-sm text-graphite">www.padoshop.com</p>
-                  <p className="text-sm text-graphite">+1 (639) 384-0265</p>
+                  <p className="text-sm text-neutral-700">www.padoshop.com</p>
+                  <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
                 </div>
               </div>
             </motion.div>
