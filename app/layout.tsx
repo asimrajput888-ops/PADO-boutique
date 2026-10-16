@@ -44,16 +44,14 @@ export default function RootLayout({
       <body className="antialiased">
         <CurrencyProvider>
           <CartProvider>
-            {/* HEADER — Inline */}
             <header className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md">
               <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
                 <Link
                   href="/custom/men"
-                  className="text-white text-[11px] uppercase tracking-[0.3em] hover:text-[#D4AF37] transition z-10"
+                  className="text-white text-[11px] uppercase tracking-[0.3em] z-10"
                 >
                   Shop
                 </Link>
-
                 <Link
                   href="/"
                   className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
@@ -65,10 +63,9 @@ export default function RootLayout({
                     BESPOKE
                   </span>
                 </Link>
-
                 <Link
                   href="/checkout"
-                  className="text-white text-[11px] uppercase tracking-[0.3em] hover:text-[#D4AF37] transition z-10"
+                  className="text-white text-[11px] uppercase tracking-[0.3em] z-10"
                 >
                   Cart
                 </Link>
@@ -77,7 +74,6 @@ export default function RootLayout({
 
             <main className="min-h-screen pt-20">{children}</main>
 
-            {/* FOOTER — Simple */}
             <footer className="border-t border-neutral-200 bg-[#FDFBF7] py-12 px-6">
               <div className="max-w-[1400px] mx-auto text-center">
                 <h3 className="text-2xl font-serif text-[#0A0A0A] mb-4 tracking-[0.3em]">
@@ -92,8 +88,6 @@ export default function RootLayout({
                   <Link href="/shipping">Shipping</Link>
                   <Link href="/returns">Returns</Link>
                   <Link href="/track-order">Track Order</Link>
-                  <Link href="/privacy">Privacy</Link>
-                  <Link href="/terms">Terms</Link>
                 </div>
               </div>
             </footer>
