@@ -47,7 +47,7 @@ export default function RootLayout({
         <CurrencyProvider>
           <CartProvider>
             <SiteHeader />
-            <main className="min-h-screen">{children}</main>
+            <main className="min-h-screen pt-20">{children}</main>
             <SiteFooter />
           </CartProvider>
         </CurrencyProvider>
