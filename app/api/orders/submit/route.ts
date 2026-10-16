@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "orderId required" }, { status: 400 });
     }
 
-    // Force number conversion (id is bigint in DB)
     const numericOrderId = Number(orderId);
     if (isNaN(numericOrderId)) {
       return NextResponse.json({ error: "Invalid orderId" }, { status: 400 });
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Update order with supplier info — capture errors
+    // 3. Update order with supplier info
     const { error: updateError } = await supabase
       .from("orders")
       .update({
@@ -86,7 +85,7 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error("Update error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update order: " + updateError.message },
+        { error: "Failed to update: " + updateError.message },
         { status: 500 }
       );
     }
