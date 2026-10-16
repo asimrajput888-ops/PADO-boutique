@@ -4,8 +4,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Reveal } from "@/components/site/reveal";
 
 const CATEGORIES = [
@@ -57,44 +56,18 @@ const PROCESS = [
 ];
 
 export default function HomePage() {
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
   return (
     <div className="bg-brand-ivory">
-      {/* ===== HERO SECTION ===== */}
-      <section
-        ref={heroRef}
-        className="relative h-screen w-full overflow-hidden"
-      >
-        <motion.div style={{ y: heroY }} className="absolute inset-0">
-          <Image
-            src="/images/hero.png"
-            alt="PADO Boutique Bespoke Tailoring"
-            fill
-            priority
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
-        </motion.div>
-
-        <motion.div
-          style={{ opacity: heroOpacity }}
-          className="relative z-10 h-full flex items-end pb-20 md:pb-28 px-6 md:px-12"
-        >
-          <div className="max-w-2xl">
+      {/* ===== HERO SECTION — Split Screen ===== */}
+      <section className="relative min-h-screen w-full grid grid-cols-1 lg:grid-cols-2">
+        {/* LEFT: Text (Dark background) */}
+        <div className="relative bg-brand-charcoal flex items-center justify-center px-6 md:px-12 py-32 lg:py-0 order-2 lg:order-1">
+          <div className="max-w-lg w-full">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-[10px] tracking-[0.5em] text-brand-gold-light uppercase mb-6"
+              className="text-[10px] tracking-[0.5em] text-brand-gold-light uppercase mb-8"
             >
               Bespoke Tailoring · Est. 2020
             </motion.p>
@@ -103,18 +76,27 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-[1.05] mb-8"
-              style={{ textShadow: "0 4px 40px rgba(0,0,0,0.6)" }}
+              className="text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[1.05] mb-8"
             >
               Cut to your
               <br />
               <em className="text-brand-gold-light">exact measure.</em>
             </motion.h1>
 
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className="text-white/70 text-base leading-relaxed mb-10 max-w-md"
+            >
+              Handcrafted bespoke suits, made to your exact measurements. Designed
+              in Canada, handcrafted in Karachi, delivered worldwide.
+            </motion.p>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
               className="flex flex-wrap gap-4"
             >
               <Link
@@ -125,36 +107,38 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/about"
-                className="inline-block border border-white/60 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-white/10 transition-all duration-500"
+                className="inline-block border border-white/40 text-white px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-white/10 transition-all duration-500"
               >
                 Our Story
               </Link>
             </motion.div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 right-8 md:right-12 hidden md:flex flex-col items-center gap-2"
-        >
-          <span className="text-[9px] tracking-[0.4em] text-white/60 uppercase">
-            Scroll
-          </span>
-          <div className="w-[1px] h-12 bg-white/40 relative overflow-hidden">
-            <motion.div
-              animate={{ y: [-48, 48] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-full h-6 bg-brand-gold"
+        {/* RIGHT: Image */}
+        <div className="relative h-[60vh] lg:h-screen order-1 lg:order-2 overflow-hidden bg-brand-charcoal">
+          <motion.div
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className="absolute inset-0"
+          >
+            <Image
+              src="/images/hero-model.jpg"
+              alt="PADO Boutique Bespoke Tailoring"
+              fill
+              priority
+              className="object-cover object-center"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
-          </div>
-        </motion.div>
+            {/* Subtle gradient for depth */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-black/30 lg:via-transparent lg:to-transparent" />
+          </motion.div>
+        </div>
       </section>
 
       {/* ===== MARQUEE STRIP ===== */}
-      <section className="bg-brand-charcoal py-5 overflow-hidden">
+      <section className="bg-brand-charcoal py-5 overflow-hidden border-t border-white/10">
         <div className="flex animate-marquee whitespace-nowrap">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-16 px-8">
