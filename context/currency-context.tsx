@@ -6,7 +6,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 type Currency = "USD" | "CAD" | "EUR" | "AUD" | "GBP" | "AED";
 
-// Static exchange rates (no API call — never crashes)
 const EXCHANGE_RATES: Record<Currency, number> = {
   USD: 1,
   CAD: 1.36,
@@ -46,7 +45,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         setCurrencyState(saved);
       }
     } catch (err) {
-      // Silent fail — use default USD
+      // silent fail
     }
   }, []);
 
@@ -55,7 +54,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem("pado_currency", newCurrency);
     } catch (err) {
-      // Silent fail
+      // silent fail
     }
   };
 
