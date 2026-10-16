@@ -266,7 +266,7 @@ function MenBespokePageContent() {
     if (showJacketSelector) return `Jacket ${jacketSize} ${jacketLength}`;
     if (showTrouserSelector) return `Trouser ${trouserSize} ${inseam}`;
     if (showShirtSelector) return `Shirt ${jacketSize}`;
-    return jacketSize || "Standard";
+    return jacketSize || "Ready to Wear";
   };
 
   const handleSubmit = async () => {
@@ -499,7 +499,7 @@ function MenBespokePageContent() {
     );
   }
 
-  // STEP 0: Choose Fit Type
+  // STEP 0: Choose Fulfillment — Ready to Wear vs Made to Measure
   if (step === 0) {
     return (
       <div className="min-h-screen bg-paper">
@@ -551,11 +551,12 @@ function MenBespokePageContent() {
               <em className="text-bronze">your {pt}?</em>
             </h1>
             <p className="text-stone text-[15px] leading-relaxed max-w-xl mx-auto">
-              Choose a standard size for faster delivery, or provide your measurements for a perfect bespoke fit.
+              Choose Ready to Wear for faster delivery, or Made to Measure for a perfect bespoke fit.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+            {/* OPTION 1: Ready to Wear */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -572,10 +573,10 @@ function MenBespokePageContent() {
                   Fastest Delivery
                 </p>
                 <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
-                  Standard Size
+                  Ready to Wear
                 </h3>
                 <p className="text-sm text-stone leading-relaxed mb-8">
-                  Choose from our standard sizes. Crafted on a ready pattern and dispatched within 7–10 days.
+                  Choose from our ready-to-wear sizes. Crafted on a ready pattern and dispatched within 7–10 days.
                 </p>
                 <ul className="space-y-3 text-[13px] text-stone">
                   {["Fixed price", "No measurements required", "7–10 day dispatch"].map((item) => (
@@ -597,6 +598,7 @@ function MenBespokePageContent() {
               )}
             </motion.button>
 
+            {/* OPTION 2: Made to Measure */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -616,7 +618,7 @@ function MenBespokePageContent() {
                   Perfect Fit
                 </p>
                 <h3 className="text-3xl md:text-4xl font-serif mb-6 text-ink">
-                  Custom Measurements
+                  Made to Measure
                 </h3>
                 <p className="text-sm text-stone leading-relaxed mb-8">
                   Made to your exact measurements by our master tailors. Delivered within 3 weeks.
@@ -1362,7 +1364,7 @@ function MenBespokePageContent() {
               <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
                 <span className="text-stone">Fit</span>
                 <span className="font-medium text-ink text-right">
-                  {fitType === "custom" ? "Custom Measurements" : getStandardSizeLabel()}
+                  {fitType === "custom" ? "Made to Measure" : getStandardSizeLabel()}
                 </span>
               </div>
               <div className="flex justify-between items-start gap-4 pt-4 border-t border-border">
