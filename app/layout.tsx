@@ -2,11 +2,9 @@
 
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
-import Script from "next/script";
+import Link from "next/link";
 import { CurrencyProvider } from "@/context/currency-context";
 import { CartProvider } from "@/context/cart-context";
-import SiteHeader from "@/components/site/site-header";
-import SiteFooter from "@/components/site/site-footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -46,23 +44,61 @@ export default function RootLayout({
       <body className="antialiased">
         <CurrencyProvider>
           <CartProvider>
-            <SiteHeader />
+            {/* HEADER — Inline */}
+            <header className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md">
+              <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
+                <Link
+                  href="/custom/men"
+                  className="text-white text-[11px] uppercase tracking-[0.3em] hover:text-[#D4AF37] transition z-10"
+                >
+                  Shop
+                </Link>
+
+                <Link
+                  href="/"
+                  className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+                >
+                  <span className="block font-serif text-2xl md:text-3xl tracking-[0.5em] text-[#D4AF37]">
+                    PADO
+                  </span>
+                  <span className="block text-[8px] md:text-[9px] tracking-[0.4em] text-white/80 mt-0.5">
+                    BESPOKE
+                  </span>
+                </Link>
+
+                <Link
+                  href="/checkout"
+                  className="text-white text-[11px] uppercase tracking-[0.3em] hover:text-[#D4AF37] transition z-10"
+                >
+                  Cart
+                </Link>
+              </div>
+            </header>
+
             <main className="min-h-screen pt-20">{children}</main>
-            <SiteFooter />
+
+            {/* FOOTER — Simple */}
+            <footer className="border-t border-neutral-200 bg-[#FDFBF7] py-12 px-6">
+              <div className="max-w-[1400px] mx-auto text-center">
+                <h3 className="text-2xl font-serif text-[#0A0A0A] mb-4 tracking-[0.3em]">
+                  PADO
+                </h3>
+                <p className="text-sm text-neutral-500 mb-8">
+                  © {new Date().getFullYear()} PADO BOUTIQUE. All rights reserved.
+                </p>
+                <div className="flex flex-wrap justify-center gap-6 text-xs text-neutral-600">
+                  <Link href="/about">About</Link>
+                  <Link href="/contact">Contact</Link>
+                  <Link href="/shipping">Shipping</Link>
+                  <Link href="/returns">Returns</Link>
+                  <Link href="/track-order">Track Order</Link>
+                  <Link href="/privacy">Privacy</Link>
+                  <Link href="/terms">Terms</Link>
+                </div>
+              </div>
+            </footer>
           </CartProvider>
         </CurrencyProvider>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-3BE6XFB1WC"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-3BE6XFB1WC');
-          `}
-        </Script>
       </body>
     </html>
   );
