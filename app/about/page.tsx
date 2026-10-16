@@ -7,7 +7,7 @@ import { Reveal } from "@/components/site/reveal";
 export const metadata = {
   title: "Our Story | PADO Boutique",
   description:
-    "Crafting timeless elegance since 2020. The PADO philosophy of bespoke tailoring — designed in Canada, handcrafted in Karachi.",
+    "Designed in Canada. Handcrafted in Karachi. Delivered worldwide. The PADO philosophy of bespoke tailoring since 2020.",
 };
 
 const PROCESS_STEPS = [
@@ -66,8 +66,8 @@ const ATELIER_IMAGES = [
     alt: "Men's formal bespoke suit",
   },
   {
-    src: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&q=90&auto=format&fit=crop",
-    alt: "Women's white tailored suit",
+    src: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800&q=90&auto=format&fit=crop",
+    alt: "Women's wool 2-piece suit",
   },
   {
     src: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=90&auto=format&fit=crop",
@@ -87,20 +87,20 @@ export default function AboutPage() {
               Our Story
             </p>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-ink leading-[1.05] mb-8 max-w-4xl">
-              Crafting timeless
+              Designed in Canada.
               <br />
-              <em className="italic text-bronze">elegance since 2020.</em>
+              <em className="italic text-bronze">Handcrafted in Karachi.</em>
             </h1>
             <p className="text-lg md:text-xl text-graphite leading-relaxed max-w-2xl">
-              PADO BOUTIQUE is a Canada-based bespoke tailoring house with our atelier
-              in Karachi, Pakistan. Every garment we create is a collaboration between
-              you and our master tailors.
+              PADO BOUTIQUE is a Canada-based bespoke tailoring house with our primary
+              atelier in Karachi, Pakistan, and select production partnerships in China.
+              Every garment we create is a collaboration between you and our master tailors.
             </p>
           </Reveal>
         </div>
       </section>
 
-      {/* ===== BRAND STORY + IMAGE ===== */}
+      {/* ===== BRAND STORY ===== */}
       <section className="pb-24 md:pb-32 px-6 md:px-16">
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
           <Reveal>
@@ -121,26 +121,153 @@ export default function AboutPage() {
               The PADO Philosophy
             </p>
             <h2 className="text-3xl md:text-5xl font-serif text-ink leading-[1.15] mb-8">
-              Luxury is not just
+              True luxury lies
               <br />
-              about the <em className="italic text-bronze">fabric.</em>
+              in the <em className="italic text-bronze">details.</em>
             </h2>
             <div className="space-y-6 text-base md:text-lg text-graphite leading-[1.8]">
               <p>
-                Founded with a passion for perfection, PADO BOUTIQUE specializes in
-                creating garments that are as unique as the individuals who wear them.
+                PADO BOUTIQUE was born from a simple idea — that true luxury lies in the
+                details. Not in logos. Not in mass production. But in the quiet
+                confidence of a garment that fits you perfectly.
               </p>
               <p>
-                We believe that true luxury is the experience — the care, the
-                craftsmanship, the attention to detail that goes into every single
-                stitch. Our atelier blends traditional techniques with a contemporary
-                vision.
+                From fabric selection to silhouette design, every decision is made with
+                intention. We don't follow fast fashion trends. We create timeless
+                pieces that will still feel relevant in ten years.
               </p>
               <p>
                 From the moment you place your order to the day your garment arrives at
-                your door, every step is handled with intention.
+                your door, every step is handled with care.
               </p>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== DESIGNED IN CANADA ===== */}
+      <section className="pb-24 md:pb-32 px-6 md:px-16">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <Reveal className="lg:col-span-4">
+            <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">
+              Designed in Canada
+            </p>
+            <span className="block w-16 h-[1px] bg-ink mb-8" />
+          </Reveal>
+          <Reveal delay={100} className="lg:col-span-8">
+            <h2 className="text-3xl md:text-5xl font-serif text-ink leading-[1.15] mb-8">
+              Contemporary minimalism,
+              <br />
+              <em className="italic text-bronze">timeless design.</em>
+            </h2>
+            <p className="text-base md:text-lg text-graphite leading-[1.8] mb-8">
+              Our design studio is based in Canada, where every PADO BOUTIQUE piece is
+              conceptualised. We draw inspiration from contemporary minimalism, classic
+              menswear traditions, and the art of understated elegance.
+            </p>
+            <ul className="space-y-4">
+              {[
+                "Contemporary, minimal design language",
+                "Attention to detail at every touchpoint",
+                "Modern sizing and fit philosophy",
+                "Ethical, slow-fashion approach",
+                "Quality control and customer care",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-4 text-sm md:text-base text-graphite"
+                >
+                  <span className="w-6 h-[1px] bg-ink flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== HANDCRAFTED IN KARACHI ===== */}
+      <section className="pb-24 md:pb-32 px-6 md:px-16 bg-cream py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <Reveal className="lg:col-span-4">
+            <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">
+              Handcrafted in Karachi
+            </p>
+            <span className="block w-16 h-[1px] bg-ink mb-8" />
+          </Reveal>
+          <Reveal delay={100} className="lg:col-span-8">
+            <h2 className="text-3xl md:text-5xl font-serif text-ink leading-[1.15] mb-8">
+              Where generations
+              <br />
+              of <em className="italic text-bronze">craftsmanship live.</em>
+            </h2>
+            <p className="text-base md:text-lg text-graphite leading-[1.8] mb-8">
+              Karachi has a generations-old tradition of bespoke tailoring. Many of the
+              world's finest luxury houses quietly source their craftsmanship from this
+              region — because the skill is unmatched, and the dedication is real.
+            </p>
+            <p className="text-base md:text-lg text-graphite leading-[1.8] mb-8">
+              Our master tailors learned their craft from their fathers, who learned from
+              theirs. They work with hand-stitching techniques passed down through
+              centuries.
+            </p>
+            <ul className="space-y-4">
+              {[
+                "Master tailors with 20+ years experience",
+                "Traditional hand-stitching techniques",
+                "14–18 days of dedicated craftsmanship per garment",
+                "Multiple quality checks before dispatch",
+                "Premium Italian & English fabrics",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-4 text-sm md:text-base text-graphite"
+                >
+                  <span className="w-6 h-[1px] bg-ink flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== CHINESE PARTNERSHIPS ===== */}
+      <section className="pb-24 md:pb-32 px-6 md:px-16 pt-24 md:pt-32">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <Reveal className="lg:col-span-4">
+            <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">
+              Chinese Partnerships
+            </p>
+            <span className="block w-16 h-[1px] bg-ink mb-8" />
+          </Reveal>
+          <Reveal delay={100} className="lg:col-span-8">
+            <h2 className="text-3xl md:text-5xl font-serif text-ink leading-[1.15] mb-8">
+              Select pieces,
+              <br />
+              same <em className="italic text-bronze">high standards.</em>
+            </h2>
+            <p className="text-base md:text-lg text-graphite leading-[1.8] mb-8">
+              For select seasonal and novelty pieces, we work with trusted manufacturing
+              partners in China. These factories are carefully vetted for quality, working
+              conditions, and craftsmanship standards.
+            </p>
+            <ul className="space-y-4">
+              {[
+                "Seasonal & novelty suits (Halloween, party wear)",
+                "Ready-to-wear accessories",
+                "Fabric sourcing and logistics",
+                "Same quality standards as our Karachi atelier",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-4 text-sm md:text-base text-graphite"
+                >
+                  <span className="w-6 h-[1px] bg-ink flex-shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
           </Reveal>
         </div>
       </section>
@@ -209,7 +336,7 @@ export default function AboutPage() {
         <div className="max-w-[1400px] mx-auto">
           <Reveal className="mb-16">
             <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">
-              Our Atelier
+              Our Craft
             </p>
             <h2 className="text-3xl md:text-5xl font-serif text-ink max-w-2xl">
               Where every garment
