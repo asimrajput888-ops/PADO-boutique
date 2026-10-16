@@ -82,8 +82,8 @@ export default function SiteHeader() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-paper/95 backdrop-blur-md border-b border-border"
-            : "bg-ink/30 backdrop-blur-sm"
+            ? "bg-paper border-b border-border"
+            : "bg-transparent"
         }`}
       >
         <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
@@ -98,17 +98,17 @@ export default function SiteHeader() {
               <div className="flex flex-col gap-[5px]">
                 <span
                   className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-paper"
+                    scrolled ? "bg-ink" : "bg-white"
                   }`}
                 />
                 <span
                   className={`w-6 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-paper"
+                    scrolled ? "bg-ink" : "bg-white"
                   }`}
                 />
                 <span
                   className={`w-4 h-[1.2px] transition-colors duration-500 ${
-                    scrolled ? "bg-ink" : "bg-paper"
+                    scrolled ? "bg-ink" : "bg-white"
                   } group-hover:w-6`}
                 />
               </div>
@@ -118,7 +118,7 @@ export default function SiteHeader() {
               href="/custom"
               aria-label="Search"
               className={`transition-colors duration-500 ${
-                scrolled ? "text-ink" : "text-paper"
+                scrolled ? "text-ink" : "text-white"
               }`}
             >
               <svg
@@ -144,12 +144,12 @@ export default function SiteHeader() {
             className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
             aria-label="PADO Boutique"
           >
-            <span className="text-gold-shine block font-serif text-2xl md:text-3xl tracking-[0.5em]">
+            <span className="block font-serif text-2xl md:text-3xl tracking-[0.5em] text-[#C5A059]">
               PADO
             </span>
             <span
               className={`block text-[8px] md:text-[9px] tracking-[0.4em] mt-0.5 transition-colors duration-500 ${
-                scrolled ? "text-stone" : "text-paper/80"
+                scrolled ? "text-stone" : "text-white/70"
               }`}
             >
               BESPOKE
@@ -162,7 +162,7 @@ export default function SiteHeader() {
               value={currency}
               onChange={(e) => setCurrency(e.target.value as any)}
               className={`bg-transparent text-[10px] md:text-xs uppercase tracking-[0.2em] border-0 outline-none cursor-pointer transition-colors duration-500 hidden md:block ${
-                scrolled ? "text-ink" : "text-paper"
+                scrolled ? "text-ink" : "text-white"
               }`}
             >
               <option value="USD" className="text-ink">USD ($)</option>
@@ -177,7 +177,7 @@ export default function SiteHeader() {
               href="/admin/login"
               aria-label="Account"
               className={`transition-colors duration-500 ${
-                scrolled ? "text-ink" : "text-paper"
+                scrolled ? "text-ink" : "text-white"
               }`}
             >
               <svg
@@ -204,7 +204,7 @@ export default function SiteHeader() {
                 strokeWidth={1}
                 stroke="currentColor"
                 className={`w-[18px] h-[18px] md:w-5 md:h-5 transition-colors duration-500 ${
-                  scrolled ? "text-ink" : "text-paper"
+                  scrolled ? "text-ink" : "text-white"
                 }`}
               >
                 <path
@@ -214,7 +214,7 @@ export default function SiteHeader() {
                 />
               </svg>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-ink text-paper text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
+                <span className="absolute -top-1.5 -right-1.5 bg-[#C5A059] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
                   {cartCount}
                 </span>
               )}
@@ -232,7 +232,7 @@ export default function SiteHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[60] bg-ink/50 backdrop-blur-sm"
+              className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
               onClick={() => setMenuOpen(false)}
             />
 
@@ -249,7 +249,7 @@ export default function SiteHeader() {
                 </span>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="text-xl text-ink hover:text-bronze transition"
+                  className="text-xl text-ink hover:text-[#C5A059] transition"
                   aria-label="Close"
                 >
                   ✕
@@ -267,7 +267,7 @@ export default function SiteHeader() {
                       }
                       className="w-full text-left flex items-center justify-between mb-4 group"
                     >
-                      <span className="text-xl md:text-2xl font-serif text-ink group-hover:text-bronze transition">
+                      <span className="text-xl md:text-2xl font-serif text-ink group-hover:text-[#C5A059] transition">
                         {section.title}
                       </span>
                       <span className="text-stone text-lg font-light">
