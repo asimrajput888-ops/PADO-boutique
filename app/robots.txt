@@ -1,0 +1,8 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /_next/
+
+Sitemap: https://www.padoshop.com/sitemap.xml
