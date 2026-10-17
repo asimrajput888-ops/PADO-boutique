@@ -4,168 +4,101 @@ import Link from "next/link";
 
 export default function SiteFooter() {
   return (
-    <footer className="bg-brand-ivory border-t border-brand-stone">
-      {/* Newsletter */}
-      <div className="border-b border-brand-stone">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center">
-            <div>
-              <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-4">
-                Newsletter
-              </p>
-              <h3 className="text-2xl md:text-4xl font-serif text-brand-charcoal leading-tight">
-                Join the atelier.
-                <br />
-                <em className="text-brand-gold">Receive our stories.</em>
-              </h3>
-            </div>
-            <div>
-              <p className="text-sm text-brand-slate leading-relaxed mb-6">
-                Subscribe for early access to new collections, fabric drops, and
-                stories from our master tailors.
-              </p>
-              <form className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="flex-1 border border-brand-stone bg-white px-5 py-4 text-sm text-brand-charcoal placeholder:text-neutral-400 focus:border-brand-gold outline-none transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="bg-brand-charcoal text-white px-8 py-4 text-[10px] uppercase tracking-[0.3em] font-medium hover:bg-brand-gold transition-colors duration-500"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Links Grid */}
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 md:gap-8">
+    <footer className="bg-brand-charcoal text-white pt-20 pb-10 border-t border-white/10">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+        
+        {/* Top Section: Newsletter & Links */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
+          
           {/* Brand */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-2">
-            <h3 className="text-2xl font-serif text-brand-charcoal mb-6 tracking-[0.3em]">
-              PADO
-            </h3>
-            <p className="text-sm leading-relaxed mb-6 max-w-xs text-brand-slate">
-              Luxury bespoke tailoring and silk loungewear. Crafted for the modern
-              individual.
+          <div className="lg:col-span-1">
+            <Link href="/" className="inline-block mb-6">
+              <span className="font-serif text-3xl tracking-[0.2em] uppercase text-white">
+                PADO
+              </span>
+            </Link>
+            <p className="text-sm text-white/60 leading-relaxed mb-8 max-w-xs">
+              Bespoke tailoring crafted to your exact measurements. Designed in Canada, handcrafted by master tailors, delivered worldwide.
             </p>
-            <div className="flex items-center gap-4">
-              {["Instagram", "Facebook", "Pinterest", "YouTube"].map(
-                (social) => (
-                  <a
-                    key={social}
-                    href="#"
-                    aria-label={social}
-                    className="w-9 h-9 border border-brand-stone flex items-center justify-center text-[10px] text-brand-slate hover:border-brand-gold hover:text-brand-gold transition-colors duration-300"
-                  >
-                    {social[0]}
-                  </a>
-                )
-              )}
+            <div className="flex gap-4">
+              {/* Instagram */}
+              <a href="#" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-brand-charcoal transition-all duration-300">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+              {/* WhatsApp */}
+              <a href="https://wa.me/16393840265" target="_blank" rel="noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-brand-charcoal transition-all duration-300">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                </svg>
+              </a>
             </div>
           </div>
 
-          {/* Custom Made */}
+          {/* Links 1 */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
-              Custom Made
-            </h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { name: "Men's Bespoke", href: "/custom/men" },
-                { name: "Women's Bespoke", href: "/custom/women" },
-                { name: "Seasonal & Novelty", href: "/seasonal" },
-              ].map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
-                  >
-                    {item.name}
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6">Collections</h4>
+            <ul className="space-y-4">
+              {["For Him", "For Her", "Seasonal & Novelty", "The Atelier"].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="text-sm text-white/70 hover:text-white transition-colors">
+                    {item}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Customer Care */}
+          {/* Links 2 */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
-              Customer Care
-            </h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { name: "Contact", href: "/contact" },
-                { name: "Measurements", href: "/measurements" },
-                { name: "Shipping", href: "/shipping" },
-                { name: "Returns", href: "/returns" },
-                { name: "Track Order", href: "/track-order" },
-              ].map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
-                  >
-                    {item.name}
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6">Customer Care</h4>
+            <ul className="space-y-4">
+              {["Track Your Order", "Measurement Guide", "Shipping & Returns", "Contact Us", "FAQ"].map((item) => (
+                <li key={item}>
+                  <Link href="#" className="text-sm text-white/70 hover:text-white transition-colors">
+                    {item}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Newsletter */}
           <div>
-            <h4 className="text-brand-charcoal text-[10px] tracking-[0.3em] uppercase mb-6 font-semibold">
-              Company
-            </h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { name: "About", href: "/about" },
-                { name: "Journal", href: "/journal" },
-                { name: "Privacy", href: "/privacy" },
-                { name: "Terms", href: "/terms" },
-              ].map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-brand-slate hover:text-brand-gold transition-colors duration-300"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6">Join The List</h4>
+            <p className="text-sm text-white/60 leading-relaxed mb-6">
+              Subscribe for early access to new collections, seasonal offers, and atelier insights.
+            </p>
+            <form className="flex border-b border-white/20 pb-2">
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                className="flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none"
+              />
+              <button type="submit" className="text-[10px] uppercase tracking-[0.2em] text-brand-gold hover:text-white transition-colors">
+                Subscribe
+              </button>
+            </form>
           </div>
         </div>
-      </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-brand-stone">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] text-neutral-500 tracking-[0.3em] uppercase text-center md:text-left">
-            © {new Date().getFullYear()} PADO BOUTIQUE. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[10px] text-white/40 uppercase tracking-[0.2em]">
+            © {new Date().getFullYear()} PADO Boutique. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <span className="text-[10px] text-neutral-400 tracking-[0.2em] uppercase">
-              Secure Payments
-            </span>
-            <div className="flex items-center gap-3">
-              {["VISA", "MC", "AMEX", "PAY"].map((brand) => (
-                <span
-                  key={brand}
-                  className="text-[9px] tracking-widest text-neutral-400 border border-brand-stone px-2 py-1"
-                >
-                  {brand}
-                </span>
-              ))}
-            </div>
+          <div className="flex gap-6">
+            {["Privacy Policy", "Terms of Service", "Refund Policy"].map((item) => (
+              <Link key={item} href="#" className="text-[10px] text-white/40 hover:text-white uppercase tracking-[0.2em] transition-colors">
+                {item}
+              </Link>
+            ))}
           </div>
         </div>
+
       </div>
     </footer>
   );
