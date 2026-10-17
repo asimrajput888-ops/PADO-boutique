@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase"; // <-- Yahan change kiya
 import { routeOrder } from "@/lib/fulfillment/router";
 import type { OrderRecord } from "@/lib/fulfillment/types";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const supabase = getSupabase();
+    // const supabase = getSupabase(); <-- Ye line hata di kyunki supabase direct import ho chuka hai
 
-    // 1. Supabase mein order save karo (Existing logic)
+    // 1. Supabase mein order save karo
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
