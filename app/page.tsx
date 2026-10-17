@@ -67,7 +67,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-brand-ivory">
-      {/* ===== HERO SECTION — Full Screen Image ===== */}
+      {/* ===== HERO SECTION ===== */}
       <section
         ref={heroRef}
         className="relative min-h-svh w-full overflow-hidden bg-brand-charcoal"
@@ -82,11 +82,11 @@ export default function HomePage() {
             className="object-cover object-[70%_25%] sm:object-[65%_center] lg:object-[58%_center]"
             sizes="100vw"
           />
-          {/* Overlay — mobile: stronger for text readability, desktop: left-to-right */}
+          {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80 md:bg-gradient-to-r md:from-black/70 md:via-black/25 md:to-transparent" />
         </motion.div>
 
-        {/* TEXT — LEFT SIDE OVERLAY */}
+        {/* TEXT — LEFT SIDE */}
         <motion.div
           style={{ opacity: heroOpacity }}
           className="relative z-10 min-h-svh flex items-center px-5 py-20 sm:px-8 md:px-12 lg:px-20"
@@ -95,29 +95,52 @@ export default function HomePage() {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-[10px] tracking-[0.4em] sm:tracking-[0.5em] text-white uppercase mb-5 sm:mb-6"
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="eyebrow text-white mb-6 sm:mb-8"
             >
               Bespoke Tailoring · Est. 2020
             </motion.p>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="text-[1.75rem] sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.08] sm:leading-[1.05] mb-5 sm:mb-6 text-balance"
-              style={{ textShadow: "0 4px 40px rgba(0,0,0,0.6)" }}
+            {/* TEXT MASK REVEAL H1 */}
+            <h1
+              className="h-display text-white mb-6 sm:mb-8"
+              style={{ textShadow: "0 4px 40px rgba(0,0,0,0.5)" }}
             >
-              Cut to your
-              <br />
-              <em className="text-white">exact measure.</em>
-            </motion.h1>
+              <span className="text-mask">
+                <motion.span
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  transition={{
+                    duration: 1.2,
+                    ease: [0.16, 1, 0.3, 1],
+                    delay: 0.3,
+                  }}
+                  className="block pb-1"
+                >
+                  Cut to your
+                </motion.span>
+              </span>
+              <span className="text-mask">
+                <motion.span
+                  initial={{ y: "100%" }}
+                  animate={{ y: 0 }}
+                  transition={{
+                    duration: 1.2,
+                    ease: [0.16, 1, 0.3, 1],
+                    delay: 0.45,
+                  }}
+                  className="block italic"
+                >
+                  exact measure.
+                </motion.span>
+              </span>
+            </h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
-              className="text-white text-[13px] sm:text-sm md:text-base leading-relaxed mb-7 sm:mb-8 max-w-md"
+              className="text-white text-[13px] sm:text-sm md:text-base leading-relaxed mb-8 sm:mb-10 max-w-md"
             >
               Handcrafted bespoke suits, made to your exact measurements.
               Designed in Canada, handcrafted in Karachi, delivered worldwide.
@@ -143,12 +166,12 @@ export default function HomePage() {
               </Link>
             </motion.div>
 
-            {/* Bottom small details */}
+            {/* Bottom hairline details */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 1.2 }}
-              className="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/20 flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-8 text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] text-white"
+              className="mt-10 sm:mt-12 pt-6 border-t border-white/20 flex flex-wrap gap-x-5 gap-y-2 sm:gap-x-8 text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] text-white"
             >
               <span>Handcrafted</span>
               <span>Made to Measure</span>
@@ -157,7 +180,7 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* Scroll Indicator — Bottom Right */}
+        {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -207,34 +230,45 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 px-5 sm:px-8 md:px-12">
         <div className="max-w-[1400px] mx-auto">
           <Reveal className="mb-10 sm:mb-12 md:mb-16">
-            <p className="text-[10px] tracking-[0.4em] sm:tracking-[0.5em] text-brand-gold uppercase mb-3 sm:mb-4">
+            <p className="eyebrow text-brand-gold mb-3 sm:mb-4">
               Collections
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-brand-charcoal text-balance">
+            <h2 className="h-section text-brand-charcoal">
               Explore Our Craft
             </h2>
           </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
             {CATEGORIES.map((cat, i) => (
-              <Reveal key={cat.name} delay={i * 100}>
+              <Reveal key={cat.name} delay={i * 150} direction="none">
                 <Link
                   href={cat.href}
                   className="group block relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-brand-stone"
                 >
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    className="object-cover object-top transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  {/* Clip Path Reveal for Image */}
+                  <motion.div
+                    initial={{ clipPath: "inset(100% 0 0 0)" }}
+                    whileInView={{ clipPath: "inset(0% 0 0 0)" }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 1.4, ease: [0.77, 0, 0.175, 1] }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      className="object-cover object-top transition-transform duration-[1.2s] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    />
+                  </motion.div>
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
                   <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6 md:p-8">
-                    <p className="text-[10px] tracking-[0.35em] sm:tracking-[0.4em] text-brand-gold-light uppercase mb-2 sm:mb-3">
+                    <p className="eyebrow text-brand-gold-light mb-2 sm:mb-3">
                       {cat.label}
                     </p>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-serif text-white mb-3 sm:mb-4">
+                    <h3 className="h-card text-white mb-3 sm:mb-4">
                       {cat.name}
                     </h3>
                     <span className="text-[10px] tracking-[0.3em] text-brand-gold-light uppercase border-b border-brand-gold-light/50 pb-1 group-hover:border-brand-gold-light transition-all duration-500">
@@ -252,10 +286,10 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 px-5 sm:px-8 md:px-12 bg-brand-cream">
         <div className="max-w-[1400px] mx-auto">
           <Reveal className="mb-10 sm:mb-12 md:mb-16">
-            <p className="text-[10px] tracking-[0.4em] sm:tracking-[0.5em] text-brand-gold uppercase mb-3 sm:mb-4">
+            <p className="eyebrow text-brand-gold mb-3 sm:mb-4">
               The Process
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-brand-charcoal text-balance">
+            <h2 className="h-section text-brand-charcoal">
               From Measurement to Masterpiece
             </h2>
           </Reveal>
@@ -263,12 +297,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6 md:gap-x-8 lg:gap-x-12">
             {PROCESS.map((step, i) => (
               <Reveal key={step.number} delay={i * 100}>
-                <div className="relative">
-                  <span className="text-[64px] sm:text-[80px] md:text-[100px] font-serif text-brand-gold/15 leading-none absolute -top-4 sm:-top-6 -left-2 select-none">
+                <div className="relative group cursor-default">
+                  <span className="text-[64px] sm:text-[80px] md:text-[100px] font-serif text-brand-gold/15 leading-none absolute -top-4 sm:-top-6 -left-2 select-none transition-colors duration-500 group-hover:text-brand-gold/25">
                     {step.number}
                   </span>
                   <div className="relative pt-7 sm:pt-8">
-                    <div className="gold-line mb-5 sm:mb-6" />
+                    <div className="gold-line mb-5 sm:mb-6 transition-all duration-500 group-hover:w-16" />
                     <h3 className="text-lg sm:text-xl font-serif text-brand-charcoal mb-2 sm:mb-3">
                       {step.title}
                     </h3>
@@ -287,7 +321,14 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 md:py-28 lg:py-32 px-5 sm:px-8 md:px-12">
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-20 items-center">
           <Reveal>
-            <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-brand-stone img-zoom-container">
+            {/* Clip Path Reveal for Image */}
+            <motion.div
+              initial={{ clipPath: "inset(100% 0 0 0)" }}
+              whileInView={{ clipPath: "inset(0% 0 0 0)" }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 1.4, ease: [0.77, 0, 0.175, 1] }}
+              className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-brand-stone img-zoom-container"
+            >
               <Image
                 src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=90&auto=format&fit=crop"
                 alt="PADO Boutique Atelier"
@@ -296,14 +337,14 @@ export default function HomePage() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 unoptimized
               />
-            </div>
+            </motion.div>
           </Reveal>
 
           <Reveal delay={200}>
-            <p className="text-[10px] tracking-[0.4em] sm:tracking-[0.5em] text-brand-gold uppercase mb-4 sm:mb-6">
+            <p className="eyebrow text-brand-gold mb-4 sm:mb-6">
               Our Atelier
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-brand-charcoal leading-[1.15] mb-6 sm:mb-8 text-balance">
+            <h2 className="h-section text-brand-charcoal mb-6 sm:mb-8">
               Where every stitch
               <br />
               tells a story.
@@ -352,10 +393,10 @@ export default function HomePage() {
           />
         </div>
         <Reveal className="relative z-10 max-w-3xl mx-auto text-center">
-          <p className="text-[10px] tracking-[0.4em] sm:tracking-[0.5em] text-brand-gold uppercase mb-4 sm:mb-6">
+          <p className="eyebrow text-brand-gold mb-4 sm:mb-6">
             Begin Your Journey
           </p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-white leading-[1.15] mb-6 sm:mb-8 text-balance">
+          <h2 className="h-section text-white mb-6 sm:mb-8">
             Your perfect fit is
             <br />
             <em className="text-brand-gold-light">one order away.</em>
