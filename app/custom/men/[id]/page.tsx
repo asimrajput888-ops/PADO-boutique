@@ -499,7 +499,7 @@ function MenBespokePageContent() {
     );
   }
 
-  // STEP 0: Choose Fulfillment — Ready to Wear vs Made to Measure
+  // STEP 0: Choose Fit Type
   if (step === 0) {
     return (
       <div className="min-h-screen bg-paper">
@@ -556,7 +556,6 @@ function MenBespokePageContent() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-            {/* OPTION 1: Ready to Wear */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -598,7 +597,6 @@ function MenBespokePageContent() {
               )}
             </motion.button>
 
-            {/* OPTION 2: Made to Measure */}
             <motion.button
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
