@@ -174,12 +174,9 @@ function WomenBespokePageContent() {
       setModel(data);
       setProfileName(`${data.name} — ${new Date().toLocaleDateString()}`);
       
-      // MAGIC LOGIC: Supplier check karke fitType set karo
-      if (["cj", "1688"].includes(data.supplier?.toLowerCase())) {
-        setFitType("standard");
-      } else {
-        setFitType("custom"); // Kashif, Cheonseng, etc.
-      }
+      // MAGIC LOGIC: Database se supplier check karo
+      const isReadyToWear = ["cj", "1688"].includes(data.supplier?.toLowerCase());
+      setFitType(isReadyToWear ? "standard" : "custom");
 
       setLoading(false);
     };
@@ -232,7 +229,7 @@ function WomenBespokePageContent() {
     (showTrouserSelector && !trouserSize) ||
     (showShirtSelector && !jacketSize);
 
-  // Custom Step Logic (Skip Fit Type Selection)
+  // Custom Step Logic
   const nextStep = () => {
     if (step === 0) setStep(2); // Standard size -> Contact
     else if (step === 1) setStep(2); // Custom measurements -> Contact
