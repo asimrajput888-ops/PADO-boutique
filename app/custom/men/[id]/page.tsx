@@ -183,12 +183,10 @@ function MenBespokePageContent() {
       setModel(data);
       setProfileName(`${data.name} — ${new Date().toLocaleDateString()}`);
       
-      // MAGIC LOGIC: Supplier check karke fitType set karo
-      if (["cj", "1688"].includes(data.supplier?.toLowerCase())) {
-        setFitType("standard");
-      } else {
-        setFitType("custom"); // Kashif, Cheonseng, etc.
-      }
+      // MAGIC LOGIC: Database se supplier check karo
+      // Agar supplier 'cj' ya '1688' hai toh Standard, warna Custom (Kashif/Cheonseng)
+      const isReadyToWear = ["cj", "1688"].includes(data.supplier?.toLowerCase());
+      setFitType(isReadyToWear ? "standard" : "custom");
 
       setLoading(false);
     };
@@ -241,7 +239,6 @@ function MenBespokePageContent() {
     (showTrouserSelector && !trouserSize) ||
     (showShirtSelector && !jacketSize);
 
-  // Custom Step Logic (Skip Fit Type Selection)
   const nextStep = () => {
     if (step === 0) setStep(2); // Standard size -> Contact
     else if (step === 1) setStep(2); // Custom measurements -> Contact
