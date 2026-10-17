@@ -10,8 +10,8 @@ import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 
-// Standard sizes (Aap apne hisaab se adjust kar sakte hain)
-const SIZES = ["S", "M", "L", "XL", "XXL"]; 
+// Standard sizes (Suits ke liye 36, 38, 40 behtar hain)
+const SIZES = ["36", "38", "40", "42", "44", "46"]; 
 
 function ReadyToWearProductContent() {
   const params = useParams();
@@ -41,7 +41,7 @@ function ReadyToWearProductContent() {
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) {
-      return alert("Please fill all shipping fields");
+      return alert("Please fill all required shipping fields");
     }
     setSubmitting(true);
 
@@ -57,7 +57,7 @@ function ReadyToWearProductContent() {
         model_id: String(model.id), 
         model_name: model.name, 
         category: model.category || "men", 
-        product_type: model.product_type,
+        product_type: model.product_type || "suit",
         measurements: null, 
         fabric_id: null, 
         fabric_name: null,
@@ -66,7 +66,6 @@ function ReadyToWearProductContent() {
         notes: "Ready to Wear Order",
       };
 
-      // Aapka existing API route
       const res = await fetch("/api/orders", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
@@ -150,11 +149,17 @@ function ReadyToWearProductContent() {
               <div className="space-y-4">
                 <input type="text" placeholder="Full Name *" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 <input type="email" placeholder="Email *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
-                <input type="text" placeholder="Address *" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
+                
+                {/* Phone number added */}
+                <input type="tel" placeholder="Phone / WhatsApp *" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
+                
+                <input type="text" placeholder="Address Line 1 *" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
+                <input type="text" placeholder="Address Line 2 (Optional)" value={contact.address2} onChange={(e) => setContact({ ...contact, address2: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 <div className="grid grid-cols-2 gap-4">
                   <input type="text" placeholder="City *" value={contact.city} onChange={(e) => setContact({ ...contact, city: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
-                  <input type="text" placeholder="Country *" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
+                  <input type="text" placeholder="Postal Code" value={contact.postalCode} onChange={(e) => setContact({ ...contact, postalCode: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 </div>
+                <input type="text" placeholder="Country *" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
               </div>
             </div>
 
