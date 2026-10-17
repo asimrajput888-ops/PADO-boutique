@@ -1,7 +1,7 @@
 // app/custom/men/[id]/page.tsx
 
 "use client";
-
+import { ProductGallery } from "@/components/product/product-gallery";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
