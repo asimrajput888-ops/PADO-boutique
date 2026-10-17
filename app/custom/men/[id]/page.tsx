@@ -1,6 +1,7 @@
 // app/custom/men/[id]/page.tsx
 
 "use client";
+
 import { ProductGallery } from "@/components/product/product-gallery";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
@@ -183,8 +184,6 @@ function MenBespokePageContent() {
       setModel(data);
       setProfileName(`${data.name} — ${new Date().toLocaleDateString()}`);
       
-      // MAGIC LOGIC: Database se supplier check karo
-      // Agar supplier 'cj' ya '1688' hai toh Standard, warna Custom (Kashif/Cheonseng)
       const isReadyToWear = ["cj", "1688"].includes(data.supplier?.toLowerCase());
       setFitType(isReadyToWear ? "standard" : "custom");
 
@@ -240,8 +239,8 @@ function MenBespokePageContent() {
     (showShirtSelector && !jacketSize);
 
   const nextStep = () => {
-    if (step === 0) setStep(2); // Standard size -> Contact
-    else if (step === 1) setStep(2); // Custom measurements -> Contact
+    if (step === 0) setStep(2); 
+    else if (step === 1) setStep(2); 
     else setStep((p) => Math.min(p + 1, 3));
   };
 
@@ -350,13 +349,11 @@ function MenBespokePageContent() {
         <div className="max-w-[1500px] mx-auto">
           <Link href="/custom/men" className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back to Collection</Link>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-            <div className="space-y-6">
-              {galleryImages.map((img, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: i * 0.15 }} className="relative aspect-[3/4] overflow-hidden bg-cream">
-                  <img src={img} alt={`${model.name} ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" loading={i === 0 ? "eager" : "lazy"} />
-                </motion.div>
-              ))}
+            
+            <div className="w-full">
+              <ProductGallery images={galleryImages} name={model.name} />
             </div>
+
             <div className="lg:sticky lg:top-32 lg:self-start">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                 <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-6">{pt} · Bespoke</p>
@@ -394,7 +391,7 @@ function MenBespokePageContent() {
     );
   }
 
-  // STEP 0: Standard Size Selection (Only for CJ / 1688)
+  // STEP 0: Standard Size Selection
   if (step === 0 && fitType === "standard") {
     return (
       <div className="min-h-screen bg-paper">
@@ -495,7 +492,7 @@ function MenBespokePageContent() {
     );
   }
 
-  // STEP 1: Measurements (Only for Kashif / Cheonseng)
+  // STEP 1: Measurements
   if (step === 1 && fitType === "custom") {
     const activeFieldData = fields.find((f) => f.id === activeField);
     const progressPercent = Math.round((filledCount / fields.length) * 100);
