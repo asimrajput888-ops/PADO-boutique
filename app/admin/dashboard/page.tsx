@@ -2,209 +2,161 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalOrders: 0,
-    pendingOrders: 0,
-    totalModels: 0,
-    totalRevenue: 0,
-  });
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+export default function AdminDashboardPage() {
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "custom" | "standard">("all");
 
   useEffect(() => {
-    const fetchStats = async () => {
-      const { count: orderCount } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true });
-
-      const { count: pendingCount } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      const { count: modelCount } = await supabase
-        .from("models")
-        .select("*", { count: "exact", head: true });
-
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("total_price, status");
-
-      const revenue =
-        orders
-          ?.filter((o) => o.status !== "cancelled")
-          .reduce((sum, o) => sum + Number(o.total_price || 0), 0) || 0;
-
-      const { data: recent } = await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      setStats({
-        totalOrders: orderCount || 0,
-        pendingOrders: pendingCount || 0,
-        totalModels: modelCount || 0,
-        totalRevenue: revenue,
-      });
-      setRecentOrders(recent || []);
-      setLoading(false);
-    };
-
-    fetchStats();
+    fetchOrders();
   }, []);
 
+  const fetchOrders = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setOrders(data);
+    }
+    setLoading(false);
+  };
+
+  // Kashif ya Cheonseng ke WhatsApp number yahan dalein (Country code ke sath, bina + ke)
+  const BESPOKE_WHATSAPP_NUMBER = "923001234567"; // <-- Yahan Kashif ka number dalein
+
+  const generateWhatsAppLink = (order: any) => {
+    const m = order.measurements || {};
+    
+    let message = `*New Bespoke Order* 🧵\n\n`;
+    message += `*Order #:* ${order.order_number}\n`;
+    message += `*Customer:* ${order.customer_name}\n`;
+    message += `*Model:* ${order.model_name}\n`;
+    message += `*Category:* ${order.category} (${order.product_type})\n\n`;
+    
+    message += `*--- MEASUREMENTS (Inches) ---*\n`;
+    if (m.height) message += `Height: ${m.height}\n`;
+    
+    // Loop through all measurements provided
+    Object.keys(m).forEach((key) => {
+      if (key !== "height" && key !== "profileName" && key !== "additionalInfo" && key !== "jacketFit" && key !== "trouserFit") {
+        if (m[key]) {
+          message += `${key.charAt(0).toUpperCase() + key.slice(1)}: ${m[key]}\n`;
+        }
+      }
+    });
+
+    if (m.jacketFit) message += `Jacket Fit: ${m.jacketFit}\n`;
+    if (m.trouserFit) message += `Trouser Fit: ${m.trouserFit}\n`;
+    
+    if (m.additionalInfo) {
+      message += `\n*Special Requests:* ${m.additionalInfo}\n`;
+    }
+
+    message += `\n*Shipping Address:*\n${order.shipping_address?.address1}\n${order.shipping_address?.city}, ${order.shipping_address?.country}\n`;
+
+    return `https://wa.me/${BESPOKE_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  };
+
+  const filteredOrders = orders.filter((o) => {
+    if (filter === "all") return true;
+    return o.fit_type === filter;
+  });
+
   return (
-    <div className="p-6 md:p-10">
-      {/* Header */}
-      <div className="mb-10">
-        <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-2">
-          Overview
-        </p>
-        <h1 className="text-3xl font-serif text-neutral-900">Dashboard</h1>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        <StatCard label="Total Orders" value={stats.totalOrders.toString()} />
-        <StatCard label="Pending" value={stats.pendingOrders.toString()} />
-        <StatCard label="Models" value={stats.totalModels.toString()} />
-        <StatCard
-          label="Revenue"
-          value={`$${stats.totalRevenue.toLocaleString()}`}
-        />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mb-12">
-        <h2 className="text-[10px] tracking-[0.3em] text-neutral-500 uppercase mb-4">
-          Quick Actions
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/admin/models/new"
-            className="bg-neutral-900 text-white px-6 py-3 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-neutral-700 transition"
-          >
-            + Add Model
-          </Link>
-          <Link
-            href="/admin/orders"
-            className="border border-neutral-300 text-neutral-900 px-6 py-3 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition"
-          >
-            View Orders
-          </Link>
-          <Link
-            href="/admin/models"
-            className="border border-neutral-300 text-neutral-900 px-6 py-3 text-[11px] uppercase tracking-[0.3em] font-medium hover:border-neutral-900 transition"
-          >
-            Manage Models
-          </Link>
-        </div>
-      </div>
-
-      {/* Recent Orders */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[10px] tracking-[0.3em] text-neutral-500 uppercase">
-            Recent Orders
-          </h2>
-          <Link
-            href="/admin/orders"
-            className="text-[10px] tracking-[0.25em] uppercase text-neutral-500 hover:text-neutral-900 transition"
-          >
-            View All →
-          </Link>
-        </div>
-
-        {loading ? (
-          <p className="text-neutral-400 text-sm">Loading...</p>
-        ) : recentOrders.length === 0 ? (
-          <div className="border border-neutral-200 p-10 text-center">
-            <p className="text-neutral-400 text-sm mb-2">No orders yet.</p>
-            <p className="text-neutral-400 text-xs">
-              Orders will appear here when customers submit them.
-            </p>
+    <div className="min-h-screen bg-paper p-6 md:p-12">
+      <div className="max-w-[1400px] mx-auto">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-border">
+          <div>
+            <h1 className="text-3xl font-serif text-ink mb-2">Admin Dashboard</h1>
+            <p className="text-sm text-stone">Manage bespoke orders and factory fulfillments.</p>
           </div>
+          <button 
+            onClick={fetchOrders} 
+            className="mt-4 md:mt-0 px-6 py-2 bg-ink text-paper text-xs uppercase tracking-[0.2em] hover:bg-bronze transition-colors"
+          >
+            Refresh Orders
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-4 mb-8">
+          {(["all", "custom", "standard"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 text-xs uppercase tracking-[0.2em] border transition-colors ${
+                filter === f ? "bg-ink text-paper border-ink" : "border-border text-stone hover:border-ink"
+              }`}
+            >
+              {f === "all" ? "All Orders" : f === "custom" ? "Bespoke (Kashif/Cheonseng)" : "Ready to Wear (CJ/1688)"}
+            </button>
+          ))}
+        </div>
+
+        {/* Orders Grid */}
+        {loading ? (
+          <p className="text-stone">Loading orders...</p>
+        ) : filteredOrders.length === 0 ? (
+          <p className="text-stone border border-border p-10 text-center">No orders found.</p>
         ) : (
-          <div className="border border-neutral-200 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-neutral-50 border-b border-neutral-200">
-                <tr>
-                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
-                    Order #
-                  </th>
-                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
-                    Customer
-                  </th>
-                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
-                    Model
-                  </th>
-                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
-                    Total
-                  </th>
-                  <th className="text-left p-4 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="border-t border-neutral-100">
-                    <td className="p-4 font-mono text-xs">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-amber-600 hover:underline"
-                      >
-                        {order.order_number || `#${order.id}`}
-                      </Link>
-                    </td>
-                    <td className="p-4 text-sm">{order.customer_name}</td>
-                    <td className="p-4 text-sm text-neutral-600">
-                      {order.model_name}
-                    </td>
-                    <td className="p-4 text-sm font-medium">
-                      ${Number(order.total_price).toLocaleString()}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`text-[10px] uppercase tracking-wider px-2 py-1 ${
-                          order.status === "pending"
-                            ? "bg-yellow-50 text-yellow-800"
-                            : order.status === "in_production"
-                            ? "bg-blue-50 text-blue-800"
-                            : order.status === "shipped"
-                            ? "bg-purple-50 text-purple-800"
-                            : order.status === "completed"
-                            ? "bg-green-50 text-green-800"
-                            : "bg-neutral-100 text-neutral-600"
-                        }`}
-                      >
-                        {order.status || "pending"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredOrders.map((order) => (
+              <div key={order.id} className="border border-border bg-white p-6 relative flex flex-col h-full">
+                
+                {/* Status Badge */}
+                <div className="absolute top-6 right-6">
+                  <span className={`text-[9px] uppercase tracking-wider px-2 py-1 rounded-sm ${
+                    order.factory_status === "submitted" ? "bg-blue-100 text-blue-800" :
+                    order.factory_status === "failed" ? "bg-red-100 text-red-800" :
+                    "bg-gray-100 text-gray-800"
+                  }`}>
+                    {order.factory_status || "Pending"}
+                  </span>
+                </div>
+
+                <p className="text-[10px] uppercase tracking-[0.2em] text-brand-gold mb-1">
+                  {order.order_number}
+                </p>
+                <h3 className="font-serif text-xl text-ink mb-4">{order.model_name}</h3>
+                
+                <div className="text-sm text-stone mb-6 space-y-1">
+                  <p><strong>Customer:</strong> {order.customer_name}</p>
+                  <p><strong>Type:</strong> {order.fit_type === "custom" ? "Made to Measure" : "Ready to Wear"}</p>
+                  <p><strong>Price:</strong> ${order.total_price}</p>
+                </div>
+
+                {/* Action Area */}
+                <div className="mt-auto pt-4 border-t border-border">
+                  {order.fit_type === "custom" ? (
+                    <a
+                      href={generateWhatsAppLink(order)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center bg-green-600 text-white py-3 text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-green-700 transition-colors"
+                    >
+                      Send Measurements via WhatsApp
+                    </a>
+                  ) : (
+                    <div className="text-center py-3 text-[10px] uppercase tracking-[0.2em] text-stone bg-gray-50 border border-gray-100">
+                      Automated via CJ API
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border border-neutral-200 p-6">
-      <p className="text-[10px] tracking-[0.3em] text-neutral-500 uppercase mb-3">
-        {label}
-      </p>
-      <p className="text-3xl font-serif text-neutral-900">{value}</p>
     </div>
   );
 }
