@@ -1,17 +1,22 @@
+// app/api/orders/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase"; // <-- Yahan change kiya
+import { supabase } from "@/lib/supabase";
 import { routeOrder } from "@/lib/fulfillment/router";
 import type { OrderRecord } from "@/lib/fulfillment/types";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    // const supabase = getSupabase(); <-- Ye line hata di kyunki supabase direct import ho chuka hai
 
-    // 1. Supabase mein order save karo
+    // 1. Order Number Generate karein (e.g. PADO-17124598)
+    const orderNumber = `PADO-${Date.now().toString().slice(-6)}`;
+
+    // 2. Supabase mein order save karo
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
+        order_number: orderNumber, // <--- Ye line sabse zaroori hai
         customer_name: body.customer_name,
         customer_email: body.customer_email,
         customer_phone: body.customer_phone,
@@ -33,13 +38,14 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error || !order) {
+      console.error("Supabase Error:", error);
       return NextResponse.json({ error: error?.message || "Failed to save order" }, { status: 500 });
     }
 
-    // 2. Order aate hi factory ko route karo
+    // 3. Order aate hi factory ko route karo (CJ ya Bespoke)
     const result = await routeOrder(order as OrderRecord);
 
-    // 3. Update karo ke factory ko bhej diya gaya hai ya nahi
+    // 4. Update karo ke factory ko bhej diya gaya hai ya nahi
     await supabase
       .from("orders")
       .update({
@@ -49,7 +55,7 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", order.id);
 
-    // 4. Frontend ko response bhejo
+    // 5. Frontend ko response bhejo
     return NextResponse.json({
       success: result.success,
       order: { ...order, supplier_order_id: result.supplier_order_id },
@@ -57,6 +63,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (err: any) {
+    console.error("Server Error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
