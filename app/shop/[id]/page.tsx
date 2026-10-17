@@ -10,8 +10,8 @@ import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 
-// Standard sizes (Suits ke liye 36, 38, 40 behtar hain)
-const SIZES = ["36", "38", "40", "42", "44", "46"]; 
+// Standard sizes for Ready to Wear suits
+const SIZES = ["36", "38", "40", "42", "44", "46"];
 
 function ReadyToWearProductContent() {
   const params = useParams();
@@ -24,7 +24,6 @@ function ReadyToWearProductContent() {
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
-  // State
   const [selectedSize, setSelectedSize] = useState("");
   const [contact, setContact] = useState({
     name: "", email: "", phone: "", address1: "", address2: "", city: "", postalCode: "", country: "",
@@ -52,7 +51,7 @@ function ReadyToWearProductContent() {
         customer_phone: contact.phone,
         customer_country: contact.country, 
         shipping_address: { ...contact },
-        fit_type: "standard", // Forces standard routing
+        fit_type: "standard", 
         standard_size: selectedSize,
         model_id: String(model.id), 
         model_name: model.name, 
@@ -73,12 +72,19 @@ function ReadyToWearProductContent() {
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to submit");
       
-      setOrderNumber(data.order?.order_number || "");
+      // Agar backend error de raha hai toh console mein print hoga
+      if (!res.ok) {
+        console.error("Order API Error:", data);
+        throw new Error(data.error || "Failed to submit order");
+      }
+      
+      // Order number set karo
+      setOrderNumber(data.order?.order_number || "PADO-SUCCESS"); 
       setSubmitted(true);
     } catch (err: any) { 
-      alert("Error: " + err.message); 
+      console.error("Frontend Error:", err);
+      alert("Order Failed: " + err.message); 
     } finally { 
       setSubmitting(false); 
     }
@@ -94,8 +100,8 @@ function ReadyToWearProductContent() {
           <div className="w-24 h-24 rounded-full bg-ink text-paper flex items-center justify-center mx-auto mb-10 text-4xl">✓</div>
           <h1 className="text-4xl font-serif text-ink mb-6">Thank you, {contact.name.split(" ")[0]}.</h1>
           <p className="text-stone mb-3">Your Order Number is:</p>
-          <p className="text-xl font-mono text-ink mb-10">{orderNumber}</p>
-          <Link href="/shop" className="bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em]">Continue Shopping</Link>
+          <p className="text-2xl font-mono text-brand-gold mb-10 tracking-wider">{orderNumber}</p>
+          <Link href="/shop" className="bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-bronze transition-colors">Continue Shopping</Link>
         </motion.div>
       </div>
     );
@@ -110,31 +116,31 @@ function ReadyToWearProductContent() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           
-          {/* Left: Image */}
+          {/* Left: Image Gallery */}
           <div>
             <ProductGallery images={galleryImages} name={model.name} />
           </div>
 
-          {/* Right: Details & Checkout */}
+          {/* Right: Details & Direct Checkout Form */}
           <div className="lg:sticky lg:top-32 h-fit">
             <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-4">Ready to Wear</p>
             <h1 className="text-4xl md:text-5xl font-serif mb-4">{model.name}</h1>
             <p className="text-2xl font-serif text-ink mb-10">{formatPrice(model.price)}</p>
             
             <div className="mb-10">
-              <p className="text-sm text-stone leading-relaxed">{model.description}</p>
+              <p className="text-sm text-stone leading-relaxed whitespace-pre-line">{model.description}</p>
             </div>
 
             {/* Size Selector */}
             <div className="mb-10">
-              <p className="text-[10px] uppercase tracking-[0.2em] mb-4">Select Size</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Size *</p>
               <div className="flex flex-wrap gap-3">
                 {SIZES.map((size) => (
                   <button 
                     key={size} 
                     onClick={() => setSelectedSize(size)} 
                     className={`w-14 h-12 border flex items-center justify-center text-sm transition-all duration-300 ${
-                      selectedSize === size ? "bg-ink text-paper border-ink" : "border-border hover:border-ink"
+                      selectedSize === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"
                     }`}
                   >
                     {size}
@@ -145,14 +151,11 @@ function ReadyToWearProductContent() {
 
             {/* Direct Checkout Form */}
             <div className="border-t border-border pt-8 mb-8">
-              <p className="text-[10px] uppercase tracking-[0.2em] mb-6">Shipping Details</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] mb-6 font-semibold text-ink">Shipping Details</p>
               <div className="space-y-4">
                 <input type="text" placeholder="Full Name *" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
-                <input type="email" placeholder="Email *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
-                
-                {/* Phone number added */}
+                <input type="email" placeholder="Email Address *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 <input type="tel" placeholder="Phone / WhatsApp *" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
-                
                 <input type="text" placeholder="Address Line 1 *" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 <input type="text" placeholder="Address Line 2 (Optional)" value={contact.address2} onChange={(e) => setContact({ ...contact, address2: e.target.value })} className="w-full border border-border p-4 text-sm focus:outline-none focus:border-ink" />
                 <div className="grid grid-cols-2 gap-4">
@@ -166,13 +169,13 @@ function ReadyToWearProductContent() {
             <button 
               onClick={handleSubmit} 
               disabled={!selectedSize || submitting} 
-              className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30"
+              className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {submitting ? "Processing..." : `Buy Now — ${formatPrice(model.price)}`}
             </button>
-            {!selectedSize && <p className="text-xs text-red-500 mt-2 text-center">Please select a size first</p>}
+            {!selectedSize && <p className="text-[10px] text-red-500 mt-3 text-center">Please select a size to continue</p>}
             
-            <div className="mt-8 flex items-center justify-center gap-2 text-xs text-stone">
+            <div className="mt-8 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.1em] text-stone">
               <span>✓ Ships in 3-5 days</span>
               <span>•</span>
               <span>✓ Secure Checkout</span>
