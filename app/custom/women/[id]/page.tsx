@@ -311,6 +311,7 @@ function WomenBespokePageContent() {
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
 
+      // Trigger supplier submission (async, background)
       if (data.order?.id) {
         fetch("/api/orders/submit", {
           method: "POST",
@@ -489,7 +490,7 @@ function WomenBespokePageContent() {
     );
   }
 
-  // STEP 0: Choose Fulfillment
+  // STEP 0: Choose Fit Type
   if (step === 0) {
     return (
       <div className="min-h-screen bg-paper">
