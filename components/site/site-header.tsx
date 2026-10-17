@@ -2,289 +2,176 @@
 
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/cart-context";
+
+const NAV_LINKS = [
+  { name: "For Him", href: "/custom/men" },
+  { name: "For Her", href: "/custom/women" },
+  { name: "Seasonal & Novelty", href: "/seasonal" },
+  { name: "Atelier", href: "/about" },
+];
 
 export default function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  
+  // Agar aapke context mein cart items hain, toh yahan use kar sakte hain
+  // const { cart } = useCart(); 
+  // const itemCount = cart?.length || 0;
 
+  // Scroll effect to change header background
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu on route change
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "unset";
-  }, [menuOpen]);
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
-  const menuSections = [
-    {
-      id: "for-him",
-      title: "For Him",
-      links: [
-        { name: "All Men's", href: "/custom/men" },
-        { name: "Suits", href: "/custom/men?type=suit" },
-        { name: "Blazers", href: "/custom/men?type=blazer" },
-        { name: "Tuxedos", href: "/custom/men?type=tuxedo" },
-        { name: "Coats", href: "/custom/men?type=coat" },
-        { name: "Shirts", href: "/custom/men?type=shirt" },
-        { name: "Trousers", href: "/custom/men?type=trouser" },
-        { name: "Vests", href: "/custom/men?type=vest" },
-      ],
-    },
-    {
-      id: "for-her",
-      title: "For Her",
-      links: [
-        { name: "All Women's", href: "/custom/women" },
-        { name: "Suits", href: "/custom/women?type=suit" },
-        { name: "Blazers", href: "/custom/women?type=blazer" },
-        { name: "Coats", href: "/custom/women?type=coat" },
-        { name: "Shirts", href: "/custom/women?type=shirt" },
-        { name: "Trousers", href: "/custom/women?type=trouser" },
-      ],
-    },
-    {
-      id: "seasonal",
-      title: "Seasonal & Novelty",
-      links: [
-        { name: "Halloween", href: "/seasonal?type=halloween" },
-        { name: "Superhero", href: "/seasonal?type=superhero" },
-        { name: "Gothic & Dark", href: "/seasonal?type=gothic" },
-        { name: "Movie-Inspired", href: "/seasonal?type=movie" },
-        { name: "Party & Events", href: "/seasonal?type=party" },
-      ],
-    },
-    {
-      id: "atelier",
-      title: "Atelier",
-      links: [
-        { name: "Our Story", href: "/about" },
-        { name: "Journal", href: "/journal" },
-        { name: "Measurements Guide", href: "/measurements" },
-        { name: "Book a Fitting", href: "/contact" },
-      ],
-    },
-  ];
+  // Home page pe transparent header, baaki pages pe solid
+  const isHomePage = pathname === "/";
+  const headerBg = isScrolled || !isHomePage || mobileMenuOpen
+    ? "bg-brand-ivory/95 backdrop-blur-md border-b border-border shadow-sm py-4"
+    : "bg-transparent py-6";
+  
+  const textColor = isScrolled || !isHomePage ? "text-brand-charcoal" : "text-white";
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-sm"
-            : "bg-gradient-to-b from-black/70 via-black/40 to-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${headerBg}`}
       >
-        <div className="relative flex items-center justify-between px-5 md:px-12 py-4 md:py-5">
-          {/* LEFT: Menu + Search */}
-          <div className="flex items-center gap-5 z-10">
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="group"
-              aria-label="Open menu"
-            >
-              <div className="flex flex-col gap-[5px]">
-                <span
-                  className={`w-6 h-[1.5px] transition-colors duration-500 ${
-                    scrolled ? "bg-black" : "bg-white"
-                  }`}
-                />
-                <span
-                  className={`w-6 h-[1.5px] transition-colors duration-500 ${
-                    scrolled ? "bg-black" : "bg-white"
-                  }`}
-                />
-                <span
-                  className={`w-4 h-[1.5px] transition-all duration-500 ${
-                    scrolled ? "bg-black" : "bg-white"
-                  } group-hover:w-6`}
-                />
-              </div>
-            </button>
-
-            <Link
-              href="/custom"
-              aria-label="Search"
-              className={`transition-colors duration-500 ${
-                scrolled ? "text-black" : "text-white"
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-[18px] h-[18px]"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </Link>
-          </div>
-
-          {/* CENTER: PADO Logo */}
-          <Link
-            href="/"
-            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
-            aria-label="PADO Boutique"
+        <div className="max-w-[1600px] mx-auto px-5 sm:px-8 md:px-12 flex items-center justify-between">
+          
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className={`lg:hidden p-2 -ml-2 ${textColor}`}
+            aria-label="Open menu"
           >
-            <span className="block font-serif text-2xl md:text-3xl tracking-[0.5em] text-[#D4AF37]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M4 8h16M4 16h16" />
+            </svg>
+          </button>
+
+          {/* Logo */}
+          <Link href="/" className="flex-1 lg:flex-none text-center lg:text-left">
+            <span className={`font-serif text-2xl tracking-[0.2em] uppercase transition-colors duration-500 ${textColor}`}>
               PADO
             </span>
-            <span
-              className={`block text-[8px] md:text-[9px] tracking-[0.4em] mt-0.5 transition-colors duration-500 ${
-                scrolled ? "text-neutral-500" : "text-white/80"
-              }`}
-            >
-              BESPOKE
+            <span className={`block text-[8px] uppercase tracking-[0.4em] mt-1 transition-colors duration-500 ${isScrolled || !isHomePage ? "text-brand-slate" : "text-white/70"}`}>
+              Bespoke
             </span>
           </Link>
 
-          {/* RIGHT: Account + Cart */}
-          <div className="flex items-center gap-4 md:gap-6 z-10">
-            <Link
-              href="/admin/login"
-              aria-label="Account"
-              className={`transition-colors duration-500 ${
-                scrolled ? "text-black" : "text-white"
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-[18px] h-[18px]"
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-10">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`text-[11px] uppercase tracking-[0.2em] font-medium transition-all duration-300 hover:text-brand-gold link-tracking ${
+                  pathname.startsWith(link.href) ? "text-brand-gold" : textColor
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                />
-              </svg>
-            </Link>
+                {link.name}
+              </Link>
+            ))}
+          </nav>
 
-            <Link
-              href="/checkout"
-              className={`transition-colors duration-500 ${
-                scrolled ? "text-black" : "text-white"
-              }`}
-              aria-label="Cart"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-[18px] h-[18px]"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"
-                />
+          {/* Right Icons (Search, User, Cart) */}
+          <div className={`flex items-center justify-end gap-5 flex-1 lg:flex-none ${textColor}`}>
+            <button className="hover:text-brand-gold transition-colors hidden sm:block">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+            <Link href="/track-order" className="hover:text-brand-gold transition-colors hidden sm:block">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
             </Link>
+            <button className="hover:text-brand-gold transition-colors relative">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                <path d="M3 6h18" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              {/* Cart Badge */}
+              <span className="absolute -top-1.5 -right-2 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                0
+              </span>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* MENU DRAWER */}
-      {menuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setMenuOpen(false)}
-          />
-
-          <div className="fixed top-0 left-0 h-full w-full md:w-[480px] bg-white z-[70] overflow-y-auto shadow-2xl">
-            <div className="flex items-center justify-between px-8 py-6 border-b border-neutral-200 sticky top-0 bg-white z-10">
-              <span className="text-[10px] uppercase tracking-[0.4em] text-neutral-500">
-                Menu
-              </span>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="text-xl text-black hover:text-[#D4AF37] transition"
-                aria-label="Close menu"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="px-8 py-10">
-              {menuSections.map((section) => (
-                <div key={section.id} className="mb-8">
-                  <button
-                    onClick={() =>
-                      setOpenSubmenu(
-                        openSubmenu === section.id ? null : section.id
-                      )
-                    }
-                    className="w-full text-left flex items-center justify-between mb-4 group"
-                  >
-                    <span className="text-xl md:text-2xl font-serif text-black group-hover:text-[#D4AF37] transition">
-                      {section.title}
-                    </span>
-                    <span className="text-neutral-400 text-lg font-light">
-                      {openSubmenu === section.id ? "−" : "+"}
-                    </span>
-                  </button>
-
-                  {openSubmenu === section.id && (
-                    <ul className="space-y-3 pl-4 border-l border-neutral-200">
-                      {section.links.map((link) => (
-                        <li key={link.name}>
-                          <Link
-                            href={link.href}
-                            onClick={() => setMenuOpen(false)}
-                            className="block text-sm text-neutral-600 hover:text-black transition tracking-wide"
-                          >
-                            {link.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="px-8 py-6 border-t border-neutral-200 space-y-3">
-              <Link
-                href="/track-order"
-                onClick={() => setMenuOpen(false)}
-                className="block text-sm text-neutral-600 hover:text-black transition"
-              >
-                Track Order
-              </Link>
-              <Link
-                href="/contact"
-                onClick={() => setMenuOpen(false)}
-                className="block text-sm text-neutral-600 hover:text-black transition"
-              >
-                Contact
-              </Link>
-              <div className="pt-4 border-t border-neutral-200 mt-4">
-                <p className="text-[10px] text-neutral-400 uppercase tracking-[0.4em] mb-3">
-                  Get in touch
-                </p>
-                <p className="text-sm text-neutral-700">www.padoshop.com</p>
-                <p className="text-sm text-neutral-700">+1 (639) 384-0265</p>
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/50 z-[60] lg:hidden"
+            />
+            
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween", duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed top-0 left-0 bottom-0 w-[85vw] max-w-[400px] bg-brand-ivory z-[70] flex flex-col lg:hidden shadow-2xl"
+            >
+              <div className="p-6 flex justify-between items-center border-b border-border">
+                <span className="font-serif text-xl tracking-[0.2em] uppercase text-brand-charcoal">PADO</span>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-brand-charcoal">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-            </div>
-          </div>
-        </>
-      )}
+
+              <div className="flex-1 overflow-y-auto py-10 px-6 flex flex-col gap-8">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className="font-serif text-3xl text-brand-charcoal hover:text-brand-gold transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+                
+                <div className="mt-8 pt-8 border-t border-border flex flex-col gap-4">
+                  <Link href="/track-order" className="text-[11px] uppercase tracking-[0.2em] text-brand-slate hover:text-brand-gold">
+                    Track Order
+                  </Link>
+                  <Link href="/contact" className="text-[11px] uppercase tracking-[0.2em] text-brand-slate hover:text-brand-gold">
+                    Contact Us
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
