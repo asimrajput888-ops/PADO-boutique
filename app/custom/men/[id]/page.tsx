@@ -46,7 +46,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "seat", label: "Seat / Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
   ],
-  // (Baaki fields same rahenge, maine short kar diya hai space ke liye, aap apne purane wale copy kar sakte hain)
+  // (Aap apne baaki fields yahan add kar sakte hain jaise tuxedo, coat, etc.)
 };
 
 const MEASUREMENT_IMAGES: Record<string, string> = {
@@ -58,7 +58,6 @@ const MEASUREMENT_IMAGES: Record<string, string> = {
   thigh: "/images/measurements-men/thigh.webp", legOpening: "/images/measurements-men/leg-opening.webp",
 };
 
-// Fabric Type Define karein
 interface Fabric {
   id: number; name: string; origin: string; price: number; image_url: string;
 }
@@ -76,7 +75,6 @@ function MenBespokePageContent() {
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
-  // Fabrics State
   const [fabrics, setFabrics] = useState<Fabric[]>([]);
   const [selectedFabric, setSelectedFabric] = useState<Fabric | null>(null);
 
@@ -100,34 +98,26 @@ function MenBespokePageContent() {
   });
 
   useEffect(() => {
-    if (searchParams.get("start") === "order") {
-      setStep(0);
-    }
+    if (searchParams.get("start") === "order") setStep(0);
   }, [searchParams]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [step]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [step]);
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Fetch Model
       const { data: modelData } = await supabase.from("models").select("*").eq("id", Number(id)).single();
       if (!modelData) { setLoading(false); return; }
       
       setModel(modelData);
       setProfileName(`${modelData.name} — ${new Date().toLocaleDateString()}`);
       
-      // Dynamic Supplier Logic (Check if supplier is api or manual)
       const isReadyToWear = ["cj", "1688"].includes(modelData.supplier?.toLowerCase());
       setFitType(isReadyToWear ? "standard" : "custom");
 
-      // 2. Fetch Fabrics (Only if custom)
       if (!isReadyToWear) {
         const { data: fabricData } = await supabase.from("fabrics").select("*").eq("is_active", true);
         if (fabricData) setFabrics(fabricData);
       }
-
       setLoading(false);
     };
     fetchData();
@@ -162,17 +152,16 @@ function MenBespokePageContent() {
   const requiredMissing = invalidOrMissing.map((f) => f.label);
   const standardSelectionComplete = (showJacketSelector && !jacketSize) || (showTrouserSelector && !trouserSize) || (showShirtSelector && !jacketSize);
 
-  // Step Navigation
   const nextStep = () => {
-    if (step === 0) setStep(3); // Standard -> Contact
-    else if (step === 1) setStep(2); // Fabric -> Measurement
-    else if (step === 2) setStep(3); // Measurement -> Contact
+    if (step === 0) setStep(3); 
+    else if (step === 1) setStep(2); 
+    else if (step === 2) setStep(3); 
     else setStep((p) => Math.min(p + 1, 4));
   };
 
   const prevStep = () => {
     if (step === 3) setStep(fitType === "standard" ? 0 : 2);
-    else if (step === 2) setStep(1); // Measurement -> Fabric
+    else if (step === 2) setStep(1); 
     else if (step === 1 || step === 0) setStep(-1);
     else setStep((p) => Math.max(p - 1, -1));
   };
@@ -184,7 +173,6 @@ function MenBespokePageContent() {
     return jacketSize || "Ready to Wear";
   };
 
-  // Final Price Calculation
   const basePrice = model?.price || 0;
   const fabricPrice = selectedFabric ? selectedFabric.price : 0;
   const finalPrice = fitType === "standard" ? basePrice : (basePrice + fabricPrice);
@@ -200,15 +188,13 @@ function MenBespokePageContent() {
         fit_type: fitType, standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
         model_id: String(model.id), model_name: model.name, category: "men", product_type: pt,
         measurements: fitType === "custom" ? { profileName, height: `${heightFt}' ${heightIn}"`, ...m, jacketFit, trouserFit, additionalInfo } : null,
-        fabric_id: selectedFabric?.id || null,
-        fabric_name: selectedFabric?.name || null,
+        fabric_id: selectedFabric?.id || null, fabric_name: selectedFabric?.name || null,
         total_price: finalPrice, currency: "USD", notes: additionalInfo || "",
       };
 
       const res = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit");
-
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
     } catch (err: any) { alert("Error: " + err.message); } 
@@ -290,7 +276,7 @@ function MenBespokePageContent() {
     );
   }
 
-  // STEP 1: FABRIC SELECTION (NEW STEP for Custom)
+  // STEP 1: FABRIC SELECTION
   if (step === 1 && fitType === "custom") {
     return (
       <div className="min-h-screen bg-paper">
@@ -328,11 +314,7 @@ function MenBespokePageContent() {
           </div>
 
           <div className="max-w-6xl mx-auto mt-20 pt-8 border-t border-border flex justify-end">
-            <button 
-              onClick={nextStep} 
-              disabled={!selectedFabric} 
-              className="bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors disabled:opacity-30"
-            >
+            <button onClick={nextStep} disabled={!selectedFabric} className="bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors disabled:opacity-30">
               Continue to Measurements →
             </button>
           </div>
@@ -377,12 +359,12 @@ function MenBespokePageContent() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
-                  {fields.map((f, index) => {
+                  {fields.map((f) => {
                     const value = m[f.id] || "";
                     const error = getFieldError(f.id, value);
                     return (
                       <div key={f.id}>
-                        <label className="flex justify-between mb-3"><span className="text-[10px] uppercase">{f.label} *</span></label>
+                        <label className="flex justify-between mb-3"><span className="text-[10px] uppercase">{f.label} {f.required && "*"}</span></label>
                         <input type="text" value={value} onChange={(e) => updateM(f.id, e.target.value)} onFocus={() => setActiveField(f.id)} placeholder="—" className={`w-full border p-4 bg-white ${error ? "border-red-400" : "border-border focus:border-bronze"}`} />
                         {error && <p className="text-[10px] text-red-500 mt-2">{error}</p>}
                       </div>
