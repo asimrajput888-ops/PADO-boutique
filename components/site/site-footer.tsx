@@ -2,6 +2,30 @@
 
 import Link from "next/link";
 
+// Collections Links
+const COLLECTIONS = [
+  { name: "For Him", href: "/custom/men" },
+  { name: "For Her", href: "/custom/women" },
+  { name: "Seasonal & Novelty", href: "/seasonal" },
+  { name: "The Atelier", href: "/about" },
+];
+
+// Customer Care Links
+const CUSTOMER_CARE = [
+  { name: "Track Your Order", href: "/track-order" },
+  { name: "Measurement Guide", href: "/measurements" },
+  { name: "Shipping & Returns", href: "/shipping" },
+  { name: "Contact Us", href: "/contact" },
+  { name: "FAQ", href: "/contact" }, // Agar alag FAQ page nahi hai toh contact pe bhej rahe hain
+];
+
+// Legal Links
+const LEGAL = [
+  { name: "Privacy Policy", href: "/privacy" },
+  { name: "Terms of Service", href: "/terms" },
+  { name: "Refund Policy", href: "/shipping" }, // Shipping page mein refund policy shamil ho sakti hai
+];
+
 export default function SiteFooter() {
   return (
     <footer className="bg-brand-charcoal text-white pt-20 pb-10 border-t border-white/10">
@@ -22,7 +46,7 @@ export default function SiteFooter() {
             </p>
             <div className="flex gap-4">
               {/* Instagram */}
-              <a href="#" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-brand-charcoal transition-all duration-300">
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-brand-charcoal transition-all duration-300">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
@@ -38,28 +62,28 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Links 1 */}
+          {/* Links 1: Collections */}
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6">Collections</h4>
             <ul className="space-y-4">
-              {["For Him", "For Her", "Seasonal & Novelty", "The Atelier"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-sm text-white/70 hover:text-white transition-colors">
-                    {item}
+              {COLLECTIONS.map((item) => (
+                <li key={item.name}>
+                  <Link href={item.href} className="text-sm text-white/70 hover:text-white transition-colors">
+                    {item.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Links 2 */}
+          {/* Links 2: Customer Care */}
           <div>
             <h4 className="text-[10px] uppercase tracking-[0.4em] text-brand-gold mb-6">Customer Care</h4>
             <ul className="space-y-4">
-              {["Track Your Order", "Measurement Guide", "Shipping & Returns", "Contact Us", "FAQ"].map((item) => (
-                <li key={item}>
-                  <Link href="#" className="text-sm text-white/70 hover:text-white transition-colors">
-                    {item}
+              {CUSTOMER_CARE.map((item) => (
+                <li key={item.name}>
+                  <Link href={item.href} className="text-sm text-white/70 hover:text-white transition-colors">
+                    {item.name}
                   </Link>
                 </li>
               ))}
@@ -91,9 +115,9 @@ export default function SiteFooter() {
             © {new Date().getFullYear()} PADO Boutique. All rights reserved.
           </p>
           <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Refund Policy"].map((item) => (
-              <Link key={item} href="#" className="text-[10px] text-white/40 hover:text-white uppercase tracking-[0.2em] transition-colors">
-                {item}
+            {LEGAL.map((item) => (
+              <Link key={item.name} href={item.href} className="text-[10px] text-white/40 hover:text-white uppercase tracking-[0.2em] transition-colors">
+                {item.name}
               </Link>
             ))}
           </div>

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const JACKET_FITS = ["Regular Fit", "Slim Fit", "Relaxed Fit"];
 const TROUSER_FITS = ["Classic Comfort Fit", "Slim Fit", "Relaxed Fit"];
@@ -20,20 +20,10 @@ const STANDARD_INSEAMS = ["Unhemmed", "28", "30", "32", "34", "36"];
 const STANDARD_SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const MEASUREMENT_LIMITS: Record<string, { min: number; max: number }> = {
-  bust: { min: 28, max: 56 },
-  underbust: { min: 24, max: 50 },
-  shoulder: { min: 12, max: 20 },
-  sleeve: { min: 18, max: 28 },
-  jacketLength: { min: 22, max: 32 },
-  bicep: { min: 8, max: 18 },
-  waist: { min: 22, max: 48 },
-  seat: { min: 30, max: 58 },
-  pantsLength: { min: 24, max: 36 },
-  thigh: { min: 16, max: 30 },
-  knee: { min: 10, max: 22 },
-  legOpening: { min: 8, max: 20 },
-  frontRise: { min: 7, max: 14 },
-  backRise: { min: 11, max: 20 },
+  bust: { min: 28, max: 56 }, underbust: { min: 24, max: 50 }, shoulder: { min: 12, max: 20 },
+  sleeve: { min: 18, max: 28 }, jacketLength: { min: 22, max: 32 }, bicep: { min: 8, max: 18 },
+  waist: { min: 22, max: 48 }, seat: { min: 30, max: 58 }, pantsLength: { min: 24, max: 36 },
+  thigh: { min: 16, max: 30 }, knee: { min: 10, max: 22 }, legOpening: { min: 8, max: 20 },
 };
 
 const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: string; required: boolean }[]> = {
@@ -42,23 +32,7 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "shoulder", label: "Shoulder Width", hint: "Shoulder point to shoulder point", required: true },
     { id: "sleeve", label: "Sleeve Length", hint: "Shoulder point to wrist bone", required: true },
     { id: "jacketLength", label: "Jacket Length", hint: "Base of neck to desired hem", required: true },
-    { id: "bicep", label: "Bicep", hint: "Fullest part of upper arm", required: false },
     { id: "waist", label: "Waist", hint: "Narrowest part of waist", required: true },
-  ],
-  shirt: [
-    { id: "bust", label: "Bust", hint: "Fullest part of bust", required: true },
-    { id: "shoulder", label: "Shoulder Width", hint: "Shoulder to shoulder", required: true },
-    { id: "sleeve", label: "Sleeve Length", hint: "Shoulder to wrist bone", required: true },
-    { id: "jacketLength", label: "Shirt Length", hint: "Base of neck to shirt hem", required: true },
-    { id: "waist", label: "Waist", hint: "Natural waistline", required: false },
-  ],
-  trouser: [
-    { id: "waist", label: "Waist", hint: "Where you wear your trousers", required: true },
-    { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
-    { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
-    { id: "knee", label: "Knee", hint: "Around knee, slightly bent", required: false },
-    { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
   ],
   suit: [
     { id: "bust", label: "Bust", hint: "Fullest part of bust", required: true },
@@ -66,38 +40,14 @@ const MEASUREMENT_FIELDS: Record<string, { id: string; label: string; hint: stri
     { id: "shoulder", label: "Shoulder Width", hint: "Shoulder to shoulder", required: true },
     { id: "sleeve", label: "Sleeve Length", hint: "Shoulder to wrist bone", required: true },
     { id: "jacketLength", label: "Jacket Length", hint: "Base of neck to hem", required: true },
-    { id: "bicep", label: "Bicep", hint: "Fullest part of upper arm", required: false },
     { id: "waist", label: "Jacket Waist", hint: "Narrowest part of waist", required: true },
     { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
-    { id: "knee", label: "Knee", hint: "Around knee", required: false },
-    { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
   ],
-  tuxedo: [
-    { id: "bust", label: "Bust", hint: "Fullest part of bust", required: true },
-    { id: "underbust", label: "Underbust", hint: "Just under the bust", required: true },
-    { id: "shoulder", label: "Shoulder Width", hint: "Shoulder to shoulder", required: true },
-    { id: "sleeve", label: "Sleeve Length", hint: "Shoulder to wrist bone", required: true },
-    { id: "jacketLength", label: "Jacket Length", hint: "Base of neck to hem", required: true },
-    { id: "waist", label: "Jacket Waist", hint: "Narrowest part of waist", required: true },
+  trouser: [
+    { id: "waist", label: "Waist", hint: "Where you wear your trousers", required: true },
     { id: "seat", label: "Hip", hint: "Fullest part of hips", required: true },
     { id: "pantsLength", label: "Inseam", hint: "Crotch to ankle bone", required: true },
-    { id: "thigh", label: "Thigh", hint: "Fullest part of thigh", required: false },
-    { id: "knee", label: "Knee", hint: "Around knee", required: false },
-    { id: "legOpening", label: "Leg Opening", hint: "Bottom of trouser leg", required: false },
-  ],
-  coat: [
-    { id: "bust", label: "Bust", hint: "Fullest part of bust", required: true },
-    { id: "shoulder", label: "Shoulder Width", hint: "Shoulder to shoulder", required: true },
-    { id: "sleeve", label: "Sleeve Length", hint: "Shoulder to wrist bone", required: true },
-    { id: "jacketLength", label: "Coat Length", hint: "Base of neck to hem", required: true },
-    { id: "waist", label: "Waist", hint: "Narrowest part of waist", required: true },
-  ],
-  vest: [
-    { id: "bust", label: "Bust", hint: "Fullest part of bust", required: true },
-    { id: "waist", label: "Waist", hint: "Narrowest part of waist", required: true },
-    { id: "jacketLength", label: "Vest Length", hint: "Top of shoulder to vest hem", required: true },
   ],
 };
 
@@ -107,16 +57,14 @@ const MEASUREMENT_IMAGES: Record<string, string> = {
   shoulder: "/images/measurements-women/wom_shoulder.webp",
   sleeve: "/images/measurements-women/wom_sleeves.webp",
   jacketLength: "/images/measurements-women/wom_jacket_length.webp",
-  bicep: "/images/measurements-women/wom_bicep.webp",
   waist: "/images/measurements-women/wom_waist.webp",
   seat: "/images/measurements-women/wom_seat.webp",
   pantsLength: "/images/measurements-women/wom_pants_length.webp",
-  knee: "/images/measurements-women/wom_knee.webp",
-  thigh: "/images/measurements-women/wom_thighs.webp",
-  legOpening: "/images/measurements-women/body_leg_opening.webp",
-  frontRise: "/images/measurements-women/front-rise-women.webp",
-  backRise: "/images/measurements-women/back-rise-women.webp",
 };
+
+interface Fabric {
+  id: number; name: string; origin: string; price: number; image_url: string;
+}
 
 function WomenBespokePageContent() {
   const params = useParams();
@@ -130,6 +78,9 @@ function WomenBespokePageContent() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+
+  const [fabrics, setFabrics] = useState<Fabric[]>([]);
+  const [selectedFabric, setSelectedFabric] = useState<Fabric | null>(null);
 
   const [fitType, setFitType] = useState<"standard" | "custom" | null>(null);
   const [jacketSize, setJacketSize] = useState("");
@@ -151,45 +102,32 @@ function WomenBespokePageContent() {
   });
 
   useEffect(() => {
-    if (searchParams.get("start") === "order") {
-      setStep(0);
-    }
+    if (searchParams.get("start") === "order") setStep(0);
   }, [searchParams]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [step]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [step]);
 
   useEffect(() => {
-    const fetchModel = async () => {
-      const { data } = await supabase
-        .from("models")
-        .select("*")
-        .eq("id", Number(id))
-        .single();
-
-      if (!data) {
-        setLoading(false);
-        return;
-      }
-      setModel(data);
-      setProfileName(`${data.name} — ${new Date().toLocaleDateString()}`);
+    const fetchData = async () => {
+      const { data: modelData } = await supabase.from("models").select("*").eq("id", Number(id)).single();
+      if (!modelData) { setLoading(false); return; }
       
-      const isReadyToWear = ["cj", "1688"].includes(data.supplier?.toLowerCase());
+      setModel(modelData);
+      setProfileName(`${modelData.name} — ${new Date().toLocaleDateString()}`);
+      
+      const isReadyToWear = ["cj", "1688"].includes(modelData.supplier?.toLowerCase());
       setFitType(isReadyToWear ? "standard" : "custom");
 
+      if (!isReadyToWear) {
+        const { data: fabricData } = await supabase.from("fabrics").select("*").eq("is_active", true);
+        if (fabricData) setFabrics(fabricData);
+      }
       setLoading(false);
     };
-    fetchModel();
+    fetchData();
   }, [id]);
 
-  const galleryImages: string[] =
-    model?.images && Array.isArray(model.images) && model.images.length > 0
-      ? model.images
-      : model?.image_url
-      ? [model.image_url]
-      : [];
-
+  const galleryImages: string[] = model?.images?.length > 0 ? model.images : model?.image_url ? [model.image_url] : [];
   const pt = model?.product_type || "suit";
   const fields = MEASUREMENT_FIELDS[pt] || MEASUREMENT_FIELDS.suit;
   const needsJacketFit = ["suit", "tuxedo", "blazer", "coat"].includes(pt);
@@ -200,134 +138,84 @@ function WomenBespokePageContent() {
   const showShirtSelector = pt === "shirt";
 
   const updateM = (key: string, value: string) => setM({ ...m, [key]: value });
-
   const getFieldError = (fieldId: string, value: string): string | null => {
     if (!value || value.trim() === "") return null;
     const num = parseFloat(value);
-    if (isNaN(num)) return "Enter a valid number";
-    if (num <= 0) return "Must be greater than 0";
+    if (isNaN(num) || num <= 0) return "Enter a valid number";
     const limits = MEASUREMENT_LIMITS[fieldId];
-    if (!limits) return null;
-    if (num < limits.min || num > limits.max) {
-      return `Must be between ${limits.min}–${limits.max} inches`;
-    }
+    if (limits && (num < limits.min || num > limits.max)) return `Must be between ${limits.min}–${limits.max}`;
     return null;
   };
 
   const filledCount = fields.filter((f) => m[f.id]).length;
-
   const invalidOrMissing = fields.filter((f) => {
     const value = m[f.id];
     if (!value || value.trim() === "") return f.required;
     return getFieldError(f.id, value) !== null;
   });
-
   const requiredMissing = invalidOrMissing.map((f) => f.label);
-
-  const standardSelectionComplete =
-    (showJacketSelector && !jacketSize) ||
-    (showTrouserSelector && !trouserSize) ||
-    (showShirtSelector && !jacketSize);
+  const standardSelectionComplete = (showJacketSelector && !jacketSize) || (showTrouserSelector && !trouserSize) || (showShirtSelector && !jacketSize);
 
   const nextStep = () => {
-    if (step === 0) setStep(2); 
+    if (step === 0) setStep(3); 
     else if (step === 1) setStep(2); 
-    else setStep((p) => Math.min(p + 1, 3));
+    else if (step === 2) setStep(3); 
+    else setStep((p) => Math.min(p + 1, 4));
   };
 
   const prevStep = () => {
-    if (step === 2) setStep(fitType === "standard" ? 0 : 1);
-    else if (step === 0 || step === 1) setStep(-1);
+    if (step === 3) setStep(fitType === "standard" ? 0 : 2);
+    else if (step === 2) setStep(1); 
+    else if (step === 1 || step === 0) setStep(-1);
     else setStep((p) => Math.max(p - 1, -1));
   };
 
   const getStandardSizeLabel = () => {
-    if (showJacketSelector && showTrouserSelector) {
-      return `Jacket ${jacketSize} ${jacketLength} / Trouser ${trouserSize} ${inseam}`;
-    }
+    if (showJacketSelector && showTrouserSelector) return `Jacket ${jacketSize} ${jacketLength} / Trouser ${trouserSize} ${inseam}`;
     if (showJacketSelector) return `Jacket ${jacketSize} ${jacketLength}`;
     if (showTrouserSelector) return `Trouser ${trouserSize} ${inseam}`;
-    if (showShirtSelector) return `Shirt ${jacketSize}`;
     return jacketSize || "Ready to Wear";
   };
 
+  const basePrice = model?.price || 0;
+  const fabricPrice = selectedFabric ? selectedFabric.price : 0;
+  const finalPrice = fitType === "standard" ? basePrice : (basePrice + fabricPrice);
+
   const handleSubmit = async () => {
-    if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) {
-      alert("Please fill in all required fields");
-      return;
-    }
+    if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) return alert("Please fill all fields");
     setSubmitting(true);
 
     try {
       const payload = {
-        customer_name: contact.name,
-        customer_email: contact.email,
-        customer_phone: contact.phone,
-        customer_country: contact.country,
-        shipping_address: {
-          address1: contact.address1, address2: contact.address2, city: contact.city,
-          postalCode: contact.postalCode, country: contact.country,
-        },
-        fit_type: fitType,
-        standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
-        model_id: String(model.id),
-        model_name: model.name,
-        category: "women",
-        product_type: pt,
-        measurements: fitType === "custom" ? {
-          profileName, height: `${heightFt}' ${heightIn}"`, ...m,
-          ...(needsJacketFit ? { jacketFit } : {}),
-          ...(needsTrouserFit ? { trouserFit } : {}),
-          additionalInfo,
-        } : null,
-        total_price: model.price,
-        currency: "USD",
-        notes: additionalInfo || "",
+        customer_name: contact.name, customer_email: contact.email, customer_phone: contact.phone,
+        customer_country: contact.country, shipping_address: { ...contact },
+        fit_type: fitType, standard_size: fitType === "standard" ? getStandardSizeLabel() : null,
+        model_id: String(model.id), model_name: model.name, category: "women", product_type: pt,
+        measurements: fitType === "custom" ? { profileName, height: `${heightFt}' ${heightIn}"`, ...m, jacketFit, trouserFit, additionalInfo } : null,
+        fabric_id: selectedFabric?.id || null, fabric_name: selectedFabric?.name || null,
+        total_price: finalPrice, currency: "USD", notes: additionalInfo || "",
       };
 
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
+      const res = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to submit");
-
       setOrderNumber(data.order?.order_number || "");
       setSubmitted(true);
-
-      if (data.order?.id) {
-        fetch("/api/orders/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: data.order.id }),
-        }).catch((err) => console.error("Supplier submit failed:", err));
-      }
-    } catch (err: any) {
-      alert("Error: " + err.message);
-    } finally {
-      setSubmitting(false);
-    }
+    } catch (err: any) { alert("Error: " + err.message); } 
+    finally { setSubmitting(false); }
   };
 
   if (loading) return (<div className="min-h-screen flex items-center justify-center bg-paper"><div className="w-8 h-8 border border-border border-t-ink rounded-full animate-spin" /></div>);
-  if (!model) return (<div className="min-h-screen flex items-center justify-center bg-paper"><div className="text-center"><h1 className="text-4xl font-serif text-ink mb-4">Model Not Found</h1><Link href="/custom/women" className="text-stone hover:text-ink underline">← Back to Women&apos;s Collection</Link></div></div>);
-  
+  if (!model) return (<div className="min-h-screen flex items-center justify-center bg-paper"><h1 className="text-4xl font-serif text-ink">Model Not Found</h1></div>);
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-paper flex items-center justify-center px-5 py-20">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-lg text-center">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3, type: "spring", stiffness: 200 }} className="w-24 h-24 rounded-full bg-ink text-paper flex items-center justify-center mx-auto mb-10 text-4xl">✓</motion.div>
-          <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-4">Order Confirmed</p>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg text-center">
+          <div className="w-24 h-24 rounded-full bg-ink text-paper flex items-center justify-center mx-auto mb-10 text-4xl">✓</div>
           <h1 className="text-4xl font-serif text-ink mb-6">Thank you, {contact.name.split(" ")[0]}.</h1>
-          <p className="text-stone mb-3 text-sm">Order number</p>
-          <p className="text-xl font-mono text-ink mb-10 tracking-wider">{orderNumber}</p>
-          <div className="border border-border bg-white p-8 text-left mb-10">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-bronze mb-4 font-semibold">Shipping to</p>
-            <p className="text-sm text-graphite leading-relaxed">{contact.address1}<br />{contact.address2 && <>{contact.address2}<br /></>}{contact.city} {contact.postalCode}<br />{contact.country}</p>
-          </div>
-          <Link href="/custom/women" className="inline-block bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em] font-medium hover:bg-bronze transition-colors duration-500">Back to Collection</Link>
+          <p className="text-xl font-mono text-ink mb-10">{orderNumber}</p>
+          <Link href="/custom/women" className="bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em]">Back to Collection</Link>
         </motion.div>
       </div>
     );
@@ -338,43 +226,19 @@ function WomenBespokePageContent() {
     return (
       <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
         <div className="max-w-[1500px] mx-auto">
-          <Link href="/custom/women" className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back to Collection</Link>
+          <Link href="/custom/women" className="text-[10px] uppercase text-stone mb-12 inline-flex items-center gap-2"><span>←</span> Back</Link>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-            
-            <div className="w-full">
-              <ProductGallery images={galleryImages} name={model.name} />
-            </div>
-
-            <div className="lg:sticky lg:top-32 lg:self-start">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-6">{pt} · Bespoke</p>
-                <h1 className="text-4xl md:text-6xl font-serif mb-8 text-ink leading-[1.05]">{model.name}</h1>
-                <p className="text-3xl text-ink mb-12 pb-12 border-b border-border font-serif">{formatPrice(model.price)}</p>
-                <div className="mb-12">
-                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-6 font-semibold">Description</h2>
-                  <p className="text-graphite leading-[1.8] text-[15px] whitespace-pre-line">{model.description}</p>
-                </div>
-                <div className="border-t border-border pt-10 mb-12">
-                  <h2 className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-6 font-semibold">The PADO Promise</h2>
-                  <ul className="space-y-4 text-sm text-graphite">
-                    {["Cut to your exact measurements", "Hand-finished by master tailors", "Dispatched within 3 weeks", "Complimentary worldwide shipping"].map((item) => (
-                      <li key={item} className="flex items-center gap-4"><span className="w-6 h-[1px] bg-ink" /><span>{item}</span></li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="space-y-4">
-                  <button
-                    onClick={() => {
-                      if (fitType === "standard") setStep(0);
-                      else setStep(1);
-                    }}
-                    className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500"
-                  >
-                    {fitType === "standard" ? "Select Size →" : "Enter Measurements →"}
-                  </button>
-                  <a href={`https://wa.me/16393840265?text=${encodeURIComponent(`Hi, I'm interested in: ${model.name}`)}`} target="_blank" rel="noopener noreferrer" className="block w-full border border-ink text-ink text-center py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-ink hover:text-paper transition-all duration-500">Speak to a Tailor</a>
-                </div>
-              </motion.div>
+            <ProductGallery images={galleryImages} name={model.name} />
+            <div className="lg:sticky lg:top-32">
+              <p className="text-[10px] tracking-[0.5em] text-bronze uppercase mb-6">{pt} · Bespoke</p>
+              <h1 className="text-4xl md:text-6xl font-serif mb-8">{model.name}</h1>
+              <p className="text-3xl text-ink mb-12 pb-12 border-b border-border font-serif">{formatPrice(model.price)}</p>
+              <div className="space-y-4">
+                <button onClick={() => setStep(fitType === "standard" ? 0 : 1)} className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em]">
+                  {fitType === "standard" ? "Select Size →" : "Select Fabric →"}
+                </button>
+                <a href={`https://wa.me/16393840265?text=Hi, I'm interested in: ${model.name}`} target="_blank" className="block w-full border border-ink text-ink text-center py-6 text-[11px] uppercase">Speak to a Tailor</a>
+              </div>
             </div>
           </div>
         </div>
@@ -382,372 +246,206 @@ function WomenBespokePageContent() {
     );
   }
 
-  // STEP 0: Standard Size Selection (Only for CJ / 1688)
+  // STEP 0: Standard Size (CJ / 1688)
   if (step === 0 && fitType === "standard") {
     return (
       <div className="min-h-screen bg-paper">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
-          <button onClick={() => setStep(-1)} className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back to Product</button>
-          
-          <div className="mb-20">
-            <div className="flex items-center justify-between max-w-md mx-auto mb-4">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-medium border transition-all duration-500 ${step >= i ? "bg-ink text-paper border-ink" : "bg-transparent text-mist border-border"}`}>{i === 0 ? "1" : i === 1 ? "2" : "3"}</div>
-                  {i < 2 && <div className={`w-16 md:w-24 h-[1px] transition-colors duration-500 ${step > i ? "bg-ink" : "bg-border"}`} />}
-                </div>
-              ))}
-            </div>
-            <p className="text-center text-[10px] uppercase tracking-[0.5em] text-bronze">Step 1 of 3 — Ready to Wear</p>
+        <div className="max-w-[1400px] mx-auto px-6 py-16">
+          <button onClick={() => setStep(-1)} className="text-[10px] uppercase text-stone mb-12">← Back</button>
+          <div className="text-center mb-20">
+            <h1 className="text-4xl md:text-6xl font-serif mb-6">Select your <br /><em className="text-bronze">size</em></h1>
           </div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-20 max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-ink leading-[1.1]">Select your <br /><em className="text-bronze">size</em></h1>
-            <p className="text-stone text-[15px] leading-relaxed max-w-xl mx-auto">Choose from our standard ready-to-wear sizes. Crafted on a ready pattern and dispatched within 7–10 days.</p>
-          </motion.div>
-
           <div className="max-w-5xl mx-auto space-y-8">
             {showJacketSelector && (
-              <div className="border border-border bg-white p-8 md:p-12">
-                <div className="flex items-center justify-between mb-8">
-                  <div><p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">Jacket</p><h4 className="text-2xl font-serif text-ink">Size & Length</h4></div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-stone">US Sizing</span>
-                </div>
-                <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-8">
+              <div className="border border-border bg-white p-8">
+                <h4 className="text-2xl font-serif mb-8">Jacket Size & Length</h4>
+                <div className="grid grid-cols-5 md:grid-cols-9 gap-2 mb-8">
                   {STANDARD_JACKET_SIZES.map((size) => (
-                    <button key={size} onClick={() => setJacketSize(size)} className={`py-3 text-sm transition-all duration-300 border ${jacketSize === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>{size}</button>
+                    <button key={size} onClick={() => setJacketSize(size)} className={`py-3 text-sm border ${jacketSize === size ? "bg-ink text-paper" : "border-border hover:border-ink"}`}>{size}</button>
                   ))}
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4">Length</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {STANDARD_JACKET_LENGTHS.map((len) => (
-                      <button key={len} onClick={() => setJacketLength(len)} className={`py-3 text-sm transition-all duration-300 border ${jacketLength === len ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>{len}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {showTrouserSelector && (
-              <div className="border border-border bg-white p-8 md:p-12">
-                <div className="flex items-center justify-between mb-8">
-                  <div><p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">Trouser</p><h4 className="text-2xl font-serif text-ink">Waist & Inseam</h4></div>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-stone">US Sizing</span>
-                </div>
-                <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-2 mb-8">
-                  {STANDARD_TROUSER_SIZES.map((size) => (
-                    <button key={size} onClick={() => setTrouserSize(size)} className={`py-3 text-sm transition-all duration-300 border ${trouserSize === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>{size}</button>
-                  ))}
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4">Inseam</p>
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                    {STANDARD_INSEAMS.map((ins) => (
-                      <button key={ins} onClick={() => setInseam(ins)} className={`py-3 text-xs transition-all duration-300 border ${inseam === ins ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>{ins}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {showShirtSelector && (
-              <div className="border border-border bg-white p-8 md:p-12">
-                <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-2">Shirt</p>
-                <h4 className="text-2xl font-serif text-ink mb-8">Size</h4>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {STANDARD_SHIRT_SIZES.map((size) => (
-                    <button key={size} onClick={() => setJacketSize(size)} className={`py-3 text-sm transition-all duration-300 border ${jacketSize === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>{size}</button>
+                <div className="grid grid-cols-3 gap-3">
+                  {STANDARD_JACKET_LENGTHS.map((len) => (
+                    <button key={len} onClick={() => setJacketLength(len)} className={`py-3 text-sm border ${jacketLength === len ? "bg-ink text-paper" : "border-border hover:border-ink"}`}>{len}</button>
                   ))}
                 </div>
               </div>
-            )}
-
-            {(jacketSize || trouserSize) && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border border-bronze/30 bg-cream p-6 md:p-8">
-                <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Your Selection</p>
-                <div className="space-y-2 text-sm text-ink">
-                  {jacketSize && showJacketSelector && <p>Jacket — <strong className="font-medium">US {jacketSize} · {jacketLength}</strong></p>}
-                  {jacketSize && showShirtSelector && <p>Shirt — <strong className="font-medium">{jacketSize}</strong></p>}
-                  {trouserSize && <p>Trouser — <strong className="font-medium">US {trouserSize} · {inseam}</strong></p>}
-                </div>
-              </motion.div>
             )}
           </div>
-
-          <div className="max-w-5xl mx-auto mt-20 pt-12 border-t border-border flex justify-end">
-            <button onClick={nextStep} disabled={standardSelectionComplete} className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed">Continue <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span></button>
+          <div className="max-w-5xl mx-auto mt-20 flex justify-end">
+            <button onClick={nextStep} disabled={standardSelectionComplete} className="bg-ink text-paper px-16 py-5 text-[11px] disabled:opacity-30">Continue →</button>
           </div>
         </div>
       </div>
     );
   }
 
-  // STEP 1: Measurements (Only for Kashif / Cheonseng)
+  // STEP 1: FABRIC SELECTION
   if (step === 1 && fitType === "custom") {
+    return (
+      <div className="min-h-screen bg-paper">
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
+          <button onClick={() => setStep(-1)} className="text-[10px] uppercase text-stone mb-12 inline-flex items-center gap-2">← Back to Product</button>
+          
+          <div className="mb-16">
+            <p className="text-center text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">Step 1 of 4 — Made to Measure</p>
+            <h1 className="text-4xl md:text-6xl font-serif text-center mb-6">Select your <br /><em className="text-bronze">Fabric</em></h1>
+            <p className="text-stone text-center text-[15px] max-w-xl mx-auto">Choose from our premium collections of Italian, UK, and Chinese wool fabrics.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {fabrics.map((fabric) => (
+              <button
+                key={fabric.id}
+                onClick={() => setSelectedFabric(fabric)}
+                className={`text-left group border transition-all duration-300 overflow-hidden ${
+                  selectedFabric?.id === fabric.id ? "border-ink shadow-lg scale-[1.02]" : "border-border hover:border-ink/50"
+                }`}
+              >
+                <div className="relative aspect-[4/3] bg-cream overflow-hidden">
+                  <img src={fabric.image_url} alt={fabric.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute top-4 right-4 bg-white/90 px-3 py-1 text-[10px] font-semibold tracking-wider uppercase">
+                    {fabric.origin}
+                  </div>
+                </div>
+                <div className="p-6 bg-white">
+                  <h3 className="font-serif text-xl text-ink mb-2">{fabric.name}</h3>
+                  <p className="text-sm text-stone">Half Canvas Construction</p>
+                  <p className="mt-4 font-serif text-lg text-ink">+ {formatPrice(fabric.price)}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="max-w-6xl mx-auto mt-20 pt-8 border-t border-border flex justify-end">
+            <button onClick={nextStep} disabled={!selectedFabric} className="bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors disabled:opacity-30">
+              Continue to Measurements →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP 2: MEASUREMENTS
+  if (step === 2 && fitType === "custom") {
     const activeFieldData = fields.find((f) => f.id === activeField);
     const progressPercent = Math.round((filledCount / fields.length) * 100);
 
     return (
       <div className="min-h-screen bg-paper">
-        <div className="max-w-[1500px] mx-auto px-6 md:px-12 py-16 md:py-24">
-          <button onClick={() => setStep(-1)} className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back to Product</button>
-
+        <div className="max-w-[1500px] mx-auto px-6 md:px-12 py-16">
+          <button onClick={() => setStep(1)} className="text-[10px] uppercase text-stone mb-12">← Back to Fabric</button>
+          
           <div className="mb-16 max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] uppercase tracking-[0.4em] text-bronze">Step 1 of 3 — Made to Measure</span>
-              <span className="text-[10px] uppercase tracking-[0.3em] text-stone">{filledCount} / {fields.length} complete</span>
+              <span className="text-[10px] uppercase tracking-[0.4em] text-bronze">Step 2 of 4 — Measurements</span>
+              <span className="text-[10px] uppercase text-stone">{filledCount} / {fields.length} complete</span>
             </div>
             <div className="h-[2px] bg-border overflow-hidden">
-              <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} transition={{ duration: 0.5, ease: "easeOut" }} />
+              <motion.div className="h-full bg-ink" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} />
             </div>
           </div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center mb-20 max-w-2xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-serif mb-6 text-ink leading-[1.1]">Your<br /><em className="text-bronze">measurements</em></h1>
-            <p className="text-stone text-[15px] leading-relaxed">Provide your measurements in inches. Fields marked with * are required.</p>
-          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
             <div className="lg:col-span-7">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-10">
+              <div className="space-y-10">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Measurement Profile Name *</label>
-                  <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full border-0 border-b border-border pb-4 focus:border-ink outline-none text-base bg-transparent text-ink transition-colors duration-300" />
+                  <label className="block text-[10px] uppercase text-bronze mb-4">Profile Name *</label>
+                  <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full border-b border-border pb-4 focus:border-ink outline-none bg-transparent" />
                 </div>
-
                 <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Height *</label>
+                  <label className="block text-[10px] uppercase text-bronze mb-4">Height *</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <select value={heightFt} onChange={(e) => setHeightFt(e.target.value)} className="border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300">
-                      <option value="">Feet</option>
-                      {[4, 5, 6, 7].map((ft) => <option key={ft} value={ft}>{ft} ft</option>)}
-                    </select>
-                    <select value={heightIn} onChange={(e) => setHeightIn(e.target.value)} className="border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300">
-                      <option value="">Inches</option>
-                      {Array.from({ length: 12 }, (_, i) => i).map((inch) => <option key={inch} value={inch}>{inch} in</option>)}
-                    </select>
+                    <select value={heightFt} onChange={(e) => setHeightFt(e.target.value)} className="border border-border bg-white p-4"><option value="">Feet</option>{[4,5,6,7].map(f => <option key={f} value={f}>{f} ft</option>)}</select>
+                    <select value={heightIn} onChange={(e) => setHeightIn(e.target.value)} className="border border-border bg-white p-4"><option value="">Inches</option>{Array.from({length:12},(_,i)=>i).map(i => <option key={i} value={i}>{i} in</option>)}</select>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center gap-4 mb-8"><span className="w-8 h-[1px] bg-ink" /><h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">{pt} Measurements</h3></div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
-                    {fields.map((f, index) => {
-                      const value = m[f.id] || "";
-                      const error = getFieldError(f.id, value);
-                      const limits = MEASUREMENT_LIMITS[f.id];
-                      const isActive = activeField === f.id;
-                      const isFilled = value.length > 0 && !error;
-                      return (
-                        <motion.div key={f.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.03 }}>
-                          <label className="flex items-center justify-between mb-3">
-                            <span className={`text-[10px] uppercase tracking-[0.3em] font-medium transition-colors ${isActive ? "text-bronze" : "text-ink"}`}>{f.label} {f.required && <span className="text-red-500">*</span>}</span>
-                            {limits && <span className="text-[9px] text-stone tracking-wider">{limits.min}–{limits.max} in</span>}
-                          </label>
-                          <div className="relative">
-                            <input type="text" inputMode="decimal" value={value} onChange={(e) => updateM(f.id, e.target.value)} onFocus={() => setActiveField(f.id)} placeholder="—" className={`w-full border p-4 pr-12 outline-none text-base transition-all duration-300 bg-white ${error ? "border-red-400 bg-red-50/50 focus:border-red-500" : isActive ? "border-bronze shadow-[0_0_0_3px_rgba(139,115,85,0.1)]" : isFilled ? "border-bronze/40" : "border-border hover:border-ink/30"}`} />
-                            {isFilled && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-ink flex items-center justify-center"><span className="text-paper text-[10px] font-bold">✓</span></motion.div>}
-                          </div>
-                          {error && <p className="text-[10px] text-red-500 mt-2">{error}</p>}
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                  {fields.map((f) => {
+                    const value = m[f.id] || "";
+                    const error = getFieldError(f.id, value);
+                    return (
+                      <div key={f.id}>
+                        <label className="flex justify-between mb-3"><span className="text-[10px] uppercase">{f.label} {f.required && "*"}</span></label>
+                        <input type="text" value={value} onChange={(e) => updateM(f.id, e.target.value)} onFocus={() => setActiveField(f.id)} placeholder="—" className={`w-full border p-4 bg-white ${error ? "border-red-400" : "border-border focus:border-bronze"}`} />
+                        {error && <p className="text-[10px] text-red-500 mt-2">{error}</p>}
+                      </div>
+                    );
+                  })}
                 </div>
-
-                {needsJacketFit && (
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Jacket Fit</label>
-                    <select value={jacketFit} onChange={(e) => setJacketFit(e.target.value)} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300">
-                      {JACKET_FITS.map((f) => <option key={f} value={f}>{f}</option>)}
-                    </select>
-                  </div>
-                )}
-
-                {needsTrouserFit && (
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Trouser Fit</label>
-                    <select value={trouserFit} onChange={(e) => setTrouserFit(e.target.value)} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300">
-                      {TROUSER_FITS.map((f) => <option key={f} value={f}>{f}</option>)}
-                    </select>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Additional Requests</label>
-                  <p className="text-xs text-stone mb-4">Any changes to fit, style, or special requests.</p>
-                  <textarea value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)} rows={5} placeholder="e.g. Taper trousers, add monogram, longer sleeves..." className="w-full border border-border bg-white p-4 focus:border-ink outline-none resize-none text-sm text-ink transition-colors duration-300" />
-                </div>
-              </motion.div>
+              </div>
             </div>
 
             <div className="lg:col-span-5">
-              <div className="lg:sticky lg:top-32 space-y-6">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="border border-border bg-white overflow-hidden">
-                  <div className="relative aspect-square bg-cream flex items-center justify-center overflow-hidden">
-                    <AnimatePresence mode="wait">
-                      {activeField && MEASUREMENT_IMAGES[activeField] ? (
-                        <motion.img key={activeField} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }} src={MEASUREMENT_IMAGES[activeField]} alt={activeFieldData?.label || "Measurement"} className="w-full h-full object-contain p-8" />
-                      ) : <p className="text-stone text-[10px] uppercase tracking-[0.3em]">Select a field to see guide</p>}
-                    </AnimatePresence>
-                  </div>
-                  <div className="p-6 md:p-8 text-center border-t border-border">
-                    <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-3">How to Measure</p>
-                    <h3 className="text-2xl font-serif text-ink mb-3">{activeFieldData?.label || "Select a Field"}</h3>
-                    {activeFieldData?.hint && <p className="text-xs text-stone leading-relaxed">{activeFieldData.hint}</p>}
-                  </div>
-                </motion.div>
-
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} className="border border-bronze/30 bg-cream p-6 md:p-8">
-                  <p className="text-[10px] uppercase tracking-[0.4em] text-bronze mb-4 font-semibold">Need assistance?</p>
-                  <p className="text-xs text-stone leading-relaxed mb-6">Send us a photo of your best-fitting {pt}. Our master tailors will match the measurements for you.</p>
-                  <a href="https://wa.me/16393840265?text=Hi%2C%20I%20need%20help%20with%20measurements" target="_blank" rel="noopener noreferrer" className="text-[10px] tracking-[0.4em] uppercase border-b border-ink pb-1 inline-block hover:border-bronze hover:text-bronze transition-colors duration-300">WhatsApp Us →</a>
-                </motion.div>
+              <div className="lg:sticky lg:top-32 border border-border bg-white">
+                <div className="aspect-square bg-cream flex items-center justify-center">
+                  {activeField && MEASUREMENT_IMAGES[activeField] ? <img src={MEASUREMENT_IMAGES[activeField]} className="w-full h-full object-contain p-8" /> : "Select field"}
+                </div>
+                <div className="p-6 text-center border-t border-border">
+                  <h3 className="text-2xl font-serif mb-2">{activeFieldData?.label}</h3>
+                  <p className="text-xs text-stone">{activeFieldData?.hint}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-20 pt-12 border-t border-border flex flex-col md:flex-row md:justify-between md:items-center gap-6 max-w-5xl mx-auto">
-            <div>
-              {requiredMissing.length > 0 ? (
-                <p className="text-xs text-stone max-w-md"><span className="font-medium text-ink">{invalidOrMissing.some((f) => m[f.id]) ? "Fix or complete:" : "Still needed:"}</span>{" "}{requiredMissing.join(", ")}</p>
-              ) : <p className="text-xs text-bronze">✓ All measurements valid — ready to continue</p>}
-            </div>
-            <button onClick={nextStep} disabled={requiredMissing.length > 0 || !heightFt || !heightIn} className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed">Continue to Contact <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span></button>
+          <div className="mt-20 pt-12 border-t border-border flex justify-between max-w-5xl mx-auto">
+            <p className="text-xs text-stone">{requiredMissing.length > 0 ? `Still needed: ${requiredMissing.join(", ")}` : "✓ All valid"}</p>
+            <button onClick={nextStep} disabled={requiredMissing.length > 0 || !heightFt} className="bg-ink text-paper px-16 py-5 text-[11px] disabled:opacity-30">Continue →</button>
           </div>
         </div>
       </div>
     );
   }
 
-  // STEP 2: Contact + Shipping
-  if (step === 2) {
+  // STEP 3: CONTACT
+  if (step === 3) {
     return (
       <div className="min-h-screen bg-paper">
-        <div className="max-w-2xl mx-auto px-6 md:px-12 py-16 md:py-24">
-          <button onClick={prevStep} className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back</button>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
-            <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">Step 2 of 3</p>
-            <h1 className="text-4xl md:text-5xl font-serif text-ink mb-4">Contact &<br /><em className="text-bronze">shipping</em></h1>
-            <p className="text-stone text-sm">Where should we send your order?</p>
-          </motion.div>
-
-          <div className="space-y-10">
-            <div>
-              <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><p className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Contact Details</p></div>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Full Name *</label>
-                  <input type="text" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Email Address *</label>
-                  <input type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Phone / WhatsApp</label>
-                  <input type="text" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                </div>
-              </div>
+        <div className="max-w-2xl mx-auto px-6 py-16">
+          <button onClick={prevStep} className="text-[10px] uppercase text-stone mb-12">← Back</button>
+          <h1 className="text-4xl font-serif text-center mb-16">Contact & Shipping</h1>
+          
+          <div className="space-y-6">
+            <input type="text" placeholder="Full Name *" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} className="w-full border border-border p-4" />
+            <input type="email" placeholder="Email *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="w-full border border-border p-4" />
+            <input type="text" placeholder="Phone" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="w-full border border-border p-4" />
+            <input type="text" placeholder="Address 1 *" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} className="w-full border border-border p-4" />
+            <div className="grid grid-cols-2 gap-4">
+              <input type="text" placeholder="City *" value={contact.city} onChange={(e) => setContact({ ...contact, city: e.target.value })} className="w-full border border-border p-4" />
+              <input type="text" placeholder="Postal Code" value={contact.postalCode} onChange={(e) => setContact({ ...contact, postalCode: e.target.value })} className="w-full border border-border p-4" />
             </div>
-
-            <div>
-              <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><p className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Shipping Address</p></div>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Address Line 1 *</label>
-                  <input type="text" value={contact.address1} onChange={(e) => setContact({ ...contact, address1: e.target.value })} placeholder="House / Street" className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink placeholder:text-mist transition-colors duration-300" />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Address Line 2</label>
-                  <input type="text" value={contact.address2} onChange={(e) => setContact({ ...contact, address2: e.target.value })} placeholder="Apartment, suite, etc. (optional)" className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink placeholder:text-mist transition-colors duration-300" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">City *</label>
-                    <input type="text" value={contact.city} onChange={(e) => setContact({ ...contact, city: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Postal Code</label>
-                    <input type="text" value={contact.postalCode} onChange={(e) => setContact({ ...contact, postalCode: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-[0.4em] text-bronze mb-3 font-semibold">Country *</label>
-                  <input type="text" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-border bg-white p-4 focus:border-ink outline-none text-sm text-ink transition-colors duration-300" />
-                </div>
-              </div>
-            </div>
+            <input type="text" placeholder="Country *" value={contact.country} onChange={(e) => setContact({ ...contact, country: e.target.value })} className="w-full border border-border p-4" />
           </div>
 
-          <div className="mt-16 pt-12 border-t border-border flex justify-between items-center">
-            <button onClick={prevStep} className="text-stone hover:text-ink font-medium text-sm tracking-wide transition-colors">← Back</button>
-            <button onClick={nextStep} disabled={!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country} className="group bg-ink text-paper px-16 py-5 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-30 disabled:cursor-not-allowed">Review Order <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span></button>
+          <div className="mt-16 flex justify-between">
+            <button onClick={prevStep} className="text-stone text-sm">← Back</button>
+            <button onClick={nextStep} disabled={!contact.name || !contact.email || !contact.address1 || !contact.city} className="bg-ink text-paper px-16 py-5 text-[11px] disabled:opacity-30">Review →</button>
           </div>
         </div>
       </div>
     );
   }
 
-  // STEP 3: Review
+  // STEP 4: REVIEW
   return (
     <div className="min-h-screen bg-paper">
-      <div className="max-w-3xl mx-auto px-6 md:px-12 py-16 md:py-24">
-        <button onClick={prevStep} className="text-[10px] uppercase tracking-[0.4em] text-stone hover:text-ink mb-12 inline-flex items-center gap-2 transition-colors"><span>←</span> Back</button>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
-          <p className="text-[10px] uppercase tracking-[0.5em] text-bronze mb-4">Step 3 of 3</p>
-          <h1 className="text-4xl md:text-5xl font-serif text-ink mb-4">Review your<br /><em className="text-bronze">order</em></h1>
-          <p className="text-stone text-sm">Confirm everything looks correct before submitting.</p>
-        </motion.div>
-
-        <div className="space-y-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="border border-border bg-white p-8">
-            <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Order Summary</h3></div>
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between items-start gap-4"><span className="text-stone">Model</span><span className="font-medium text-ink text-right">{model.name}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-4 border-t border-border"><span className="text-stone">Fit</span><span className="font-medium text-ink text-right">{fitType === "custom" ? "Made to Measure" : getStandardSizeLabel()}</span></div>
-              <div className="flex justify-between items-start gap-4 pt-4 border-t border-border"><span className="text-stone">Total</span><span className="font-serif text-2xl text-ink">{formatPrice(model.price)}</span></div>
-            </div>
-          </motion.div>
-
-          {fitType === "custom" && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="border border-border bg-white p-8">
-              <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Measurements (inches)</h3></div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 text-sm">
-                <div><p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Height</p><p className="font-medium text-ink">{heightFt}&apos; {heightIn}&quot;</p></div>
-                {fields.map((f) => m[f.id] ? (<div key={f.id}><p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">{f.label}</p><p className="font-medium text-ink">{m[f.id]}&quot;</p></div>) : null)}
-                {needsJacketFit && <div><p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Jacket Fit</p><p className="font-medium text-ink">{jacketFit}</p></div>}
-                {needsTrouserFit && <div><p className="text-[9px] uppercase tracking-[0.3em] text-stone mb-2">Trouser Fit</p><p className="font-medium text-ink">{trouserFit}</p></div>}
-              </div>
-            </motion.div>
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <h1 className="text-4xl font-serif text-center mb-16">Review Order</h1>
+        
+        <div className="border border-border bg-white p-8 mb-6">
+          <div className="flex justify-between mb-4"><span>Model</span><span className="font-medium">{model.name}</span></div>
+          {selectedFabric && (
+            <div className="flex justify-between mb-4 border-t pt-4"><span>Fabric</span><span className="font-medium">{selectedFabric.name} (+{formatPrice(selectedFabric.price)})</span></div>
           )}
-
-          {additionalInfo && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="border border-border bg-white p-8">
-              <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Additional Requests</h3></div>
-              <p className="text-sm text-stone whitespace-pre-line leading-relaxed">{additionalInfo}</p>
-            </motion.div>
-          )}
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="border border-border bg-white p-8">
-            <div className="flex items-center gap-4 mb-6"><span className="w-8 h-[1px] bg-ink" /><h3 className="text-[10px] uppercase tracking-[0.4em] text-ink font-semibold">Shipping Address</h3></div>
-            <div className="text-sm text-stone leading-relaxed">
-              <p className="font-medium text-ink mb-2">{contact.name}</p>
-              <p>{contact.address1}</p>
-              {contact.address2 && <p>{contact.address2}</p>}
-              <p>{contact.city} {contact.postalCode}</p>
-              <p>{contact.country}</p>
-              <div className="mt-5 pt-5 border-t border-border space-y-1"><p className="text-stone">{contact.email}</p>{contact.phone && <p className="text-stone">{contact.phone}</p>}</div>
-            </div>
-          </motion.div>
-
-          <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} onClick={handleSubmit} disabled={submitting} className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em] font-medium hover:bg-bronze transition-colors duration-500 disabled:opacity-50">
-            {submitting ? "Submitting Order..." : "Submit Order"}
-          </motion.button>
+          <div className="flex justify-between border-t pt-4"><span>Total</span><span className="text-2xl font-serif">{formatPrice(finalPrice)}</span></div>
         </div>
+
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-ink text-paper py-6 text-[11px] uppercase tracking-[0.4em]">
+          {submitting ? "Submitting..." : "Submit Order"}
+        </button>
       </div>
     </div>
   );
@@ -755,7 +453,7 @@ function WomenBespokePageContent() {
 
 export default function WomenBespokePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-paper flex items-center justify-center"><div className="w-8 h-8 border border-border border-t-ink rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <WomenBespokePageContent />
     </Suspense>
   );
