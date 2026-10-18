@@ -10,7 +10,7 @@ import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 
-// Standard sizes for Ready to Wear suits
+// Ready to Wear ke standard sizes
 const SIZES = ["36", "38", "40", "42", "44", "46"];
 
 function ReadyToWearProductContent() {
@@ -21,8 +21,6 @@ function ReadyToWearProductContent() {
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
 
   const [selectedSize, setSelectedSize] = useState("");
   const [contact, setContact] = useState({
@@ -65,7 +63,8 @@ function ReadyToWearProductContent() {
         notes: "Ready to Wear Order",
       };
 
-      const res = await fetch("/api/orders", { 
+      // Stripe Checkout API call
+      const res = await fetch("/api/checkout", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify(payload) 
@@ -73,39 +72,25 @@ function ReadyToWearProductContent() {
       
       const data = await res.json();
       
-      // Agar backend error de raha hai toh console mein print hoga
-      if (!res.ok) {
-        console.error("Order API Error:", data);
-        throw new Error(data.error || "Failed to submit order");
+      if (!res.ok) throw new Error(data.error || "Failed to initiate checkout");
+
+      // Customer ko Stripe ke payment page par bhej dein
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned from server");
       }
       
-      // Order number set karo
-      setOrderNumber(data.order?.order_number || "PADO-SUCCESS"); 
-      setSubmitted(true);
     } catch (err: any) { 
       console.error("Frontend Error:", err);
-      alert("Order Failed: " + err.message); 
+      alert("Error: " + err.message); 
     } finally { 
       setSubmitting(false); 
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center font-serif text-xl">Loading...</div>;
   if (!model) return <div className="min-h-screen flex items-center justify-center font-serif text-2xl">Product Not Found</div>;
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-paper flex items-center justify-center px-5 py-20">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg text-center">
-          <div className="w-24 h-24 rounded-full bg-ink text-paper flex items-center justify-center mx-auto mb-10 text-4xl">✓</div>
-          <h1 className="text-4xl font-serif text-ink mb-6">Thank you, {contact.name.split(" ")[0]}.</h1>
-          <p className="text-stone mb-3">Your Order Number is:</p>
-          <p className="text-2xl font-mono text-brand-gold mb-10 tracking-wider">{orderNumber}</p>
-          <Link href="/shop" className="bg-ink text-paper px-10 py-4 text-[11px] uppercase tracking-[0.3em] hover:bg-bronze transition-colors">Continue Shopping</Link>
-        </motion.div>
-      </div>
-    );
-  }
 
   const galleryImages: string[] = model?.images?.length > 0 ? model.images : model?.image_url ? [model.image_url] : [];
 
@@ -171,7 +156,7 @@ function ReadyToWearProductContent() {
               disabled={!selectedSize || submitting} 
               className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              {submitting ? "Processing..." : `Buy Now — ${formatPrice(model.price)}`}
+              {submitting ? "Redirecting to Payment..." : `Buy Now — ${formatPrice(model.price)}`}
             </button>
             {!selectedSize && <p className="text-[10px] text-red-500 mt-3 text-center">Please select a size to continue</p>}
             
