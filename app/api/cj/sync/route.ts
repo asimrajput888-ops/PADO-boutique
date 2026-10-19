@@ -11,7 +11,7 @@ function formatLuxuryDescription(rawDesc: string, productName: string) {
   return `Elevate your wardrobe with the ${productName}.\n\nPRODUCT DETAILS:\n${clean}\n\nPADO PROMISE:\n✓ Premium Quality Fabric\n✓ Expert Tailoring`;
 }
 
-const PRODUCT_IDS = ["2084517420358029314"]; // <-- Apni IDs yahan dalein
+const PRODUCT_IDS = ["2084517420358029314"]; // <-- Yahan apni IDs dalein
 
 export async function GET() {
   try {
@@ -35,7 +35,6 @@ export async function GET() {
 
       if (!productDetail) continue;
 
-      // 1. IMAGE FIX (Encode URLs)
       let rawImages: string[] = [];
       if (productDetail.productImage) rawImages.push(productDetail.productImage);
       if (productDetail.bigImage) rawImages.push(productDetail.bigImage);
@@ -44,23 +43,37 @@ export async function GET() {
       const cleanImages = rawImages
         .filter(url => typeof url === 'string' && url.trim().length > 0)
         .map(url => url.startsWith('//') ? `https:${url}` : url)
-        .map(url => encodeURI(url)) // 🔥 Yahan URL Encode kiya hai
+        .map(url => encodeURI(url))
         .filter(url => url.startsWith('http'));
 
       const uniqueImages = Array.from(new Set(cleanImages));
-      
       const mainImage = uniqueImages[0] || "";
       const galleryImages = uniqueImages.slice(0, 6); 
 
-      // 2. VARIANTS (Colors & Sizes) EXTRACT KAREIN
+      // 🔥 VARIANTS FIX: Color aur Size ko alag karna
       let variantsData: any[] = [];
       if (productDetail.variants && Array.isArray(productDetail.variants)) {
-        variantsData = productDetail.variants.map((v: any) => ({
-          vid: v.vid,
-          color: v.variantKey || v.variantName || "Default",
-          size: v.variantValue || v.variantSku || "One Size",
-          image: v.variantImage ? encodeURI(v.variantImage) : mainImage,
-        }));
+        variantsData = productDetail.variants.map((v: any) => {
+          let color = v.variantKey || v.variantName || "Default";
+          let size = v.variantValue || v.variantSku || "One Size";
+
+          // Agar color ke andar size mila hua hai (e.g., "Black-M")
+          if (color.includes("-")) {
+            const parts = color.split("-");
+            const lastPart = parts[parts.length - 1].toUpperCase();
+            if (["S", "M", "L", "XL", "XXL", "3XL", "4XL"].includes(lastPart) || !isNaN(Number(lastPart))) {
+              size = lastPart;
+              color = parts.slice(0, -1).join("-");
+            }
+          }
+
+          return {
+            vid: v.vid,
+            color: color.trim(),
+            size: size.trim(),
+            image: v.variantImage ? encodeURI(v.variantImage) : mainImage,
+          };
+        });
       }
 
       const rawName = productDetail.productNameEn || productDetail.productName || "Exclusive Suit";
@@ -80,7 +93,7 @@ export async function GET() {
         price: finalSellingPrice, 
         image_url: mainImage, 
         images: galleryImages, 
-        variants: variantsData, // 🔥 Variants save kar rahe hain
+        variants: variantsData, 
         description: cleanDescription, 
         supplier: "cj", 
         category: category, 
