@@ -9,8 +9,6 @@ import { useParams } from "next/navigation";
 import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 
-const SIZES = ["36", "38", "40", "42", "44", "46"];
-
 function ReadyToWearProductContent() {
   const params = useParams();
   const id = params?.id as string;
@@ -20,27 +18,61 @@ function ReadyToWearProductContent() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [selectedSize, setSelectedSize] = useState("");
+  // Variants State
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [displayImage, setDisplayImage] = useState<string>("");
+
   const [contact, setContact] = useState({ name: "", email: "", phone: "", address1: "", address2: "", city: "", postalCode: "", country: "" });
 
   useEffect(() => {
     const fetchModel = async () => {
       const { data } = await supabase.from("models").select("*").eq("id", Number(id)).single();
-      if (data) setModel(data);
+      if (data) {
+        setModel(data);
+        setDisplayImage(data.image_url);
+        
+        // Auto-select first color if variants exist
+        if (data.variants && data.variants.length > 0) {
+          const uniqueColors = Array.from(new Set(data.variants.map((v: any) => v.color)));
+          if (uniqueColors.length > 0) {
+            handleColorSelect(uniqueColors[0] as string, data);
+          }
+        }
+      }
       setLoading(false);
     };
     fetchModel();
   }, [id]);
 
+  const handleColorSelect = (color: string, dataToUse = model) => {
+    setSelectedColor(color);
+    // Filter sizes for this color
+    const sizesForColor = dataToUse.variants.filter((v: any) => v.color === color).map((v: any) => v.size);
+    setAvailableSizes(Array.from(new Set(sizesForColor)) as string[]);
+    
+    // Change image if variant has specific image
+    const variantWithImage = dataToUse.variants.find((v: any) => v.color === color && v.image);
+    if (variantWithImage) setDisplayImage(variantWithImage.image);
+    else setDisplayImage(dataToUse.image_url);
+
+    setSelectedVariant(null); // Reset size selection
+  };
+
   const handleSubmit = async () => {
+    if (!selectedVariant) return alert("Please select a size.");
     if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) return alert("Please fill all required shipping fields");
+    
     setSubmitting(true);
     try {
       const payload = {
         customer_name: contact.name, customer_email: contact.email, customer_phone: contact.phone,
         customer_country: contact.country, shipping_address: { ...contact },
-        fit_type: "standard", standard_size: selectedSize, model_id: String(model.id),
-        model_name: model.name, category: model.category || "men", product_type: model.product_type || "suit",
+        fit_type: "standard", 
+        standard_size: `${selectedColor} - ${selectedVariant.size}`,
+        cj_vid: selectedVariant.vid, // 🔥 CJ ko order bhejne ke liye ye zaroori hai
+        model_id: String(model.id), model_name: model.name, category: model.category || "men", product_type: model.product_type || "suit",
         measurements: null, fabric_id: null, fabric_name: null, total_price: model.price,
         currency: "USD", notes: "Ready to Wear Order",
       };
@@ -49,7 +81,6 @@ function ReadyToWearProductContent() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to initiate checkout");
       if (data.url) window.location.href = data.url;
-      else throw new Error("No checkout URL returned");
     } catch (err: any) { alert("Error: " + err.message); } finally { setSubmitting(false); }
   };
 
@@ -57,6 +88,7 @@ function ReadyToWearProductContent() {
   if (!model) return <div className="min-h-screen flex items-center justify-center font-serif text-2xl">Product Not Found</div>;
 
   const galleryImages: string[] = model?.images?.length > 0 ? model.images : model?.image_url ? [model.image_url] : [];
+  const uniqueColors = model.variants ? Array.from(new Set(model.variants.map((v: any) => v.color))) : [];
 
   return (
     <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
@@ -65,7 +97,8 @@ function ReadyToWearProductContent() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           <div>
-            <ProductGallery images={galleryImages} name={model.name} />
+            {/* Main Image ke sath gallery, image dynamic hai */}
+            <ProductGallery images={[displayImage, ...galleryImages.filter(img => img !== displayImage)]} name={model.name} />
           </div>
 
           <div className="lg:sticky lg:top-32 h-fit">
@@ -74,19 +107,43 @@ function ReadyToWearProductContent() {
             <p className="text-2xl font-serif text-ink mb-10">{formatPrice(model.price)}</p>
             
             <div className="mb-10">
-              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border">
-                {model.description || "Premium Ready to Wear Suit."}
-              </p>
+              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border">{model.description}</p>
             </div>
 
+            {/* Color Selector */}
+            {uniqueColors.length > 0 && (
+              <div className="mb-8">
+                <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Color: <span className="text-brand-gold">{selectedColor}</span></p>
+                <div className="flex flex-wrap gap-3">
+                  {uniqueColors.map((color: any) => (
+                    <button 
+                      key={color} 
+                      onClick={() => handleColorSelect(color)} 
+                      className={`px-4 py-2 border text-sm transition-all ${selectedColor === color ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Size Selector */}
             <div className="mb-10">
               <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Size *</p>
               <div className="flex flex-wrap gap-3">
-                {SIZES.map((size) => (
-                  <button key={size} onClick={() => setSelectedSize(size)} className={`w-14 h-12 border flex items-center justify-center text-sm transition-all duration-300 ${selectedSize === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}>
-                    {size}
-                  </button>
-                ))}
+                {availableSizes.length > 0 ? availableSizes.map((size) => {
+                  const variantObj = model.variants.find((v: any) => v.color === selectedColor && v.size === size);
+                  return (
+                    <button 
+                      key={size} 
+                      onClick={() => setSelectedVariant(variantObj)} 
+                      className={`min-w-[3.5rem] h-12 px-4 border flex items-center justify-center text-sm transition-all ${selectedVariant?.size === size ? "bg-ink text-paper border-ink" : "border-border text-ink hover:border-ink"}`}
+                    >
+                      {size}
+                    </button>
+                  )
+                }) : <p className="text-sm text-stone">Select a color to see sizes.</p>}
               </div>
             </div>
 
@@ -104,7 +161,7 @@ function ReadyToWearProductContent() {
               </div>
             </div>
 
-            <button onClick={handleSubmit} disabled={!selectedSize || submitting} className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+            <button onClick={handleSubmit} disabled={!selectedVariant || submitting} className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
               {submitting ? "Redirecting to Payment..." : `Buy Now — ${formatPrice(model.price)}`}
             </button>
           </div>
