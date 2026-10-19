@@ -13,9 +13,15 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({ containScroll: "keepSnaps", dragFree: true });
 
   useEffect(() => {
-    // Filter out empty or null images initially
-    const initialValid = images.filter(img => img && img.trim() !== "");
-    setValidImages(initialValid);
+    // 🔥 URL PROXY LOGIC
+    const processedImages = (images || []).map(img => {
+      if (img && (img.includes("aliyuncs.com") || img.includes("cjdropshipping.com"))) {
+        return `/api/proxy-image?url=${encodeURIComponent(img)}`;
+      }
+      return img;
+    }).filter(img => img && img.trim() !== "");
+
+    setValidImages(processedImages);
   }, [images]);
 
   const onThumbClick = useCallback((index: number) => {
@@ -36,10 +42,7 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
   }, [emblaMainApi, onSelect]);
 
   const handleImageError = (failedImgUrl: string) => {
-    setValidImages((prev) => {
-      const filtered = prev.filter((url) => url !== failedImgUrl);
-      return filtered; // Agar sab kharab ho jayein toh empty ho jayega
-    });
+    setValidImages((prev) => prev.filter((url) => url !== failedImgUrl));
   };
 
   if (!validImages || validImages.length === 0) {
