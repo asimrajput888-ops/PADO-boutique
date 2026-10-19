@@ -11,54 +11,64 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Stripe Metadata limit (500 chars per key) ko dhyan mein rakhte hue data split kar rahe hain
+    // 1. Data ko saaf (Sanitize) karein
+    const email = body.customer_email?.trim();
+    if (!email || !email.includes("@")) {
+      return NextResponse.json({ error: "Valid customer email is required" }, { status: 400 });
+    }
+
+    const modelName = body.model_name?.trim() || "PADO Premium Suit";
+    
+    // Price ko number mein convert karein (agar string mein $ laga hai toh hata dein)
+    const priceString = String(body.total_price).replace(/[^0-9.]/g, '');
+    const price = parseFloat(priceString);
+    
+    if (isNaN(price) || price <= 0) {
+      return NextResponse.json({ error: `Invalid total price: ${body.total_price}` }, { status: 400 });
+    }
+
+    // 2. Stripe Session banayein
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      customer_email: body.customer_email,
+      customer_email: email,
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: body.model_name || "PADO Bespoke Suit",
-              description: `Size: ${body.standard_size || "Custom"} | Fabric: ${body.fabric_name || "Standard"}`,
+              name: modelName,
+              description: `Size: ${body.standard_size || "Standard"} | Type: ${body.fit_type || "Standard"}`,
             },
-            unit_amount: Math.round(body.total_price * 100), // Cents mein
+            unit_amount: Math.round(price * 100), // Cents mein
           },
           quantity: 1,
         },
       ],
       metadata: {
-        customer_name: body.customer_name || "Unknown",
-        customer_email: body.customer_email || "",
-        customer_phone: body.customer_phone || "",
-        customer_country: body.customer_country || "CA",
-        // Address ko JSON.stringify karna zaroori hai kyunki Stripe object accept nahi karta
+        customer_name: String(body.customer_name || "Unknown").substring(0, 100),
+        customer_email: email,
+        customer_phone: String(body.customer_phone || "").substring(0, 50),
+        customer_country: String(body.customer_country || "CA").substring(0, 50),
         shipping_address: JSON.stringify(body.shipping_address || {}),
-        fit_type: body.fit_type || "standard",
-        standard_size: body.standard_size || "",
+        fit_type: String(body.fit_type || "standard"),
+        standard_size: String(body.standard_size || "").substring(0, 100),
         model_id: String(body.model_id || ""),
-        model_name: body.model_name || "",
-        category: body.category || "men",
-        product_type: body.product_type || "suit",
-        total_price: String(body.total_price || 0),
-        currency: body.currency || "USD",
-        notes: body.notes || "",
-        
-        // 🔥 SABSE ZAROORI: CJ VARIANT ID
-        cj_vid: body.cj_vid || "", 
-        
-        fabric_id: body.fabric_id ? String(body.fabric_id) : "",
-        fabric_name: body.fabric_name || "",
+        model_name: modelName,
+        category: String(body.category || "men"),
+        product_type: String(body.product_type || "suit"),
+        total_price: String(price),
+        currency: "USD",
+        notes: String(body.notes || "").substring(0, 200),
+        cj_vid: String(body.cj_vid || ""), // 🔥 CJ ka Variant ID
       },
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.padoshop.com"}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.padoshop.com"}/shop`,
+      success_url: `https://www.padoshop.com/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://www.padoshop.com/shop`,
     });
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
-    console.error("Stripe Error:", err);
+    console.error("Stripe 400 Error Details:", err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
