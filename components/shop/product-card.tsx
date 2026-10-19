@@ -23,13 +23,13 @@ export function ProductCard({ product, category }: ProductCardProps) {
   const { formatPrice } = useCurrency();
   const [imageError, setImageError] = useState(false);
 
-  // Main Image URL
-  let imageSrc = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "");
+  // Main Image URL nikaalein
+  let rawImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "");
 
-  // 🔥 MAGIC: Agar image aliyuncs ya cjdropshipping se hai, toh proxy use karo
-  if (imageSrc && (imageSrc.includes("aliyuncs.com") || imageSrc.includes("cjdropshipping.com"))) {
-    imageSrc = `/api/proxy-image?url=${encodeURIComponent(imageSrc)}`;
-  }
+  // 🔥 MAGIC: Agar image CJ (aliyuncs) ki hai, toh Proxy CDN use karein
+  const imageSrc = (rawImage && (rawImage.includes("aliyuncs.com") || rawImage.includes("cjdropshipping.com")))
+    ? `https://wsrv.nl/?url=${encodeURIComponent(rawImage)}`
+    : rawImage;
 
   const isReadyToWear = ["cj", "1688"].includes(product.supplier?.toLowerCase() || "");
 
