@@ -20,6 +20,7 @@ export async function GET() {
     const authData = await authRes.json();
     const token = authData.data.accessToken;
 
+    // 15 products fetch kar rahe hain
     const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=15&keyWord=suit`;
     const productsRes = await fetch(url, {
       method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
@@ -39,35 +40,35 @@ export async function GET() {
     for (const p of cjProducts) {
       const pid = p.id || p.pid;
 
+      // Detail API call taake sahi images mil sakein
       const detailRes = await fetch(`https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`, {
         method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
       });
       const detailData = await detailRes.json();
       const productDetail = detailData.data;
       
-      // Pictures ka logic (Max 3 pictures taake gandagi na ho)
+      // Pictures ka logic
       let imageArray = productDetail?.productImageSet || [];
       if (imageArray.length === 0 && p.bigImage) imageArray = [p.bigImage];
       
-      // Main image hamesha pehli image hogi
       const mainImage = imageArray[0] || p.bigImage || "";
-      // Sirf aglay 2 pictures uthayen taake gallery mein mix-up na ho
-      const galleryImages = imageArray.slice(0, 3); 
+      const galleryImages = imageArray.slice(0, 3); // Sirf 3 pictures
 
       const productName = p.nameEn || p.name || "Premium Suit";
       const cleanTitle = productName.length > 50 ? productName.substring(0, 50).trim() + "..." : productName;
 
-      // Category detection (Sirf 'women' word dekh kar women mein dalega)
+      // Category check (Women/Men)
       const lowerName = productName.toLowerCase();
       const isWomen = lowerName.includes("women") || lowerName.includes("female");
       const category = isWomen ? "women" : "men";
 
+      // Price 4.5x badha rahe hain
       const cjPrice = Number(p.sellPrice) || 0;
       const finalSellingPrice = Math.ceil(cjPrice * 4.5); 
 
       // Description se HTML tags saaf karein
       const rawDescription = productDetail?.description || p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.";
-      const cleanDescription = stripHtml(rawDescription).substring(0, 500); // 500 characters max
+      const cleanDescription = stripHtml(rawDescription).substring(0, 500);
 
       const productToSave = {
         name: cleanTitle,
