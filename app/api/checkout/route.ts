@@ -21,34 +21,34 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: body.model_name,
-              description: `Size: ${body.standard_size || "Custom"} | Fabric: ${body.fabric_name || "N/A"}`,
+              name: body.model_name || "PADO Bespoke Suit",
+              description: `Size: ${body.standard_size || "Custom"} | Fabric: ${body.fabric_name || "Standard"}`,
             },
-            unit_amount: Math.round(body.total_price * 100), // Cents mein convert
+            unit_amount: Math.round(body.total_price * 100), // Cents mein
           },
           quantity: 1,
         },
       ],
       metadata: {
-        customer_name: body.customer_name,
-        customer_email: body.customer_email,
+        customer_name: body.customer_name || "Unknown",
+        customer_email: body.customer_email || "",
         customer_phone: body.customer_phone || "",
-        customer_country: body.customer_country,
-        shipping_address: JSON.stringify(body.shipping_address), // Ye aam taur par 500 se kam hota hai
-        fit_type: body.fit_type,
+        customer_country: body.customer_country || "CA",
+        // Address ko JSON.stringify karna zaroori hai kyunki Stripe object accept nahi karta
+        shipping_address: JSON.stringify(body.shipping_address || {}),
+        fit_type: body.fit_type || "standard",
         standard_size: body.standard_size || "",
-        model_id: String(body.model_id),
-        model_name: body.model_name,
+        model_id: String(body.model_id || ""),
+        model_name: body.model_name || "",
         category: body.category || "men",
         product_type: body.product_type || "suit",
-        total_price: String(body.total_price),
+        total_price: String(body.total_price || 0),
         currency: body.currency || "USD",
         notes: body.notes || "",
         
-        // 🔥 CJ KE LIYE SABSE ZAROORI FIELD
+        // 🔥 SABSE ZAROORI: CJ VARIANT ID
         cj_vid: body.cj_vid || "", 
         
-        // Custom orders ke liye (agar zaroorat ho)
         fabric_id: body.fabric_id ? String(body.fabric_id) : "",
         fabric_name: body.fabric_name || "",
       },
