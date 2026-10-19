@@ -11,7 +11,7 @@ function formatLuxuryDescription(rawDesc: string, productName: string) {
   return `Elevate your wardrobe with the ${productName}.\n\nPRODUCT DETAILS:\n${clean}\n\nPADO PROMISE:\n✓ Premium Quality Fabric\n✓ Expert Tailoring`;
 }
 
-const PRODUCT_IDS = ["2084517420358029314"]; // <-- Yahan apni IDs dalein
+const PRODUCT_IDS = ["2084517420358029314"]; // <-- Apni IDs yahan dalein
 
 export async function GET() {
   try {
@@ -35,6 +35,7 @@ export async function GET() {
 
       if (!productDetail) continue;
 
+      // Images Extract
       let rawImages: string[] = [];
       if (productDetail.productImage) rawImages.push(productDetail.productImage);
       if (productDetail.bigImage) rawImages.push(productDetail.bigImage);
@@ -50,28 +51,45 @@ export async function GET() {
       const mainImage = uniqueImages[0] || "";
       const galleryImages = uniqueImages.slice(0, 6); 
 
-      // 🔥 VARIANTS FIX: Color aur Size ko alag karna
+      // 🔥 SMART VARIANTS FIX 🔥
       let variantsData: any[] = [];
       if (productDetail.variants && Array.isArray(productDetail.variants)) {
         variantsData = productDetail.variants.map((v: any) => {
-          let color = v.variantKey || v.variantName || "Default";
-          let size = v.variantValue || v.variantSku || "One Size";
+          let rawKey = (v.variantKey || v.variantName || "").trim();
+          let rawValue = (v.variantValue || v.variantSku || "").trim();
+          
+          let color = rawKey || "Default";
+          let size = "One Size";
 
-          // Agar color ke andar size mila hua hai (e.g., "Black-M")
-          if (color.includes("-")) {
-            const parts = color.split("-");
-            const lastPart = parts[parts.length - 1].toUpperCase();
-            if (["S", "M", "L", "XL", "XXL", "3XL", "4XL"].includes(lastPart) || !isNaN(Number(lastPart))) {
-              size = lastPart;
-              color = parts.slice(0, -1).join("-");
-            }
+          // Size detect karne ka regex (S, M, L, XL, 2XL, 3XL)
+          const sizeRegex = /(XXS|XS|S|M|L|XL|XXL|3XL|4XL|5XL|6XL)/i;
+          
+          const keyMatch = rawKey.match(sizeRegex);
+          const valMatch = rawValue.match(sizeRegex);
+
+          if (keyMatch) {
+            // Agar "Black-M" jaisa hai
+            size = keyMatch[0].toUpperCase();
+            color = rawKey.replace(sizeRegex, "").replace(/[-_\s]+$/, "").trim();
+          } else if (valMatch) {
+            // Agar "Brown" aur "2XL" alag hain
+            size = valMatch[0].toUpperCase();
+            color = rawKey;
+          } else if (/^\d{2}$/.test(rawValue)) {
+            // Agar size number mein hai (e.g., 40, 42)
+            size = rawValue;
+            color = rawKey;
           }
+
+          // Color ko saaf karein
+          color = color.replace(/[-_\s]+$/, "").replace(/^(Color|Size):\s*/i, "").trim();
+          if (!color) color = "Default";
 
           return {
             vid: v.vid,
-            color: color.trim(),
-            size: size.trim(),
-            image: v.variantImage ? encodeURI(v.variantImage) : mainImage,
+            color: color,
+            size: size,
+            image: v.variantImage ? encodeURI(v.variantImage) : "",
           };
         });
       }
