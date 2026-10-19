@@ -13,10 +13,10 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({ containScroll: "keepSnaps", dragFree: true });
 
   useEffect(() => {
-    // 🔥 URL PROXY LOGIC
+    // 🔥 MAGIC: Har image ko CDN proxy ke zariye process karein
     const processedImages = (images || []).map(img => {
       if (img && (img.includes("aliyuncs.com") || img.includes("cjdropshipping.com"))) {
-        return `/api/proxy-image?url=${encodeURIComponent(img)}`;
+        return `https://wsrv.nl/?url=${encodeURIComponent(img)}`;
       }
       return img;
     }).filter(img => img && img.trim() !== "");
