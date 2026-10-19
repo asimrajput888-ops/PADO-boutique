@@ -9,6 +9,20 @@ import { useParams } from "next/navigation";
 import { useCurrency } from "@/context/currency-context";
 import { supabase } from "@/lib/supabase";
 
+// 🔥 Helper function jo "Black-M" ko "Black" banadega
+const getCleanColor = (colorStr: string) => {
+  if (!colorStr) return "Default";
+  const parts = colorStr.split("-");
+  if (parts.length > 1) {
+    const lastPart = parts[parts.length - 1].toUpperCase();
+    // Agar aakhri hissa size lag raha hai (S, M, L, XL, ya number)
+    if (["S", "M", "L", "XL", "XXL", "3XL", "4XL"].includes(lastPart) || !isNaN(Number(lastPart))) {
+      return parts.slice(0, -1).join("-"); // Size ko hata kar sirf Color return karo
+    }
+  }
+  return colorStr;
+};
+
 function ReadyToWearProductContent() {
   const params = useParams();
   const id = params?.id as string;
@@ -34,7 +48,7 @@ function ReadyToWearProductContent() {
         
         // Auto-select first color
         if (data.variants && data.variants.length > 0) {
-          const uniqueColors = Array.from(new Set(data.variants.map((v: any) => v.color)));
+          const uniqueColors = Array.from(new Set(data.variants.map((v: any) => getCleanColor(v.color))));
           if (uniqueColors.length > 0) {
             handleColorSelect(uniqueColors[0] as string, data);
           }
@@ -45,15 +59,15 @@ function ReadyToWearProductContent() {
     fetchModel();
   }, [id]);
 
-  const handleColorSelect = (color: string, dataToUse = model) => {
-    setSelectedColor(color);
+  const handleColorSelect = (cleanColor: string, dataToUse = model) => {
+    setSelectedColor(cleanColor);
     
-    // Sizes filter karein
-    const sizesForColor = dataToUse.variants.filter((v: any) => v.color === color).map((v: any) => v.size);
+    // Sirf us color ke saare variants nikalein
+    const variantsForColor = dataToUse.variants.filter((v: any) => getCleanColor(v.color) === cleanColor);
+    const sizesForColor = variantsForColor.map((v: any) => v.size);
     setAvailableSizes(Array.from(new Set(sizesForColor)) as string[]);
     
-    // Variant ki picture set karein
-    const variantWithImage = dataToUse.variants.find((v: any) => v.color === color && v.image);
+    const variantWithImage = variantsForColor.find((v: any) => v.image);
     if (variantWithImage) setDisplayImage(variantWithImage.image);
     else setDisplayImage(dataToUse.image_url);
 
@@ -70,7 +84,7 @@ function ReadyToWearProductContent() {
         customer_name: contact.name, customer_email: contact.email, customer_phone: contact.phone,
         customer_country: contact.country, shipping_address: { ...contact },
         fit_type: "standard", 
-        standard_size: `${selectedColor} - ${selectedVariant.size}`,
+        standard_size: `${selectedColor} - ${selectedVariant.size}`, // Yahan "Black - M" jayega
         cj_vid: selectedVariant.vid, 
         model_id: String(model.id), model_name: model.name, category: model.category || "men", product_type: model.product_type || "suit",
         measurements: null, fabric_id: null, fabric_name: null, total_price: model.price,
@@ -87,11 +101,11 @@ function ReadyToWearProductContent() {
   if (loading) return <div className="min-h-screen flex items-center justify-center font-serif text-xl">Loading...</div>;
   if (!model) return <div className="min-h-screen flex items-center justify-center font-serif text-2xl">Product Not Found</div>;
 
-  // 🔥 Gallery ke liye images array (pehle display image, phir baaki)
   const galleryImages: string[] = model?.images?.length > 0 ? model.images : model?.image_url ? [model.image_url] : [];
   const allImages = [displayImage, ...galleryImages.filter((img: string) => img !== displayImage)];
   
-  const uniqueColors = model.variants ? Array.from(new Set(model.variants.map((v: any) => v.color))) : [];
+  // 🔥 Unique Colors nikaalte waqt bhi Clean function use karein
+  const uniqueColors = model.variants ? Array.from(new Set(model.variants.map((v: any) => getCleanColor(v.color)))) : [];
 
   return (
     <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
@@ -135,7 +149,8 @@ function ReadyToWearProductContent() {
               <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Size *</p>
               <div className="flex flex-wrap gap-3">
                 {availableSizes.length > 0 ? availableSizes.map((size) => {
-                  const variantObj = model.variants.find((v: any) => v.color === selectedColor && v.size === size);
+                  // 🔥 Sahi variant dhundhne ke liye clean color use karein
+                  const variantObj = model.variants.find((v: any) => getCleanColor(v.color) === selectedColor && v.size === size);
                   return (
                     <button 
                       key={size} 
