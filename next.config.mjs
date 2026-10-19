@@ -13,18 +13,17 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.supabase.co",
       },
-      // CJ Dropshipping ke images allow karne ke liye
       {
         protocol: "https",
-        hostname: "cf.cjdropshipping.com",
+        hostname: "**.cjdropshipping.com", // CJ ke saare subdomains allow karega
       },
       {
         protocol: "https",
-        hostname: "oss-cf.cjdropshipping.com",
+        hostname: "**.alicdn.com", // 1688 aur Alibaba ke images ke liye
       },
       {
         protocol: "https",
-        hostname: "cbu01.alicdn.com", // 1688 ke images ke liye (future proofing)
+        hostname: "**.alicdn.com",
       }
     ],
   },
