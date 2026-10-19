@@ -14,8 +14,8 @@ export async function GET() {
     const authData = await authRes.json();
     const token = authData.data.accessToken;
 
-    // Hum abhi "women suit" search kar rahe hain taake products aayen
-    const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=20&keyWord=suit`;
+    // Hum list API se products utha rahe hain (10 products for testing)
+    const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=10&keyWord=suit`;
     const productsRes = await fetch(url, {
       method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
     });
@@ -32,29 +32,44 @@ export async function GET() {
     let errors: any[] = [];
 
     for (const p of cjProducts) {
-      const productName = p.nameEn || p.name || "Premium Suit";
+      const pid = p.id || p.pid;
+
+      // 1. HAR PRODUCT KI DETAIL API CALL (Taake saari pictures milein)
+      const detailRes = await fetch(`https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`, {
+        method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
+      });
+      const detailData = await detailRes.json();
       
-      // 1. Title ko chhota aur clean karein (sirf pehle 50 characters)
+      const productDetail = detailData.data;
+      
+      // Agar detail API fail ho jaye toh list wali image use karein
+      let imageArray = productDetail?.productImageSet || [];
+      if (imageArray.length === 0 && p.bigImage) {
+        imageArray = [p.bigImage];
+      }
+
+      const productName = p.nameEn || p.name || "Premium Suit";
       const cleanTitle = productName.length > 50 ? productName.substring(0, 50).trim() + "..." : productName;
 
-      // 2. Auto-detect Gender (Agar naam mein women/dress/skirt hai toh women, warna men)
+      // 2. Gender Detection
       const lowerName = productName.toLowerCase();
-      const isWomen = lowerName.includes("women") || lowerName.includes("dress") || lowerName.includes("skirt") || lowerName.includes("blouse");
+      const isWomen = lowerName.includes("women") || lowerName.includes("dress") || lowerName.includes("skirt") || lowerName.includes("blouse") || lowerName.includes("female");
       const category = isWomen ? "women" : "men";
 
-      // 3. PRICE MARKUP (CJ Price ka 4.5x)
+      // 3. Price Markup (4.5x)
       const cjPrice = Number(p.sellPrice) || 0;
       const finalSellingPrice = Math.ceil(cjPrice * 4.5); 
 
       const productToSave = {
         name: cleanTitle,
-        price: finalSellingPrice, // Naya markup wala price
-        image_url: p.bigImage || "",
-        description: p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.",
+        price: finalSellingPrice, 
+        image_url: imageArray[0] || "", // Pehli image main image ke liye
+        images: imageArray, // JSON Array (6-8 pictures)
+        description: productDetail?.description || p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.",
         supplier: "cj", 
-        category: category, // Ab sahi category mein jayega
+        category: category, 
         product_type: "suit",
-        cj_product_id: String(p.id || p.pid), 
+        cj_product_id: String(pid), 
       };
 
       const { error } = await supabase
@@ -62,7 +77,7 @@ export async function GET() {
         .upsert(productToSave, { onConflict: "cj_product_id" });
 
       if (error) {
-        errors.push({ id: p.id, error: error.message });
+        errors.push({ id: pid, error: error.message });
       } else {
         syncedCount++;
       }
@@ -70,7 +85,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      message: `Synced ${syncedCount} products.`,
+      message: `Synced ${syncedCount} products with multiple images.`,
       errors: errors.length > 0 ? errors : "No errors"
     });
 
