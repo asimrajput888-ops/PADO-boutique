@@ -23,8 +23,13 @@ export function ProductCard({ product, category }: ProductCardProps) {
   const { formatPrice } = useCurrency();
   const [imageError, setImageError] = useState(false);
 
-  // Image URL logic
+  // Main Image URL
   let imageSrc = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "");
+
+  // 🔥 MAGIC: Agar image aliyuncs ya cjdropshipping se hai, toh proxy use karo
+  if (imageSrc && (imageSrc.includes("aliyuncs.com") || imageSrc.includes("cjdropshipping.com"))) {
+    imageSrc = `/api/proxy-image?url=${encodeURIComponent(imageSrc)}`;
+  }
 
   const isReadyToWear = ["cj", "1688"].includes(product.supplier?.toLowerCase() || "");
 
@@ -36,7 +41,6 @@ export function ProductCard({ product, category }: ProductCardProps) {
     <Link href={href} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden bg-brand-cream mb-4">
         
-        {/* Image or Placeholder */}
         {!imageSrc || imageError ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-cream text-brand-slate p-4 text-center">
             <span className="font-serif text-2xl mb-2">PADO</span>
@@ -55,12 +59,6 @@ export function ProductCard({ product, category }: ProductCardProps) {
           <span className={`text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 font-medium ${isReadyToWear ? "bg-white/90 text-brand-charcoal" : "bg-brand-charcoal/90 text-white"}`}>
             {isReadyToWear ? "Ready to Wear" : "Made to Measure"}
           </span>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
-          <div className="bg-white/95 backdrop-blur-sm text-brand-charcoal text-center py-3 text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-brand-charcoal hover:text-white transition-colors">
-            {isReadyToWear ? "Select Size" : "Begin Order"}
-          </div>
         </div>
       </div>
 
