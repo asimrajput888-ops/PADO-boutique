@@ -3,6 +3,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useCurrency } from "@/context/currency-context";
 
 interface ProductCardProps {
@@ -20,7 +21,11 @@ interface ProductCardProps {
 
 export function ProductCard({ product, category }: ProductCardProps) {
   const { formatPrice } = useCurrency();
-  const mainImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "/placeholder.jpg");
+  const [imageError, setImageError] = useState(false);
+
+  // Image URL logic
+  let imageSrc = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "");
+
   const isReadyToWear = ["cj", "1688"].includes(product.supplier?.toLowerCase() || "");
 
   let href = `/custom/${category === "shop" ? "men" : category}/${product.id}`;
@@ -31,13 +36,20 @@ export function ProductCard({ product, category }: ProductCardProps) {
     <Link href={href} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden bg-brand-cream mb-4">
         
-        {/* NORMAL IMG TAG (No domain errors) */}
-        <img
-          src={mainImage}
-          alt={product.name}
-          className="object-cover object-center absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-          onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x600?text=No+Image"; }}
-        />
+        {/* Image or Placeholder */}
+        {!imageSrc || imageError ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-cream text-brand-slate p-4 text-center">
+            <span className="font-serif text-2xl mb-2">PADO</span>
+            <span className="text-[10px] uppercase tracking-widest">Image Coming Soon</span>
+          </div>
+        ) : (
+          <img
+            src={imageSrc}
+            alt={product.name}
+            className="object-cover object-center absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+            onError={() => setImageError(true)}
+          />
+        )}
 
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <span className={`text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 font-medium ${isReadyToWear ? "bg-white/90 text-brand-charcoal" : "bg-brand-charcoal/90 text-white"}`}>
