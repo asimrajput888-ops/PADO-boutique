@@ -8,17 +8,20 @@ export async function GET() {
     const apiKey = process.env.CJ_API_KEY;
     if (!apiKey) return NextResponse.json({ error: "CJ_API_KEY is missing" }, { status: 500 });
 
-    // 1. Access Token
+    // 1. Access Token generate karein
     const authRes = await fetch("https://developers.cjdropshipping.com/api2.0/v1/authentication/getAccessToken", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ apiKey }),
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ apiKey }),
     });
     const authData = await authRes.json();
     const token = authData.data.accessToken;
 
-    // 2. CJ API Call
+    // 2. CJ API Call (Suit search)
     const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=20&keyWord=suit`;
     const productsRes = await fetch(url, {
-      method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
+      method: "GET", 
+      headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
     });
     const productsData = await productsRes.json();
 
@@ -29,7 +32,9 @@ export async function GET() {
       });
     }
 
-    if (cjProducts.length === 0) return NextResponse.json({ success: false, message: "No products found" });
+    if (cjProducts.length === 0) {
+      return NextResponse.json({ success: false, message: "No products found" });
+    }
 
     let syncedCount = 0;
     let errors: any[] = [];
@@ -38,13 +43,14 @@ export async function GET() {
     for (const p of cjProducts) {
       const productToSave = {
         name: p.nameEn || p.name || "CJ Suit",
-        price: parseFloat(p.sellPrice) || 0,
+        // Price ko Number mein convert kar rahe hain taake decimal (43.12) sahi save ho
+        price: Number(p.sellPrice) || 0, 
         image_url: p.bigImage || "",
         description: p.description || "Premium Ready to Wear Suit",
         supplier: "cj", 
         category: "men", 
         product_type: "suit",
-        cj_product_id: String(p.id || p.pid), // Ensure ID string format mein ho
+        cj_product_id: String(p.id || p.pid), 
       };
 
       const { error } = await supabase
@@ -52,7 +58,7 @@ export async function GET() {
         .upsert(productToSave, { onConflict: "cj_product_id" });
 
       if (error) {
-        // Agar error aaye toh usko list mein save karein
+        console.error("Supabase Error for Product ID", p.id, ":", error.message);
         errors.push({ 
           cj_product_id: p.id, 
           error_message: error.message, 
@@ -64,15 +70,11 @@ export async function GET() {
       }
     }
 
-    // 4. Result return karein (Errors ke sath)
+    // 4. Result return karein
     return NextResponse.json({
       success: true,
-      message: `Synced ${syncedCount} products.`,
-      totalFound: cjProducts.length,
-      // Agar 0 synced hue hain toh yeh array exact error batayega
-      errors: errors.length > 0 ? errors : "No errors found", 
-      // Pehla product kaisa dikh raha hai wo bhi print kar rahe hain
-      sample_payload: cjProducts[0] 
+      message: `Synced ${syncedCount} products out of ${cjProducts.length}.`,
+      errors: errors.length > 0 ? errors : "No errors found",
     });
 
   } catch (error: any) {
