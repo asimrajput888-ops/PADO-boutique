@@ -26,9 +26,9 @@ export function ProductCard({ product, category }: ProductCardProps) {
   // Main Image URL nikaalein
   let rawImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "");
 
-  // 🔥 MAGIC: Agar image CJ (aliyuncs) ki hai, toh Proxy CDN use karein
+  // 🔥 MAGIC CDN PROXY (Aliyun block fix)
   const imageSrc = (rawImage && (rawImage.includes("aliyuncs.com") || rawImage.includes("cjdropshipping.com")))
-    ? `https://wsrv.nl/?url=${encodeURIComponent(rawImage)}`
+    ? `https://images.weserv.nl/?url=${encodeURIComponent(rawImage)}`
     : rawImage;
 
   const isReadyToWear = ["cj", "1688"].includes(product.supplier?.toLowerCase() || "");
