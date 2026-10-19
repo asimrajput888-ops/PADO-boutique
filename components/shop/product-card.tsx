@@ -22,7 +22,7 @@ interface ProductCardProps {
 export function ProductCard({ product, category }: ProductCardProps) {
   const { formatPrice } = useCurrency();
 
-  // Main image nikalne ka logic (Agar image_url khali hai toh images array se uthayein)
+  // Main image nikalne ka logic
   const mainImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : "/placeholder.jpg");
 
   // Check karein ke product Ready-to-Wear (CJ/1688) hai ya Made-to-Measure
