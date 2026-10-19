@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    // Stripe Metadata limit (500 chars per key) ko dhyan mein rakhte hue data split kar rahe hain
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -23,12 +24,11 @@ export async function POST(req: NextRequest) {
               name: body.model_name,
               description: `Size: ${body.standard_size || "Custom"} | Fabric: ${body.fabric_name || "N/A"}`,
             },
-            unit_amount: Math.round(body.total_price * 100),
+            unit_amount: Math.round(body.total_price * 100), // Cents mein convert
           },
           quantity: 1,
         },
       ],
-      // 🔥 FIX: Order data ko alag-alag fields mein baant dein
       metadata: {
         customer_name: body.customer_name,
         customer_email: body.customer_email,
@@ -44,10 +44,13 @@ export async function POST(req: NextRequest) {
         total_price: String(body.total_price),
         currency: body.currency || "USD",
         notes: body.notes || "",
-        // Custom orders ke liye (agar zaroorat ho, inhe bhi chhote hisson mein baant sakte hain)
-        // measurements: JSON.stringify(body.measurements || {}), 
-        // fabric_id: String(body.fabric_id || ""),
-        // fabric_name: body.fabric_name || "",
+        
+        // 🔥 CJ KE LIYE SABSE ZAROORI FIELD
+        cj_vid: body.cj_vid || "", 
+        
+        // Custom orders ke liye (agar zaroorat ho)
+        fabric_id: body.fabric_id ? String(body.fabric_id) : "",
+        fabric_name: body.fabric_name || "",
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.padoshop.com"}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.padoshop.com"}/shop`,
