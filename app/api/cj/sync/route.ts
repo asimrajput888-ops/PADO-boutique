@@ -51,47 +51,65 @@ export async function GET() {
       const mainImage = uniqueImages[0] || "";
       const galleryImages = uniqueImages.slice(0, 6); 
 
-      // 🔥 SMART VARIANTS FIX 🔥
+      // 🔥 SMART VARIANTS & STOCK FIX 🔥
       let variantsData: any[] = [];
       if (productDetail.variants && Array.isArray(productDetail.variants)) {
-        variantsData = productDetail.variants.map((v: any) => {
+        for (const v of productDetail.variants) {
+          
+          // --- 1. STOCK CHECK LOGIC ---
+          let stock = 0;
+          if (typeof v.inventoryNum === 'number') {
+            stock = v.inventoryNum;
+          } else if (Array.isArray(v.inventory)) {
+            // Agar inventory ek array hai (multiple warehouses)
+            stock = v.inventory.reduce((acc: number, curr: any) => acc + (curr.totalInventory || curr.warehouseInventory || 0), 0);
+          } else if (typeof v.inventory === 'number') {
+            stock = v.inventory;
+          }
+
+          // Agar stock 0 hai, toh is size/color ko skip kar do
+          if (stock <= 0) continue; 
+
+          // --- 2. SIZE & COLOR SEPARATION LOGIC ---
           let rawKey = (v.variantKey || v.variantName || "").trim();
           let rawValue = (v.variantValue || v.variantSku || "").trim();
           
           let color = rawKey || "Default";
           let size = "One Size";
 
-          // Size detect karne ka regex (S, M, L, XL, 2XL, 3XL)
           const sizeRegex = /(XXS|XS|S|M|L|XL|XXL|3XL|4XL|5XL|6XL)/i;
           
           const keyMatch = rawKey.match(sizeRegex);
           const valMatch = rawValue.match(sizeRegex);
 
           if (keyMatch) {
-            // Agar "Black-M" jaisa hai
             size = keyMatch[0].toUpperCase();
             color = rawKey.replace(sizeRegex, "").replace(/[-_\s]+$/, "").trim();
           } else if (valMatch) {
-            // Agar "Brown" aur "2XL" alag hain
             size = valMatch[0].toUpperCase();
             color = rawKey;
           } else if (/^\d{2}$/.test(rawValue)) {
-            // Agar size number mein hai (e.g., 40, 42)
             size = rawValue;
             color = rawKey;
           }
 
-          // Color ko saaf karein
           color = color.replace(/[-_\s]+$/, "").replace(/^(Color|Size):\s*/i, "").trim();
           if (!color) color = "Default";
 
-          return {
+          variantsData.push({
             vid: v.vid,
             color: color,
             size: size,
             image: v.variantImage ? encodeURI(v.variantImage) : "",
-          };
-        });
+            stock: stock // Debugging ke liye stock save kar rahe hain
+          });
+        }
+      }
+
+      // Agar saare variants out of stock hain, toh product hi save mat karo
+      if (variantsData.length === 0) {
+        console.log(`Skipping product ${pid} - All variants out of stock.`);
+        continue;
       }
 
       const rawName = productDetail.productNameEn || productDetail.productName || "Exclusive Suit";
@@ -123,7 +141,7 @@ export async function GET() {
       if (!error) syncedCount++;
     }
 
-    return NextResponse.json({ success: true, message: `Synced ${syncedCount} perfect products.` });
+    return NextResponse.json({ success: true, message: `Synced ${syncedCount} products with active stock.` });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
