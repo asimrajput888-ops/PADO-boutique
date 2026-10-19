@@ -18,7 +18,6 @@ function ReadyToWearProductContent() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Variants State
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
@@ -33,7 +32,7 @@ function ReadyToWearProductContent() {
         setModel(data);
         setDisplayImage(data.image_url);
         
-        // Auto-select first color if variants exist
+        // Auto-select first color
         if (data.variants && data.variants.length > 0) {
           const uniqueColors = Array.from(new Set(data.variants.map((v: any) => v.color)));
           if (uniqueColors.length > 0) {
@@ -48,16 +47,17 @@ function ReadyToWearProductContent() {
 
   const handleColorSelect = (color: string, dataToUse = model) => {
     setSelectedColor(color);
-    // Filter sizes for this color
+    
+    // Sizes filter karein
     const sizesForColor = dataToUse.variants.filter((v: any) => v.color === color).map((v: any) => v.size);
     setAvailableSizes(Array.from(new Set(sizesForColor)) as string[]);
     
-    // Change image if variant has specific image
+    // Variant ki picture set karein
     const variantWithImage = dataToUse.variants.find((v: any) => v.color === color && v.image);
     if (variantWithImage) setDisplayImage(variantWithImage.image);
     else setDisplayImage(dataToUse.image_url);
 
-    setSelectedVariant(null); // Reset size selection
+    setSelectedVariant(null); 
   };
 
   const handleSubmit = async () => {
@@ -71,7 +71,7 @@ function ReadyToWearProductContent() {
         customer_country: contact.country, shipping_address: { ...contact },
         fit_type: "standard", 
         standard_size: `${selectedColor} - ${selectedVariant.size}`,
-        cj_vid: selectedVariant.vid, // 🔥 CJ ko order bhejne ke liye ye zaroori hai
+        cj_vid: selectedVariant.vid, 
         model_id: String(model.id), model_name: model.name, category: model.category || "men", product_type: model.product_type || "suit",
         measurements: null, fabric_id: null, fabric_name: null, total_price: model.price,
         currency: "USD", notes: "Ready to Wear Order",
@@ -87,7 +87,10 @@ function ReadyToWearProductContent() {
   if (loading) return <div className="min-h-screen flex items-center justify-center font-serif text-xl">Loading...</div>;
   if (!model) return <div className="min-h-screen flex items-center justify-center font-serif text-2xl">Product Not Found</div>;
 
+  // 🔥 Gallery ke liye images array (pehle display image, phir baaki)
   const galleryImages: string[] = model?.images?.length > 0 ? model.images : model?.image_url ? [model.image_url] : [];
+  const allImages = [displayImage, ...galleryImages.filter((img: string) => img !== displayImage)];
+  
   const uniqueColors = model.variants ? Array.from(new Set(model.variants.map((v: any) => v.color))) : [];
 
   return (
@@ -97,8 +100,7 @@ function ReadyToWearProductContent() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           <div>
-            {/* Main Image ke sath gallery, image dynamic hai */}
-            <ProductGallery images={[displayImage, ...galleryImages.filter(img => img !== displayImage)]} name={model.name} />
+            <ProductGallery images={allImages} name={model.name} />
           </div>
 
           <div className="lg:sticky lg:top-32 h-fit">
@@ -107,7 +109,7 @@ function ReadyToWearProductContent() {
             <p className="text-2xl font-serif text-ink mb-10">{formatPrice(model.price)}</p>
             
             <div className="mb-10">
-              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border">{model.description}</p>
+              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border max-h-64 overflow-y-auto">{model.description}</p>
             </div>
 
             {/* Color Selector */}
