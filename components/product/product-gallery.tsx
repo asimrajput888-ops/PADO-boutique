@@ -39,15 +39,16 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
                 src={img}
                 alt={`${name} - ${index + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).src = "https://via.placeholder.com/800x1000?text=No+Image"; }}
+                // Agar image load na ho toh usko hide kar do
+                onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
               />
             </div>
           ))}
         </div>
         {images.length > 1 && (
           <div className="absolute inset-0 flex items-center justify-between p-4 pointer-events-none">
-            <button onClick={() => emblaMainApi?.scrollPrev()} className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center pointer-events-auto">←</button>
-            <button onClick={() => emblaMainApi?.scrollNext()} className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center pointer-events-auto">→</button>
+            <button onClick={() => emblaMainApi?.scrollPrev()} className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center pointer-events-auto hover:bg-white">←</button>
+            <button onClick={() => emblaMainApi?.scrollNext()} className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center pointer-events-auto hover:bg-white">→</button>
           </div>
         )}
       </div>
