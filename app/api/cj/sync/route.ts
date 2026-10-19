@@ -20,73 +20,80 @@ export async function GET() {
     const authData = await authRes.json();
     const token = authData.data.accessToken;
 
-    const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=20&keyWord=suit`;
-    const productsRes = await fetch(url, {
-      method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
-    });
-    const productsData = await productsRes.json();
-
-    let cjProducts: any[] = [];
-    if (productsData.data && productsData.data.content) {
-      productsData.data.content.forEach((page: any) => {
-        if (page.productList) cjProducts = cjProducts.concat(page.productList);
-      });
-    }
-
     let syncedCount = 0;
     let errors: any[] = [];
 
-    for (const p of cjProducts) {
-      const pid = p.id || p.pid;
+    // Hamein dono categories ke liye alag search karna hai
+    const searchQueries = [
+      { keyword: "women suit", category: "women" },
+      { keyword: "men suit", category: "men" }
+    ];
 
-      const detailRes = await fetch(`https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`, {
+    for (const query of searchQueries) {
+      const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=10&keyWord=${encodeURIComponent(query.keyword)}`;
+      const productsRes = await fetch(url, {
         method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
       });
-      const detailData = await detailRes.json();
-      const productDetail = detailData.data;
-      
-      // SAARI PICTURES NIKALEIN (Max 6)
-      let imageArray = productDetail?.productImageSet || [];
-      if (imageArray.length === 0 && p.bigImage) imageArray = [p.bigImage];
-      
-      const mainImage = imageArray[0] || p.bigImage || "";
-      const galleryImages = imageArray.slice(0, 6); // 6 pictures tak allow kiya
+      const productsData = await productsRes.json();
 
-      const productName = p.nameEn || p.name || "Premium Suit";
-      const cleanTitle = productName.length > 45 ? productName.substring(0, 45).trim() + "..." : productName;
+      let cjProducts: any[] = [];
+      if (productsData.data && productsData.data.content) {
+        productsData.data.content.forEach((page: any) => {
+          if (page.productList) cjProducts = cjProducts.concat(page.productList);
+        });
+      }
 
-      // STRONG WOMEN DETECTION (Agar title mein ye words hain toh Women)
-      const lowerName = productName.toLowerCase();
-      const womenKeywords = ["women", "female", "lady", "ladies", "dress", "skirt", "blouse", "bra", "top", "peplum", "tunic"];
-      const isWomen = womenKeywords.some(keyword => lowerName.includes(keyword));
-      const category = isWomen ? "women" : "men";
+      for (const p of cjProducts) {
+        const pid = p.id || p.pid;
 
-      const cjPrice = Number(p.sellPrice) || 0;
-      const finalSellingPrice = Math.ceil(cjPrice * 4.5); 
+        // Detail API call
+        const detailRes = await fetch(`https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`, {
+          method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
+        });
+        const detailData = await detailRes.json();
+        const productDetail = detailData.data;
+        
+        let imageArray = productDetail?.productImageSet || [];
+        if (imageArray.length === 0 && p.bigImage) imageArray = [p.bigImage];
+        
+        const mainImage = imageArray[0] || p.bigImage || "";
+        const galleryImages = imageArray.slice(0, 6); // 6 pictures
 
-      const rawDescription = productDetail?.description || p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.";
-      let cleanDescription = stripHtml(rawDescription);
-      // Description ko chhota rakhein taake page clean lage
-      cleanDescription = cleanDescription.substring(0, 300) + "..."; 
+        const productName = p.nameEn || p.name || "Premium Suit";
+        const cleanTitle = productName.length > 45 ? productName.substring(0, 45).trim() + "..." : productName;
 
-      const productToSave = {
-        name: cleanTitle,
-        price: finalSellingPrice, 
-        image_url: mainImage, 
-        images: galleryImages, 
-        description: cleanDescription, 
-        supplier: "cj", 
-        category: category, 
-        product_type: "suit",
-        cj_product_id: String(pid), 
-      };
+        const cjPrice = Number(p.sellPrice) || 0;
+        const finalSellingPrice = Math.ceil(cjPrice * 4.5); 
 
-      const { error } = await supabase
-        .from("models")
-        .upsert(productToSave, { onConflict: "cj_product_id" });
+        // Description nikalne ka behtar tarika
+        let rawDescription = productDetail?.description || "";
+        
+        // Agar CJ ne description nahi di hai, toh ek achi si default description likh do
+        if (!rawDescription || rawDescription.trim() === "") {
+          rawDescription = `Elevate your wardrobe with this premium ${cleanTitle}. Crafted with high-quality fabric for a perfect fit and elegant look. Ideal for formal events, office wear, and special occasions.`;
+        } else {
+          rawDescription = stripHtml(rawDescription).substring(0, 400) + "...";
+        }
 
-      if (error) errors.push({ id: pid, error: error.message });
-      else syncedCount++;
+        const productToSave = {
+          name: cleanTitle,
+          price: finalSellingPrice, 
+          image_url: mainImage, 
+          images: galleryImages, 
+          description: rawDescription, 
+          supplier: "cj", 
+          category: query.category, // Ab category direct search ke hisaab se set hogi
+          product_type: "suit",
+          cj_product_id: String(pid), 
+        };
+
+        const { error } = await supabase
+          .from("models")
+          .upsert(productToSave, { onConflict: "cj_product_id" });
+
+        if (error) errors.push({ id: pid, error: error.message });
+        else syncedCount++;
+      }
     }
 
     return NextResponse.json({ success: true, message: `Synced ${syncedCount} products.`, errors });
