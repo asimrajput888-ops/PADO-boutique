@@ -3,6 +3,12 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+// HTML tags remove karne ka function
+function stripHtml(html: string) {
+  if (!html) return "";
+  return html.replace(/<[^>]*>?/gm, '').trim();
+}
+
 export async function GET() {
   try {
     const apiKey = process.env.CJ_API_KEY;
@@ -14,8 +20,7 @@ export async function GET() {
     const authData = await authRes.json();
     const token = authData.data.accessToken;
 
-    // Hum list API se products utha rahe hain (10 products for testing)
-    const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=10&keyWord=suit`;
+    const url = `https://developers.cjdropshipping.com/api2.0/v1/product/listV2?page=1&size=15&keyWord=suit`;
     const productsRes = await fetch(url, {
       method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
     });
@@ -34,38 +39,42 @@ export async function GET() {
     for (const p of cjProducts) {
       const pid = p.id || p.pid;
 
-      // 1. HAR PRODUCT KI DETAIL API CALL (Taake saari pictures milein)
       const detailRes = await fetch(`https://developers.cjdropshipping.com/api2.0/v1/product/query?pid=${pid}`, {
         method: "GET", headers: { "CJ-Access-Token": token, "Content-Type": "application/json" },
       });
       const detailData = await detailRes.json();
-      
       const productDetail = detailData.data;
       
-      // Agar detail API fail ho jaye toh list wali image use karein
+      // Pictures ka logic (Max 3 pictures taake gandagi na ho)
       let imageArray = productDetail?.productImageSet || [];
-      if (imageArray.length === 0 && p.bigImage) {
-        imageArray = [p.bigImage];
-      }
+      if (imageArray.length === 0 && p.bigImage) imageArray = [p.bigImage];
+      
+      // Main image hamesha pehli image hogi
+      const mainImage = imageArray[0] || p.bigImage || "";
+      // Sirf aglay 2 pictures uthayen taake gallery mein mix-up na ho
+      const galleryImages = imageArray.slice(0, 3); 
 
       const productName = p.nameEn || p.name || "Premium Suit";
       const cleanTitle = productName.length > 50 ? productName.substring(0, 50).trim() + "..." : productName;
 
-      // 2. Gender Detection
+      // Category detection (Sirf 'women' word dekh kar women mein dalega)
       const lowerName = productName.toLowerCase();
-      const isWomen = lowerName.includes("women") || lowerName.includes("dress") || lowerName.includes("skirt") || lowerName.includes("blouse") || lowerName.includes("female");
+      const isWomen = lowerName.includes("women") || lowerName.includes("female");
       const category = isWomen ? "women" : "men";
 
-      // 3. Price Markup (4.5x)
       const cjPrice = Number(p.sellPrice) || 0;
       const finalSellingPrice = Math.ceil(cjPrice * 4.5); 
+
+      // Description se HTML tags saaf karein
+      const rawDescription = productDetail?.description || p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.";
+      const cleanDescription = stripHtml(rawDescription).substring(0, 500); // 500 characters max
 
       const productToSave = {
         name: cleanTitle,
         price: finalSellingPrice, 
-        image_url: imageArray[0] || "", // Pehli image main image ke liye
-        images: imageArray, // JSON Array (6-8 pictures)
-        description: productDetail?.description || p.description || "Premium Ready to Wear Suit crafted with high-quality fabric.",
+        image_url: mainImage, 
+        images: galleryImages, 
+        description: cleanDescription + "...", 
         supplier: "cj", 
         category: category, 
         product_type: "suit",
@@ -85,7 +94,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      message: `Synced ${syncedCount} products with multiple images.`,
+      message: `Synced ${syncedCount} clean products.`,
       errors: errors.length > 0 ? errors : "No errors"
     });
 
