@@ -23,7 +23,9 @@ function ReadyToWearProductContent() {
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   const [displayImage, setDisplayImage] = useState<string>("");
 
-  const [contact, setContact] = useState({ name: "", email: "", phone: "", address1: "", address2: "", city: "", postalCode: "", country: "" });
+  const [contact, setContact] = useState({ 
+    name: "", email: "", phone: "", address1: "", address2: "", city: "", postalCode: "", country: "" 
+  });
 
   useEffect(() => {
     const fetchModel = async () => {
@@ -52,7 +54,7 @@ function ReadyToWearProductContent() {
     const sizesForColor = variantsForColor.map((v: any) => v.size);
     setAvailableSizes(Array.from(new Set(sizesForColor)) as string[]);
     
-    // Agar us color ki koi specific image hai toh dikhao
+    // Agar us color ki specific image hai toh dikhao
     const variantWithImage = variantsForColor.find((v: any) => v.image);
     if (variantWithImage) setDisplayImage(variantWithImage.image);
     else setDisplayImage(dataToUse.image_url);
@@ -62,26 +64,56 @@ function ReadyToWearProductContent() {
 
   const handleSubmit = async () => {
     if (!selectedVariant) return alert("Please select a size.");
-    if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) return alert("Please fill all required shipping fields");
+    if (!contact.name || !contact.email || !contact.address1 || !contact.city || !contact.country) {
+      return alert("Please fill all required shipping fields");
+    }
     
     setSubmitting(true);
     try {
       const payload = {
-        customer_name: contact.name, customer_email: contact.email, customer_phone: contact.phone,
-        customer_country: contact.country, shipping_address: { ...contact },
+        customer_name: contact.name, 
+        customer_email: contact.email, 
+        customer_phone: contact.phone,
+        customer_country: contact.country, 
+        shipping_address: { ...contact },
         fit_type: "standard", 
         standard_size: `${selectedColor} - ${selectedVariant.size}`,
+        
+        // 🔥 SABSE ZAROORI: CJ VARIANT ID YAHAN SE JA RAHI HAI
         cj_vid: selectedVariant.vid, 
-        model_id: String(model.id), model_name: model.name, category: model.category || "men", product_type: model.product_type || "suit",
-        measurements: null, fabric_id: null, fabric_name: null, total_price: model.price,
-        currency: "USD", notes: "Ready to Wear Order",
+        
+        model_id: String(model.id), 
+        model_name: model.name, 
+        category: model.category || "men", 
+        product_type: model.product_type || "suit",
+        measurements: null, 
+        fabric_id: null, 
+        fabric_name: null, 
+        total_price: model.price,
+        currency: "USD", 
+        notes: "Ready to Wear Order",
       };
 
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const res = await fetch("/api/checkout", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify(payload) 
+      });
+      
       const data = await res.json();
+      
       if (!res.ok) throw new Error(data.error || "Failed to initiate checkout");
-      if (data.url) window.location.href = data.url;
-    } catch (err: any) { alert("Error: " + err.message); } finally { setSubmitting(false); }
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL returned from server");
+      }
+    } catch (err: any) { 
+      alert("Error: " + err.message); 
+    } finally { 
+      setSubmitting(false); 
+    }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center font-serif text-xl">Loading...</div>;
@@ -94,26 +126,35 @@ function ReadyToWearProductContent() {
   return (
     <div className="min-h-screen bg-paper pt-32 pb-24 px-6 md:px-12">
       <div className="max-w-[1400px] mx-auto">
-        <Link href="/shop" className="text-[10px] uppercase text-stone mb-12 inline-flex items-center gap-2 hover:text-ink transition-colors"><span>←</span> Back to Ready to Wear</Link>
+        <Link href="/shop" className="text-[10px] uppercase text-stone mb-12 inline-flex items-center gap-2 hover:text-ink transition-colors">
+          <span>←</span> Back to Ready to Wear
+        </Link>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
+          
+          {/* Left: Image Gallery */}
           <div>
             <ProductGallery images={allImages} name={model.name} />
           </div>
 
+          {/* Right: Details & Form */}
           <div className="lg:sticky lg:top-32 h-fit">
             <p className="text-[10px] tracking-[0.5em] text-brand-gold uppercase mb-4">Ready to Wear</p>
             <h1 className="text-3xl md:text-5xl font-serif mb-4">{model.name}</h1>
             <p className="text-2xl font-serif text-ink mb-10">{formatPrice(model.price)}</p>
             
             <div className="mb-10">
-              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border max-h-64 overflow-y-auto">{model.description}</p>
+              <p className="text-sm text-stone leading-relaxed whitespace-pre-line bg-brand-cream p-6 border border-border max-h-64 overflow-y-auto">
+                {model.description}
+              </p>
             </div>
 
-            {/* Colors */}
+            {/* Color Selector */}
             {uniqueColors.length > 0 && (
               <div className="mb-8">
-                <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Color: <span className="text-brand-gold">{selectedColor}</span></p>
+                <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">
+                  Select Color: <span className="text-brand-gold">{selectedColor}</span>
+                </p>
                 <div className="flex flex-wrap gap-3">
                   {uniqueColors.map((color: any) => (
                     <button 
@@ -128,7 +169,7 @@ function ReadyToWearProductContent() {
               </div>
             )}
 
-            {/* Sizes */}
+            {/* Size Selector */}
             <div className="mb-10">
               <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-semibold text-ink">Select Size *</p>
               <div className="flex flex-wrap gap-3">
@@ -147,6 +188,7 @@ function ReadyToWearProductContent() {
               </div>
             </div>
 
+            {/* Shipping Form */}
             <div className="border-t border-border pt-8 mb-8">
               <p className="text-[10px] uppercase tracking-[0.2em] mb-6 font-semibold text-ink">Shipping Details</p>
               <div className="space-y-4">
@@ -161,7 +203,11 @@ function ReadyToWearProductContent() {
               </div>
             </div>
 
-            <button onClick={handleSubmit} disabled={!selectedVariant || submitting} className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+            <button 
+              onClick={handleSubmit} 
+              disabled={!selectedVariant || submitting} 
+              className="w-full bg-brand-charcoal text-white py-5 text-[11px] uppercase tracking-[0.3em] hover:bg-brand-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
               {submitting ? "Redirecting to Payment..." : `Buy Now — ${formatPrice(model.price)}`}
             </button>
           </div>
